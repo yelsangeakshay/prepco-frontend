@@ -1,5 +1,13 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { VerifyEmailPanel } from "@/features/auth/components/VerifyEmailPanel";
 
-export default function Page() {
-  return <ScreenPlaceholder code="E1" title="Verify email" />;
+export const metadata: Metadata = { title: "Verify email" };
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ email?: string }>;
+}) {
+  const { email } = await searchParams;
+  return <VerifyEmailPanel email={email} />;
 }

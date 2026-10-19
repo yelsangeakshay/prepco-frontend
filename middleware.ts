@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   isPublicPath,
   isRole,
+  ONBOARDED_COOKIE,
   ROLE_COOKIE,
   ROLE_HOME,
   roleForPath,
@@ -42,7 +43,8 @@ export function middleware(req: NextRequest) {
       res = redirect(ROLE_HOME[role]);
     } else if (
       role === "student" &&
-      scenario === "first-login" &&
+      ((scenario === "first-login" && req.cookies.get(ONBOARDED_COOKIE)?.value !== "1") ||
+        req.cookies.get(ONBOARDED_COOKIE)?.value === "0") &&
       !pathname.startsWith("/onboarding")
     ) {
       res = redirect(ROUTES.student.onboarding(1));

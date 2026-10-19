@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { ForgotPasswordForm } from "@/features/auth/components/RecoveryForms";
+
+export const metadata: Metadata = { title: "Forgot password" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="E1" title="Forgot password" />;
+  return <ForgotPasswordForm />;
 }

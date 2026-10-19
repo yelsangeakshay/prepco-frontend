@@ -17,7 +17,7 @@ for (const role of ["student", "panelist", "ops"] as const) {
       for (const href of hrefs) {
         const res = await page.goto(href);
         expect(res?.status(), href).toBeLessThan(400);
-        await expect(page.locator("[data-testid=screen-placeholder]:visible"), href).toBeVisible();
+        await expect(page.locator("h1:visible").first(), href).toBeVisible();
       }
     });
 
@@ -26,10 +26,7 @@ for (const role of ["student", "panelist", "ops"] as const) {
       for (const s of SCREENS.filter((x) => x.access === role)) {
         const res = await page.goto(s.sample);
         expect(res?.status(), s.sample).toBeLessThan(400);
-        await expect(
-          page.locator("[data-testid=screen-placeholder]:visible"),
-          s.sample,
-        ).toContainText(s.title);
+        await expect(page.locator("h1:visible").first(), s.sample).toBeVisible();
       }
     });
   });
@@ -39,9 +36,7 @@ test("public routes render signed out", async ({ page }) => {
   for (const s of SCREENS.filter((x) => x.access === "public")) {
     const res = await page.goto(s.sample);
     expect(res?.status(), s.sample).toBeLessThan(400);
-    await expect(page.locator("[data-testid=screen-placeholder]:visible"), s.sample).toContainText(
-      s.title,
-    );
+    await expect(page.locator("h1:visible").first(), s.sample).toBeVisible();
   }
 });
 

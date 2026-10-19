@@ -2,6 +2,8 @@ export type Role = "student" | "panelist" | "ops";
 
 export const ROLE_COOKIE = "prepco_role";
 export const SCENARIO_COOKIE = "prepco_scenario";
+/** "0" = student has not finished onboarding. Absent or "1" = onboarded. */
+export const ONBOARDED_COOKIE = "prepco_onboarded";
 
 export const ROLES: readonly Role[] = ["student", "panelist", "ops"];
 

@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { SignUpForm } from "@/features/auth/components/SignUpForm";
+
+export const metadata: Metadata = { title: "Sign up" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="S1" title="Sign up" />;
+  return <SignUpForm />;
 }

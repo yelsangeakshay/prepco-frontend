@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { CvUpload } from "@/features/onboarding/components/CvUpload";
+
+export const metadata: Metadata = { title: "Upload your CV" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="E2" title="CV upload" />;
+  return <CvUpload />;
 }

@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { HomeView } from "@/features/runway/components/HomeView";
+
+export const metadata: Metadata = { title: "Home" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="S5" title="Home" />;
+  return <HomeView />;
 }

@@ -1,6 +1,9 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { SessionDetail } from "@/features/runway/components/SessionDetail";
+
+export const metadata: Metadata = { title: "Session" };
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const p = await params;
-  return <ScreenPlaceholder code="E6" title="Session detail" params={p} />;
+  const { id } = await params;
+  return <SessionDetail id={id} />;
 }

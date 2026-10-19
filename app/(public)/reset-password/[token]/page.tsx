@@ -1,6 +1,9 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { ResetPasswordForm } from "@/features/auth/components/RecoveryForms";
+
+export const metadata: Metadata = { title: "Reset password" };
 
 export default async function Page({ params }: { params: Promise<{ token: string }> }) {
-  const p = await params;
-  return <ScreenPlaceholder code="E1" title="Reset password" params={p} />;
+  const { token } = await params;
+  return <ResetPasswordForm token={token} />;
 }

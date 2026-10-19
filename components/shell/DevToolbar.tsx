@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Wrench } from "lucide-react";
 import {
+  ONBOARDED_COOKIE,
   ROLE_COOKIE,
   ROLE_HOME,
   ROLE_LABEL,
@@ -43,6 +44,7 @@ export function DevToolbar() {
   const onRole = (value: string) => {
     setRole(value);
     writeCookie(ROLE_COOKIE, value);
+    writeCookie(ONBOARDED_COOKIE, "");
     router.push(isRole(value) ? ROLE_HOME[value as Role] : ROUTES.signIn);
     router.refresh();
   };

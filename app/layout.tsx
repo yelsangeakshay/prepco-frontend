@@ -1,8 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Inter, Playfair_Display } from "next/font/google";
-import { DevToolbar } from "@/components/shell/DevToolbar";
+import dynamic from "next/dynamic";
 import { Providers } from "@/components/shell/Providers";
 import "./globals.css";
+
+// Dev-only: the import is eliminated from production builds.
+const DevToolbar =
+  process.env.NODE_ENV === "production"
+    ? () => null
+    : dynamic(() => import("@/components/shell/DevToolbar").then((m) => m.DevToolbar));
 
 const playfair = Playfair_Display({
   subsets: ["latin"],

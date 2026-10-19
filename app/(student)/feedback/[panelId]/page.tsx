@@ -1,6 +1,9 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { FeedbackDetailView } from "@/features/feedback/components/FeedbackViews";
+
+export const metadata: Metadata = { title: "Panel feedback" };
 
 export default async function Page({ params }: { params: Promise<{ panelId: string }> }) {
-  const p = await params;
-  return <ScreenPlaceholder code="S10" title="Panel feedback detail" params={p} />;
+  const { panelId } = await params;
+  return <FeedbackDetailView panelId={panelId} />;
 }
