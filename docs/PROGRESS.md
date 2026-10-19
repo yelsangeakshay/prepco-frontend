@@ -44,7 +44,7 @@ Not verified: visual match to `cover.png` (file absent). Gold text is not used o
 
 ## Phase 5: Panelist and Ops: done
 
-- Shared mock world (): 1,000 students (plans 212 / 312 / 41 / 435 free), 52 panelists in six functions, about 700 bookings, ledger, application queue. Riya's real sessions are merged in live, so one panel is the same record for student, ops and panelist
+- Shared mock world (mocks/world.ts): 1,000 students (plans 212 / 312 / 41 / 435 free), 52 panelists in six functions, about 700 bookings, ledger, application queue. Riya's real sessions are merged in live, so one panel is the same record for student, ops and panelist
 - Persistence: every mock write saves the world to sessionStorage before the response goes out (mocks/http.ts + mocks/persist.ts), so reloads and role switches keep state
 - Panelist: P1 apply and submitted, P2 today, P3 briefs and brief, P4 scoring list and live scoring (brief beside the form, verdict, note, send-back switch, local draft), P5 availability, profile
 - Ops: A1 overview (stat cards, needs attention, seat gauges, funnel, revenue chart, this week chart), A2 students (1,000 rows virtualised, filters, sort and paging in the URL) and detail with CV re-lock review, A3 assignment (load per function, unassigned queue with candidates, live sidebar badge), A4 bookings (unassigned and no-show tabs, excuse), A5 ledger, A6 roster (health, reminders, pause) and application queue
