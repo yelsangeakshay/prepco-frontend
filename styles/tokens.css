@@ -1,0 +1,45 @@
+/* Design tokens from design/mockups/cover.png (see PREPCO_UI_BUILD_PROMPT.md section 4). */
+:root {
+  --cream: #f5f2ea; /* page background */
+  --cream-soft: #efe9dc; /* inset panels, tip boxes */
+  --white: #ffffff; /* cards */
+  --navy-900: #0f1b2d; /* text, sidebar, hero card */
+  --navy-400: #6b7785; /* secondary text */
+  --maroon-600: #7c1f34; /* primary button, active nav, accent */
+  --maroon-700: #611829; /* hover */
+  --maroon-100: #f6e4e8; /* flagged badge bg */
+  --gold-500: #c0993d; /* Elite, Day 0 */
+  --gold-300: #e2c383; /* accent on navy */
+  --green-600: #2f7d4f; /* done */
+  --green-100: #e3f1e8;
+  --line: #e2dccd; /* hairlines on cream */
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-feature: 16px;
+  --radius-badge: 9999px;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-cream-soft: var(--cream-soft);
+  --color-surface: var(--white);
+  --color-navy-900: var(--navy-900);
+  --color-navy-400: var(--navy-400);
+  --color-maroon-600: var(--maroon-600);
+  --color-maroon-700: var(--maroon-700);
+  --color-maroon-100: var(--maroon-100);
+  --color-gold-500: var(--gold-500);
+  --color-gold-300: var(--gold-300);
+  --color-green-600: var(--green-600);
+  --color-green-100: var(--green-100);
+  --color-line: var(--line);
+
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --radius-feature: var(--radius-feature);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-hand: var(--font-caveat), cursive;
+}
