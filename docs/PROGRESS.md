@@ -12,3 +12,13 @@
 - Dev toolbar + `middleware.ts` guards (signed out, cross-role, first-login)
 
 Not done in Phase 1: Storybook (see report), real screens, mockup fidelity pass.
+
+## Phase 2: Component library: done
+
+- Primitives restyled to tokens: Button, Badge, Card, Input/Textarea/Label, Switch
+- Shared: StatCard, ProgressBar, ScoreBar, ReadinessMeter, CountdownCard, RunwayTimeline (horizontal + vertical + auto), DataTable (TanStack Table v8 + Virtual above 200 rows), FunnelBars, EmptyState, ErrorCard, Skeletons, 10 named badges
+- Domain: NextSessionHero, TaskList, SlotPicker (keyboard radiogroup, slot-taken error), PlanCard, AnswerCard, FeedbackNote, ScoringForm (RHF + Zod), AvailabilityGrid, SeatGauge, LedgerRow, NotificationItem
+- Stories for every state (default, loading, empty, error where relevant) plus 390 px
+- 16 unit tests total; Storybook builds
+
+Not verified: visual match to `cover.png` (file absent). Gold text is not used on cream; gold appears only as a fill with navy text or as text on navy.
