@@ -34,7 +34,8 @@ for (const s of stories) {
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto(`/iframe.html?id=${s.id}&viewMode=story`, { waitUntil: "load" });
     const root = page.locator("#storybook-root");
-    await expect(root).not.toBeEmpty({ timeout: 15_000 });
+    // toBeEmpty() looks at text only; skeleton-only stories have elements but no text.
+    await expect(root.locator(":scope > *").first()).toBeAttached({ timeout: 15_000 });
 
     if (/: Loading$/.test(s.name)) {
       await expect(root.locator("[role=status]").first()).toBeVisible({ timeout: 10_000 });
