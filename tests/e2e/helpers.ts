@@ -16,3 +16,23 @@ export async function gotoReady(page: Page, path: string) {
 
 /** App alerts only. Excludes Next's route announcer, which also has role=alert. */
 export const alerts = (page: Page) => page.locator("[role=alert]:not(#__next-route-announcer__)");
+
+/** Client-side navigation through the shell (mock state lives in the page, so avoid hard reloads). */
+export async function openFromNav(page: Page, label: string, isMobile: boolean) {
+  if (!isMobile) {
+    await page
+      .getByRole("navigation", { name: "Primary" })
+      .getByRole("link", { name: label })
+      .click();
+    return;
+  }
+  const direct = page
+    .getByRole("navigation", { name: "Mobile" })
+    .getByRole("link", { name: label.split(" ")[0], exact: true });
+  if (await direct.count()) {
+    await direct.click();
+    return;
+  }
+  await page.getByRole("button", { name: "More" }).click();
+  await page.getByRole("dialog").getByRole("link", { name: label }).click();
+}

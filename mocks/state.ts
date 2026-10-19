@@ -1,0 +1,496 @@
+import type { Bullet, CvScores, CvVersion } from "@/features/cv-builder/schemas";
+import { scoreBulletText } from "@/features/cv-builder/schemas";
+import type { AnswerDetail } from "@/features/answer-bank/schemas";
+import type { Notification } from "@/features/notifications/schemas";
+import type { Billing } from "@/features/billing/schemas";
+import type { Outcome } from "@/features/outcome/schemas";
+import { getDb, type Db } from "./db";
+import type { Scenario } from "@/lib/config/scenarios";
+
+/** Mock state for Phase 4 features. Rebuilt whenever the scenario (and so the Db) changes. */
+
+export interface CvSectionState {
+  id: string;
+  title: string;
+  bullets: Bullet[];
+}
+
+export interface State {
+  cv: {
+    lockedVersion: string | null;
+    lockedAt: string | null;
+    lockedScores: CvScores | null;
+    sections: CvSectionState[];
+    baseline: { sum: number; sumDecision: number; sumTradeoff: number; n: number };
+    versions: CvVersion[];
+    relock: { status: "none" | "pending"; requestedAt: string | null; reason: string | null };
+  };
+  answers: AnswerDetail[];
+  notifications: Notification[];
+  plan: Billing["plan"];
+  credits: Billing["credits"];
+  invoices: Billing["invoices"];
+  upgradeAttempts: number;
+  outcome: Outcome;
+  target: { function: string; role: string };
+  targetChange: { changedAt: string; from: string; answersToRework: number } | null;
+  profile: { name: string; college: string; batch: string };
+}
+
+const at = (day: string, hour = 19) => `2026-${day}T${String(hour).padStart(2, "0")}:00:00+05:30`;
+
+const BULLETS: [string, string, string][] = [
+  [
+    "exp",
+    "b1",
+    "Led pricing review across 14 distributors, cutting trade-spend 8% instead of reducing the SKU range",
+  ],
+  ["exp", "b2", "Built a weekly sales dashboard used by 6 regional managers"],
+  ["exp", "b3", "Prioritised 3 modern-trade accounts, lifting category share by 2.1 points"],
+  ["exp", "b4", "Supported the launch of a 250 ml pack in Pune and Nashik"],
+  ["edu", "b5", "Top 5% of the cohort in Marketing Management at SCMHRD Pune"],
+  ["lead", "b6", "Elected placement committee lead for a batch of 40 students"],
+  ["lead", "b7", "Negotiated a sponsor tie-up for the college fest despite a tight budget"],
+];
+
+function bullet(id: string, text: string): Bullet {
+  return { id, text, ...scoreBulletText(text) };
+}
+
+function sum(sections: CvSectionState[]) {
+  const all = sections.flatMap((s) => s.bullets);
+  return {
+    sum: all.filter((b) => b.hasNumber).length,
+    sumDecision: all.filter((b) => b.hasDecision).length,
+    sumTradeoff: all.filter((b) => b.hasTradeoff).length,
+    n: all.length,
+  };
+}
+
+/** Base scores are Riya's: Impact 88, Clarity 82, Defensibility 81. Edits move them by the change in the three tests. */
+export function computeScores(s: State["cv"]): CvScores {
+  const cur = sum(s.sections);
+  const base = s.baseline;
+  const n = Math.max(1, cur.n);
+  const impact =
+    88 + Math.round(((cur.sum - base.sum + cur.sumDecision - base.sumDecision) / (2 * n)) * 40);
+  const defensibility =
+    81 +
+    Math.round(
+      ((cur.sumTradeoff - base.sumTradeoff + cur.sumDecision - base.sumDecision) / (2 * n)) * 40,
+    );
+  const clarity = 82;
+  const c = (v: number) => Math.max(0, Math.min(100, v));
+  const i = c(impact);
+  const d = c(defensibility);
+  return { impact: i, clarity, defensibility: d, overall: Math.round((i + clarity + d) / 3) };
+}
+
+const QUESTIONS: [string, string, string][] = [
+  [
+    "Tell me about yourself",
+    "Opening",
+    "I spent two years as an FMCG sales analyst, which taught me that distributor margins decide shelf presence. I now want a Management Trainee role where I own those calls.",
+  ],
+  [
+    "Why Sales & Marketing?",
+    "Motivation",
+    "Because I have seen how one pricing decision changes a region's numbers, and I want to make those decisions myself.",
+  ],
+  [
+    "Why this company?",
+    "Motivation",
+    "Your brand sits in categories where distribution is the moat, which is exactly where my analyst work was.",
+  ],
+  [
+    "Walk me through a time you led without authority",
+    "Leadership",
+    "As placement lead I got 40 peers to submit on time by publishing a daily tracker.",
+  ],
+  [
+    "Tell me about a failure",
+    "Behavioural",
+    "We missed a Q3 target by 6% because I trusted a forecast without checking distributor stock.",
+  ],
+  [
+    "Describe a conflict with a teammate",
+    "Behavioural",
+    "A colleague and I disagreed on promo depth. I ran both options on last year's data.",
+  ],
+  [
+    "What is your biggest strength?",
+    "Self",
+    "Turning messy sales data into one decision a manager can act on.",
+  ],
+  [
+    "What is your biggest weakness?",
+    "Self",
+    "I over-prepare numbers and under-prepare the story. I now write the headline first.",
+  ],
+  ["Where do you see yourself in 5 years?", "Career", "Running a regional team and owning a P&L."],
+  [
+    "Why should we hire you over others?",
+    "Pitch",
+    "I bring two years of ground sales data and the habit of testing decisions before defending them.",
+  ],
+  [
+    "Tell me about a time you used data to decide",
+    "Analytical",
+    "I moved trade-spend from 14 low-yield distributors to 3 modern-trade accounts and share rose 2.1 points.",
+  ],
+  [
+    "How do you handle pressure?",
+    "Self",
+    "I list what is in my control, do the first small step, and tell my manager early.",
+  ],
+  [
+    "Describe your ideal manager",
+    "Fit",
+    "Someone who gives me a clear target and asks for my reasoning.",
+  ],
+  [
+    "Tell me about a time you persuaded someone",
+    "Influence",
+    "I persuaded a sceptical distributor to stock a new pack by showing his own sell-through data.",
+  ],
+  ["How would you launch a product in a new city?", "Case", ""],
+  ["What would you do in your first 90 days?", "Career", ""],
+  [
+    "Tell me about a trade-off you made",
+    "Analytical",
+    "I cut SKUs in two stores to protect shelf space for the top three sellers.",
+  ],
+  [
+    "How do you prioritise competing tasks?",
+    "Self",
+    "Impact first, deadline second, effort third.",
+  ],
+];
+
+const FLAGGED = new Set([4, 5, 8, 16]);
+const CRITIQUE: Record<number, { critique: string; inline: { quote: string; note: string }[] }> = {
+  4: {
+    critique: "No number and no lesson. A panel will ask what you changed.",
+    inline: [
+      { quote: "missed a Q3 target by 6%", note: "Good: a real number. Now say what it cost." },
+      { quote: "trusted a forecast", note: "Name the check you now run instead." },
+    ],
+  },
+  5: {
+    critique: "Sounds like blame-free storytelling. Show your part in the disagreement.",
+    inline: [{ quote: "ran both options", note: "Which one won, and what did you give up?" }],
+  },
+  8: {
+    critique: "Too short. Give one milestone per year.",
+    inline: [{ quote: "Running a regional team", note: "How many people? Which region?" }],
+  },
+  16: {
+    critique: "Trade-off is there, but the cost is missing.",
+    inline: [{ quote: "protect shelf space", note: "What did the two stores lose?" }],
+  },
+};
+
+function buildAnswers(scenario: Scenario | null): AnswerDetail[] {
+  const reworked = scenario === "target-change";
+  return QUESTIONS.map(([question, category, draft], i): AnswerDetail => {
+    const id = `a-${1001 + i}`;
+    let status: AnswerDetail["status"] = draft ? "rehearsed" : "not-drafted";
+    if (FLAGGED.has(i) || (reworked && draft && i % 2 === 1 && i < 14)) status = "flagged";
+    const c = CRITIQUE[i];
+    return {
+      id,
+      question,
+      category,
+      status,
+      snippet: draft ? draft.slice(0, 120) : null,
+      critique:
+        status === "flagged"
+          ? (c?.critique ?? "Your target changed: reframe this for the new role.")
+          : null,
+      draft,
+      inlineCritique: status === "flagged" ? (c?.inline ?? []) : [],
+    };
+  });
+}
+
+function buildNotifications(db: Db): Notification[] {
+  const s = db.scenario;
+  const list: Notification[] = [];
+  const add = (n: Omit<Notification, "read"> & { read?: boolean }) =>
+    list.push({ read: false, ...n });
+
+  if (s === "first-login") {
+    add({
+      id: "n-welcome",
+      kind: "system",
+      title: "Welcome to The Prep Co",
+      body: "Book your free session to start.",
+      at: at("10-05", 9),
+      href: "/free-session",
+    });
+    return list;
+  }
+  if (s === "panelist-cancelled")
+    add({
+      id: "n-x1",
+      kind: "session",
+      title: "Your panelist cancelled",
+      body: "Pick a new slot for your domain deep-dive. No charge.",
+      at: at("10-05", 11),
+      href: "/sessions/s-1003",
+    });
+  if (s === "student-reschedule")
+    add({
+      id: "n-x2",
+      kind: "session",
+      title: "Your session was moved to Thu 8 Oct",
+      body: "You can still reschedule for free until 24 hours before.",
+      at: at("10-05", 11),
+      href: "/sessions/s-1003",
+    });
+  if (s === "no-show")
+    add({
+      id: "n-x3",
+      kind: "session",
+      title: "You missed your deep-dive",
+      body: "Your first no-show is free. Rebook now.",
+      at: at("10-05", 8),
+      href: "/sessions/s-1003",
+    });
+  if (s === "day0-moved")
+    add({
+      id: "n-x4",
+      kind: "runway",
+      title: "Day 0 moved to Mon 16 Nov",
+      body: "Your remaining sessions still fit.",
+      at: at("10-05", 10),
+      href: "/journey",
+    });
+  if (s === "placed" || s === "not-placed")
+    add({
+      id: "n-x5",
+      kind: "runway",
+      title: "Day 0 results are open",
+      body: "Tell us how it went.",
+      at: at("10-05", 10),
+      href: "/outcome",
+    });
+  if (s === "basic-ended")
+    add({
+      id: "n-x6",
+      kind: "billing",
+      title: "Your Basic plan has ended",
+      body: "Upgrade to keep your runway going.",
+      at: at("10-05", 9),
+      href: "/billing/upgrade",
+    });
+
+  add({
+    id: "n-1",
+    kind: "session",
+    title: "Your deep-dive is Wed 7 Oct · 7:00 PM IST",
+    body: "Read your brief the evening before.",
+    at: at("10-04", 18),
+    href: "/sessions/s-1003",
+  });
+  add({
+    id: "n-2",
+    kind: "feedback",
+    title: "Arjun Mehta sent your P1 feedback",
+    body: "Strong structure, thin on the pricing trade-off.",
+    at: at("09-22", 9),
+    href: "/feedback/p-1001",
+  });
+  add({
+    id: "n-3",
+    kind: "runway",
+    title: "Slots for your P2 panel open Monday",
+    body: null,
+    at: at("10-02", 10),
+    href: "/sessions/s-1004",
+    read: true,
+  });
+  add({
+    id: "n-4",
+    kind: "billing",
+    title: "Payment received: Premium",
+    body: "Receipt PC-2026-4102",
+    at: at("09-10", 12),
+    href: "/billing",
+    read: true,
+  });
+  add({
+    id: "n-5",
+    kind: "system",
+    title: "Welcome to Season 1",
+    body: null,
+    at: at("09-10", 9),
+    href: null,
+    read: true,
+  });
+  return list;
+}
+
+function buildState(db: Db): State {
+  const s = db.scenario;
+  const firstLogin = s === "first-login";
+
+  const sections: CvSectionState[] = firstLogin
+    ? []
+    : [
+        { id: "exp", title: "Experience", bullets: [] },
+        { id: "edu", title: "Education", bullets: [] },
+        { id: "lead", title: "Leadership", bullets: [] },
+      ].map((sec) => ({
+        ...sec,
+        bullets: BULLETS.filter(([g]) => g === sec.id).map(([, id, text]) => bullet(id, text)),
+      }));
+
+  const cv: State["cv"] = {
+    lockedVersion: firstLogin ? null : "V4",
+    lockedAt: firstLogin ? null : at("09-14", 20),
+    lockedScores: null,
+    sections,
+    baseline: sum(sections),
+    versions: firstLogin
+      ? []
+      : [
+          {
+            id: "v1",
+            version: "V1",
+            createdAt: at("08-12", 12),
+            score: 58,
+            locked: false,
+            current: false,
+            note: "First upload",
+          },
+          {
+            id: "v2",
+            version: "V2",
+            createdAt: at("08-28", 12),
+            score: 69,
+            locked: false,
+            current: false,
+            note: "Added numbers to experience",
+          },
+          {
+            id: "v3",
+            version: "V3",
+            createdAt: at("09-10", 12),
+            score: 77,
+            locked: false,
+            current: false,
+            note: "Rewrote leadership bullets",
+          },
+          {
+            id: "v4",
+            version: "V4",
+            createdAt: at("09-14", 20),
+            score: 84,
+            locked: true,
+            current: true,
+            note: "Locked at profiling call",
+          },
+        ],
+    relock: { status: "none", requestedAt: null, reason: null },
+  };
+  cv.lockedScores = firstLogin ? null : { overall: 84, impact: 88, clarity: 82, defensibility: 81 };
+
+  const answers = buildAnswers(s);
+
+  const basicEnded = s === "basic-ended";
+  const plan: State["plan"] = firstLogin
+    ? { id: "free", name: "Free", paid: 0, status: "active", endedAt: null }
+    : basicEnded
+      ? { id: "basic", name: "Basic", paid: 14999, status: "ended", endedAt: at("10-01", 23) }
+      : { id: "premium", name: "Premium", paid: 36999, status: "active", endedAt: null };
+
+  const outcome: Outcome =
+    s === "placed"
+      ? {
+          state: "placed",
+          company: "Northwind Consumer Brands",
+          role: "Management Trainee, Sales",
+          ctc: 1200000,
+          creditCarried: null,
+          day0Label: "Mon 9 Nov",
+        }
+      : s === "not-placed"
+        ? {
+            state: "not-placed",
+            company: null,
+            role: null,
+            ctc: null,
+            creditCarried: 36999,
+            day0Label: "Mon 9 Nov",
+          }
+        : {
+            state: "pending",
+            company: null,
+            role: null,
+            ctc: null,
+            creditCarried: null,
+            day0Label: "Mon 9 Nov",
+          };
+
+  const changed = s === "target-change";
+
+  return {
+    cv,
+    answers,
+    notifications: buildNotifications(db),
+    plan,
+    credits: firstLogin
+      ? { total: 0, used: 0, carriedOver: 0 }
+      : basicEnded
+        ? { total: 3, used: 3, carriedOver: 0 }
+        : { total: 6, used: 2, carriedOver: 0 },
+    invoices: firstLogin
+      ? []
+      : [
+          {
+            id: "inv-1",
+            receiptNo: "PC-2026-4102",
+            description: `${plan.name} plan`,
+            amount: plan.paid,
+            at: at("09-10", 12),
+          },
+        ],
+    upgradeAttempts: 0,
+    outcome,
+    target: changed
+      ? { function: "Finance", role: "Analyst" }
+      : { function: "Sales & Marketing", role: "Management Trainee" },
+    targetChange: changed
+      ? {
+          changedAt: at("10-03", 15),
+          from: "Sales & Marketing (Management Trainee)",
+          answersToRework: 6,
+        }
+      : null,
+    profile: { name: "Riya Kulkarni", college: "SCMHRD Pune", batch: "2025–27" },
+  };
+}
+
+const cache = new WeakMap<Db, State>();
+
+export function getState(scenario: Scenario | null): State {
+  const db = getDb(scenario);
+  let st = cache.get(db);
+  if (!st) {
+    st = buildState(db);
+    cache.set(db, st);
+  }
+  return st;
+}
+
+export function answerCounts(st: State) {
+  const rehearsed = st.answers.filter((a) => a.status === "rehearsed").length;
+  const flagged = st.answers.filter((a) => a.status === "flagged").length;
+  return {
+    all: st.answers.length,
+    rehearsed,
+    flagged,
+    notDrafted: st.answers.length - rehearsed - flagged,
+  };
+}

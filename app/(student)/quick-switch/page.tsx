@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { QuickSwitchView } from "@/features/journey/components/QuickSwitchView";
+
+export const metadata: Metadata = { title: "Quick Switch" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="S13" title="Quick Switch" />;
+  return <QuickSwitchView />;
 }

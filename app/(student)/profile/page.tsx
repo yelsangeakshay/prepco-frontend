@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { ProfileView } from "@/features/profile/components/ProfileView";
+
+export const metadata: Metadata = { title: "Profile" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="S15" title="Profile" />;
+  return <ProfileView />;
 }

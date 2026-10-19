@@ -1,6 +1,9 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { AnswerDetailView } from "@/features/answer-bank/components/AnswerDetailView";
+
+export const metadata: Metadata = { title: "Answer" };
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const p = await params;
-  return <ScreenPlaceholder code="S8" title="Answer detail" params={p} />;
+  const { id } = await params;
+  return <AnswerDetailView id={id} />;
 }

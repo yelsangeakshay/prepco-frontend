@@ -12,7 +12,7 @@ export function TopBar({ role }: { role: Role }) {
         <p className="truncate text-sm font-semibold">{profile.name}</p>
         <p className="text-navy-400 truncate text-xs">{profile.subtitle}</p>
       </div>
-      {role === "student" && <NotificationBell unread={2} />}
+      {role === "student" && <NotificationBell />}
       <span
         aria-label={profile.name}
         className="bg-navy-900 flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"

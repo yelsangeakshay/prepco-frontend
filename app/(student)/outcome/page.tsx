@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { OutcomeView } from "@/features/outcome/components/OutcomeView";
+
+export const metadata: Metadata = { title: "Outcome" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="E7" title="Outcome" />;
+  return <OutcomeView />;
 }

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useForm, type FieldValues, type Resolver } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from "@/lib/forms/zodResolver";
 import type { ZodType } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/field";

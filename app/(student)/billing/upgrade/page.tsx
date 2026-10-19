@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { UpgradeView } from "@/features/billing/components/UpgradeView";
+
+export const metadata: Metadata = { title: "Upgrade" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="E8" title="Upgrade" />;
+  return <UpgradeView />;
 }

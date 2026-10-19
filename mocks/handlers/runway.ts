@@ -4,6 +4,7 @@ import { formatDay, formatSession } from "@/lib/utils/dates";
 import type { Runway, Session } from "@/features/runway/schemas";
 import { buildSlots, getDb, type Db } from "../db";
 import { DAY0_ISO, DAY0_MOVED_ISO, RIYA } from "../fixtures/personas";
+import { answerCounts, getState } from "../state";
 import { apiError, latency, paginate, scenarioOf } from "../utils";
 
 const MS_DAY = 86_400_000;
@@ -56,6 +57,8 @@ export function buildRunway(db: Db): Runway {
   });
 
   const done = sessions.filter((s) => s.status === "completed").length;
+  const st = getState(scenario);
+  const counts = answerCounts(st);
   const firstLogin = scenario === "first-login";
   const late = scenario === "late-joiner";
 
@@ -65,7 +68,7 @@ export function buildRunway(db: Db): Runway {
     student: {
       name: RIYA.name,
       college: RIYA.college,
-      plan: firstLogin ? "Free" : RIYA.plan,
+      plan: st.plan.name,
       track: RIYA.track,
       target: RIYA.target,
       readiness: firstLogin ? 0 : late ? 38 : RIYA.readiness,
@@ -76,15 +79,20 @@ export function buildRunway(db: Db): Runway {
       daysLeft: daysUntil(day0Iso),
       movedFrom: moved ? formatDay(DAY0_ISO) : null,
     },
-    banner: firstLogin
-      ? "first-login"
-      : late
-        ? "late-joiner"
-        : moved
-          ? "day0-moved"
-          : scenario === "returning-student"
-            ? "returning-student"
-            : null,
+    banner:
+      scenario === "placed"
+        ? "placed"
+        : scenario === "not-placed"
+          ? "not-placed"
+          : firstLogin
+            ? "first-login"
+            : late
+              ? "late-joiner"
+              : moved
+                ? "day0-moved"
+                : scenario === "returning-student"
+                  ? "returning-student"
+                  : null,
     steps,
     doneCount: done,
     totalCount: sessions.length,
@@ -116,14 +124,16 @@ export function buildRunway(db: Db): Runway {
         ],
     cv: firstLogin
       ? { version: "V0", locked: false, score: 0 }
-      : { version: RIYA.cv.version, locked: RIYA.cv.locked, score: RIYA.cv.score },
-    answers: firstLogin
-      ? { total: 0, prepared: 0, needWork: 0 }
       : {
-          total: RIYA.answers.total,
-          prepared: RIYA.answers.prepared,
-          needWork: RIYA.answers.needWork,
+          version: st.cv.lockedVersion ?? "V0",
+          locked: !!st.cv.lockedVersion,
+          score: st.cv.lockedScores?.overall ?? 0,
         },
+    answers: {
+      total: counts.all,
+      prepared: counts.rehearsed,
+      needWork: counts.flagged,
+    },
   };
 }
 

@@ -18,6 +18,14 @@ const COPY: Record<
     title: "Welcome to The Prep Co",
     body: () => "Nothing is booked yet. Start with your free session.",
   },
+  placed: {
+    title: "Congratulations",
+    body: () => "Your placement is recorded. See your summary.",
+  },
+  "not-placed": {
+    title: "Your credit is carried over",
+    body: () => "We are sorry it did not work out this season. Your credit moves to the next one.",
+  },
   "returning-student": {
     title: "Welcome back",
     body: () => "Your runway and answers are right where you left them.",

@@ -63,3 +63,26 @@ Slot booking is never optimistic. In the mock, the slot id ending in `-race` ret
 ## Scenarios that change responses
 
 `first-login`, `late-joiner`, `day0-moved`, `panelist-cancelled`, `student-reschedule`, `no-show`, `payment-failed` (first checkout only), `cohort-full`, `cv-upload-failed`, `gmail-unverified`, `returning-student`.
+
+## Phase 4 endpoints
+
+The full, machine-readable list is `docs/openapi.json`, generated from `lib/api/contract.ts` (run `pnpm test lib/api/openapi.test.ts` to regenerate). Summary:
+
+| Area          | Method and path                                                       | Notes                                                                                                                                |
+| ------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| CV            | GET `/cv`                                                             | `{ locked: { version, lockedAt, scores } , draft: { version, sections, scores }, relock: { status } }`                               |
+| CV            | PATCH `/cv/bullets/:id`                                               | `{ text }` returns `{ bullet: { hasDecision, hasNumber, hasTradeoff }, scores }`. Errors: 404 `bullet_not_found`, 422 `empty_bullet` |
+| CV            | GET `/cv/versions`                                                    | versions plus the working draft (`id: "draft"`)                                                                                      |
+| CV            | POST `/cv/versions/:id/lock`                                          | 409 `relock_required` while a version is locked                                                                                      |
+| CV            | POST `/cv/relock-request`                                             | `{ reason }`, returns `{ status: "pending" }`                                                                                        |
+| Answers       | GET `/answers?status=&q=&page=&pageSize=`                             | `{ items, total, page, pageSize, counts: { all, rehearsed, flagged, notDrafted } }`                                                  |
+| Answers       | GET, PATCH `/answers/:id`                                             | PATCH `{ draft?, status? }`; 422 `no_draft`, `has_draft`                                                                             |
+| Extras        | GET `/journey`, `/quick-switch?to=`, `/case-track`                    | case track: 403 `elite_only` unless on Elite                                                                                         |
+| Billing       | GET `/billing`, GET `/billing/upgrade-quote`, POST `/billing/upgrade` | quote = list price minus credit for unused sessions (Proposed)                                                                       |
+| Profile       | GET, PUT `/profile`; POST `/profile/change-target`                    | change target flags answers (`answersToRework`)                                                                                      |
+| Outcome       | GET, POST `/outcome`                                                  | `{ state: "placed", company, role, ctc }` or `{ state: "not-placed" }`                                                               |
+| Notifications | GET `/notifications`; POST `/notifications/read`                      | read body `{ ids? , all? }`; list returns `unread`                                                                                   |
+
+New scenarios that change responses: `placed`, `not-placed`, `target-change`, `basic-ended`.
+
+Mock state lives in the browser page. In-app navigation keeps it; a hard reload resets it. A real backend replaces this.

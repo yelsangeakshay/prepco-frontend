@@ -1,0 +1,4172 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "The Prep Co web API (mock contract)",
+    "version": "0.4.0",
+    "description": "Generated from lib/api/contract.ts. Phase 4 covers the student app; panelist and ops endpoints arrive in Phase 5."
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "paths": {
+    "/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Current user",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "student",
+                        "panelist",
+                        "ops"
+                      ]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "initials": {
+                      "type": "string"
+                    },
+                    "onboarded": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "name",
+                    "initials",
+                    "onboarded"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/sign-in": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Sign in",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "student",
+                        "panelist",
+                        "ops"
+                      ]
+                    },
+                    "onboarded": {
+                      "type": "boolean"
+                    },
+                    "verifyRequired": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "role",
+                    "onboarded"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "invalid_credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "email_unverified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "no_account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/sign-up": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Sign up",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "student",
+                        "panelist",
+                        "ops"
+                      ]
+                    },
+                    "onboarded": {
+                      "type": "boolean"
+                    },
+                    "verifyRequired": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "role",
+                    "onboarded"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "email_taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Request a reset link (always succeeds)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  }
+                },
+                "required": [
+                  "email"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Set a new password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8
+                  }
+                },
+                "required": [
+                  "token",
+                  "password"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "token_expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/me/profile": {
+      "put": {
+        "tags": [
+          "Onboarding"
+        ],
+        "summary": "Save onboarding profile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "college": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "batch": {
+                    "type": "string",
+                    "minLength": 4
+                  },
+                  "track": {
+                    "type": "string",
+                    "enum": [
+                      "finals",
+                      "summers"
+                    ]
+                  },
+                  "targetFunction": {
+                    "type": "string",
+                    "enum": [
+                      "Sales & Marketing",
+                      "Finance",
+                      "Operations",
+                      "Consulting",
+                      "HR",
+                      "Product & Analytics"
+                    ]
+                  },
+                  "targetRole": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "experience": {
+                    "type": "string",
+                    "minLength": 10
+                  },
+                  "yearsExperience": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 15
+                  }
+                },
+                "required": [
+                  "college",
+                  "batch",
+                  "track",
+                  "targetFunction",
+                  "targetRole",
+                  "experience",
+                  "yearsExperience"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/me/cv": {
+      "post": {
+        "tags": [
+          "Onboarding"
+        ],
+        "summary": "Upload CV metadata",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  },
+                  "consent": {
+                    "type": "boolean",
+                    "const": true
+                  }
+                },
+                "required": [
+                  "fileName",
+                  "size",
+                  "consent"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "done",
+                        "failed"
+                      ]
+                    },
+                    "reason": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "extracted": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "roles": {
+                              "type": "number"
+                            },
+                            "bullets": {
+                              "type": "number"
+                            },
+                            "education": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "roles",
+                            "bullets",
+                            "education"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "reason",
+                    "extracted"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/free-session": {
+      "get": {
+        "tags": [
+          "Onboarding"
+        ],
+        "summary": "Free session slots",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "eligible": {
+                      "type": "boolean"
+                    },
+                    "usedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "slots": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "taken": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "startsAt",
+                          "label"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "eligible",
+                    "usedAt",
+                    "slots"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plans": {
+      "get": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "List plans",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "enum": [
+                              "basic",
+                              "premium",
+                              "elite"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": "number"
+                          },
+                          "tagline": {
+                            "type": "string"
+                          },
+                          "features": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "mostChosen": {
+                            "type": "boolean"
+                          },
+                          "elite": {
+                            "type": "boolean"
+                          },
+                          "seatsTotal": {
+                            "type": "number"
+                          },
+                          "seatsTaken": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "price",
+                          "tagline",
+                          "features",
+                          "mostChosen",
+                          "elite",
+                          "seatsTotal",
+                          "seatsTaken"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "cohortFull": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "cohortFull"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkout": {
+      "post": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "Pay for a plan",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "planId": {
+                    "type": "string",
+                    "enum": [
+                      "basic",
+                      "premium",
+                      "elite"
+                    ]
+                  }
+                },
+                "required": [
+                  "planId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "planId": {
+                      "type": "string",
+                      "enum": [
+                        "basic",
+                        "premium",
+                        "elite"
+                      ]
+                    },
+                    "planName": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "paid",
+                        "failed"
+                      ]
+                    },
+                    "failureReason": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "seatHeldUntil": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "receiptNo": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "paidAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "planId",
+                    "planName",
+                    "amount",
+                    "status",
+                    "failureReason",
+                    "seatHeldUntil",
+                    "receiptNo",
+                    "paidAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "plan_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "cohort_full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkout/{id}": {
+      "get": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "A checkout",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "planId": {
+                      "type": "string",
+                      "enum": [
+                        "basic",
+                        "premium",
+                        "elite"
+                      ]
+                    },
+                    "planName": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "paid",
+                        "failed"
+                      ]
+                    },
+                    "failureReason": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "seatHeldUntil": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "receiptNo": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "paidAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "planId",
+                    "planName",
+                    "amount",
+                    "status",
+                    "failureReason",
+                    "seatHeldUntil",
+                    "receiptNo",
+                    "paidAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "checkout_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/waitlist": {
+      "post": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "Join the waitlist",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "planId": {
+                    "type": "string",
+                    "enum": [
+                      "basic",
+                      "premium",
+                      "elite"
+                    ]
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  }
+                },
+                "required": [
+                  "planId",
+                  "email"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "position": {
+                      "type": "number"
+                    },
+                    "claimWindowHours": {
+                      "type": "number"
+                    },
+                    "priceKept": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "position",
+                    "claimWindowHours",
+                    "priceKept"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/students/me/runway": {
+      "get": {
+        "tags": [
+          "Runway"
+        ],
+        "summary": "Runway, next session, tasks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "student": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "college": {
+                          "type": "string"
+                        },
+                        "plan": {
+                          "type": "string"
+                        },
+                        "track": {
+                          "type": "string"
+                        },
+                        "target": {
+                          "type": "string"
+                        },
+                        "readiness": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "college",
+                        "plan",
+                        "track",
+                        "target",
+                        "readiness"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "day0": {
+                      "type": "object",
+                      "properties": {
+                        "iso": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "daysLeft": {
+                          "type": "number"
+                        },
+                        "movedFrom": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "iso",
+                        "label",
+                        "daysLeft",
+                        "movedFrom"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "banner": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "late-joiner",
+                            "day0-moved",
+                            "first-login",
+                            "returning-student",
+                            "placed",
+                            "not-placed"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "week": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "when": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "done",
+                              "next",
+                              "locked",
+                              "pick-slot",
+                              "day0"
+                            ]
+                          },
+                          "sessionId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "week",
+                          "title",
+                          "status",
+                          "sessionId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "doneCount": {
+                      "type": "number"
+                    },
+                    "totalCount": {
+                      "type": "number"
+                    },
+                    "nextSession": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "week": {
+                              "type": "string"
+                            },
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "profiling",
+                                "panel",
+                                "deep-dive",
+                                "group",
+                                "free"
+                              ]
+                            },
+                            "startsAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "previousStartsAt": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "upcoming",
+                                "completed",
+                                "cancelled",
+                                "rescheduled",
+                                "no-show",
+                                "unbooked",
+                                "locked"
+                              ]
+                            },
+                            "panelist": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "panelFunction": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "note": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "freeRescheduleUntil": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "feedbackId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "title",
+                            "week",
+                            "kind",
+                            "startsAt",
+                            "status",
+                            "panelist",
+                            "panelFunction"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tasks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "hint": {
+                            "type": "string"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "done"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "cv": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "string"
+                        },
+                        "locked": {
+                          "type": "boolean"
+                        },
+                        "score": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "locked",
+                        "score"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "answers": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "prepared": {
+                          "type": "number"
+                        },
+                        "needWork": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "prepared",
+                        "needWork"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "student",
+                    "day0",
+                    "banner",
+                    "steps",
+                    "doneCount",
+                    "totalCount",
+                    "nextSession",
+                    "tasks",
+                    "cv",
+                    "answers"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "get": {
+        "tags": [
+          "Runway"
+        ],
+        "summary": "List sessions",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "week": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "profiling",
+                              "panel",
+                              "deep-dive",
+                              "group",
+                              "free"
+                            ]
+                          },
+                          "startsAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "previousStartsAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "completed",
+                              "cancelled",
+                              "rescheduled",
+                              "no-show",
+                              "unbooked",
+                              "locked"
+                            ]
+                          },
+                          "panelist": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "panelFunction": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "note": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "freeRescheduleUntil": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "feedbackId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "week",
+                          "kind",
+                          "startsAt",
+                          "status",
+                          "panelist",
+                          "panelFunction"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{id}": {
+      "get": {
+        "tags": [
+          "Runway"
+        ],
+        "summary": "A session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "week": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "profiling",
+                        "panel",
+                        "deep-dive",
+                        "group",
+                        "free"
+                      ]
+                    },
+                    "startsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "previousStartsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "upcoming",
+                        "completed",
+                        "cancelled",
+                        "rescheduled",
+                        "no-show",
+                        "unbooked",
+                        "locked"
+                      ]
+                    },
+                    "panelist": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "panelFunction": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "freeRescheduleUntil": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feedbackId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "week",
+                    "kind",
+                    "startsAt",
+                    "status",
+                    "panelist",
+                    "panelFunction"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "session_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{id}/slots": {
+      "get": {
+        "tags": [
+          "Runway"
+        ],
+        "summary": "Open slots for a session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "taken": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "startsAt",
+                          "label"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{id}/book": {
+      "post": {
+        "tags": [
+          "Runway"
+        ],
+        "summary": "Book a slot (never optimistic)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slotId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slotId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "week": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "profiling",
+                        "panel",
+                        "deep-dive",
+                        "group",
+                        "free"
+                      ]
+                    },
+                    "startsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "previousStartsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "upcoming",
+                        "completed",
+                        "cancelled",
+                        "rescheduled",
+                        "no-show",
+                        "unbooked",
+                        "locked"
+                      ]
+                    },
+                    "panelist": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "panelFunction": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "freeRescheduleUntil": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feedbackId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "week",
+                    "kind",
+                    "startsAt",
+                    "status",
+                    "panelist",
+                    "panelFunction"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "slot_taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{id}/reschedule": {
+      "post": {
+        "tags": [
+          "Runway"
+        ],
+        "summary": "Move a session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slotId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slotId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "week": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "profiling",
+                        "panel",
+                        "deep-dive",
+                        "group",
+                        "free"
+                      ]
+                    },
+                    "startsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "previousStartsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "upcoming",
+                        "completed",
+                        "cancelled",
+                        "rescheduled",
+                        "no-show",
+                        "unbooked",
+                        "locked"
+                      ]
+                    },
+                    "panelist": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "panelFunction": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "freeRescheduleUntil": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feedbackId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "week",
+                    "kind",
+                    "startsAt",
+                    "status",
+                    "panelist",
+                    "panelFunction"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "slot_taken",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Runway"
+        ],
+        "summary": "Cancel a session",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "week": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "profiling",
+                        "panel",
+                        "deep-dive",
+                        "group",
+                        "free"
+                      ]
+                    },
+                    "startsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "previousStartsAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "upcoming",
+                        "completed",
+                        "cancelled",
+                        "rescheduled",
+                        "no-show",
+                        "unbooked",
+                        "locked"
+                      ]
+                    },
+                    "panelist": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "panelFunction": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "freeRescheduleUntil": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "feedbackId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "week",
+                    "kind",
+                    "startsAt",
+                    "status",
+                    "panelist",
+                    "panelFunction"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feedback": {
+      "get": {
+        "tags": [
+          "Feedback"
+        ],
+        "summary": "Panel feedback list",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "panelId": {
+                            "type": "string"
+                          },
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "panelist": {
+                            "type": "string"
+                          },
+                          "function": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "verdict": {
+                            "type": "string"
+                          },
+                          "headline": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "panelId",
+                          "sessionId",
+                          "panelist",
+                          "function",
+                          "startsAt",
+                          "verdict",
+                          "headline"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feedback/{panelId}": {
+      "get": {
+        "tags": [
+          "Feedback"
+        ],
+        "summary": "One panel's feedback",
+        "parameters": [
+          {
+            "name": "panelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "panelId": {
+                      "type": "string"
+                    },
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "panelist": {
+                      "type": "string"
+                    },
+                    "function": {
+                      "type": "string"
+                    },
+                    "startsAt": {
+                      "type": "string"
+                    },
+                    "verdict": {
+                      "type": "string"
+                    },
+                    "headline": {
+                      "type": "string"
+                    },
+                    "note": {
+                      "type": "string"
+                    },
+                    "scores": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "value"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "sentBackToBuilder": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "panelId",
+                    "sessionId",
+                    "panelist",
+                    "function",
+                    "startsAt",
+                    "verdict",
+                    "headline",
+                    "note",
+                    "scores",
+                    "sentBackToBuilder"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "feedback_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cv": {
+      "get": {
+        "tags": [
+          "CV"
+        ],
+        "summary": "Locked version, working draft, re-lock status",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locked": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "lockedAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "scores": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "overall": {
+                                  "type": "number"
+                                },
+                                "impact": {
+                                  "type": "number"
+                                },
+                                "clarity": {
+                                  "type": "number"
+                                },
+                                "defensibility": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "overall",
+                                "impact",
+                                "clarity",
+                                "defensibility"
+                              ],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "lockedAt",
+                        "scores"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "draft": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "string"
+                        },
+                        "sections": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "bullets": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "text": {
+                                      "type": "string"
+                                    },
+                                    "hasDecision": {
+                                      "type": "boolean"
+                                    },
+                                    "hasNumber": {
+                                      "type": "boolean"
+                                    },
+                                    "hasTradeoff": {
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "text",
+                                    "hasDecision",
+                                    "hasNumber",
+                                    "hasTradeoff"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "bullets"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "scores": {
+                          "type": "object",
+                          "properties": {
+                            "overall": {
+                              "type": "number"
+                            },
+                            "impact": {
+                              "type": "number"
+                            },
+                            "clarity": {
+                              "type": "number"
+                            },
+                            "defensibility": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "overall",
+                            "impact",
+                            "clarity",
+                            "defensibility"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "sections",
+                        "scores"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "relock": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "pending"
+                          ]
+                        },
+                        "requestedAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "reason": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "requestedAt",
+                        "reason"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "locked",
+                    "draft",
+                    "relock"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cv/bullets/{id}": {
+      "patch": {
+        "tags": [
+          "CV"
+        ],
+        "summary": "Edit a draft bullet; returns the three tests and new scores",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "bullet": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "hasDecision": {
+                          "type": "boolean"
+                        },
+                        "hasNumber": {
+                          "type": "boolean"
+                        },
+                        "hasTradeoff": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "text",
+                        "hasDecision",
+                        "hasNumber",
+                        "hasTradeoff"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "scores": {
+                      "type": "object",
+                      "properties": {
+                        "overall": {
+                          "type": "number"
+                        },
+                        "impact": {
+                          "type": "number"
+                        },
+                        "clarity": {
+                          "type": "number"
+                        },
+                        "defensibility": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "overall",
+                        "impact",
+                        "clarity",
+                        "defensibility"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "bullet",
+                    "scores"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "bullet_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "empty_bullet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cv/versions": {
+      "get": {
+        "tags": [
+          "CV"
+        ],
+        "summary": "All versions plus the draft",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "score": {
+                            "type": "number"
+                          },
+                          "locked": {
+                            "type": "boolean"
+                          },
+                          "current": {
+                            "type": "boolean"
+                          },
+                          "note": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "version",
+                          "createdAt",
+                          "score",
+                          "locked",
+                          "current",
+                          "note"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cv/versions/{id}/lock": {
+      "post": {
+        "tags": [
+          "CV"
+        ],
+        "summary": "Lock a version (only while nothing is locked)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "version_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "relock_required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cv/relock-request": {
+      "post": {
+        "tags": [
+          "CV"
+        ],
+        "summary": "Ask ops to replace the locked CV",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 10
+                  }
+                },
+                "required": [
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "pending"
+                    },
+                    "requestedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "requestedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "not_locked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/answers": {
+      "get": {
+        "tags": [
+          "Answers"
+        ],
+        "summary": "Answer bank",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "question": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "rehearsed",
+                              "flagged",
+                              "not-drafted"
+                            ]
+                          },
+                          "snippet": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "critique": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "question",
+                          "category",
+                          "status",
+                          "snippet",
+                          "critique"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    },
+                    "counts": {
+                      "type": "object",
+                      "properties": {
+                        "all": {
+                          "type": "number"
+                        },
+                        "rehearsed": {
+                          "type": "number"
+                        },
+                        "flagged": {
+                          "type": "number"
+                        },
+                        "notDrafted": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "all",
+                        "rehearsed",
+                        "flagged",
+                        "notDrafted"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize",
+                    "counts"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/answers/{id}": {
+      "get": {
+        "tags": [
+          "Answers"
+        ],
+        "summary": "One answer with inline critique",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "question": {
+                      "type": "string"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "rehearsed",
+                        "flagged",
+                        "not-drafted"
+                      ]
+                    },
+                    "snippet": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "critique": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "draft": {
+                      "type": "string"
+                    },
+                    "inlineCritique": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "quote": {
+                            "type": "string"
+                          },
+                          "note": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "quote",
+                          "note"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "question",
+                    "category",
+                    "status",
+                    "snippet",
+                    "critique",
+                    "draft",
+                    "inlineCritique"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "answer_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Answers"
+        ],
+        "summary": "Save a draft or change status",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "draft": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "rehearsed",
+                      "flagged",
+                      "not-drafted"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "question": {
+                      "type": "string"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "rehearsed",
+                        "flagged",
+                        "not-drafted"
+                      ]
+                    },
+                    "snippet": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "critique": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "draft": {
+                      "type": "string"
+                    },
+                    "inlineCritique": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "quote": {
+                            "type": "string"
+                          },
+                          "note": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "quote",
+                          "note"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "question",
+                    "category",
+                    "status",
+                    "snippet",
+                    "critique",
+                    "draft",
+                    "inlineCritique"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "no_draft, has_draft",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/journey": {
+      "get": {
+        "tags": [
+          "Extras"
+        ],
+        "summary": "Season and routes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "season": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "detail": {
+                            "type": "string"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "detail",
+                          "done"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "routes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "fit": {
+                            "type": "string",
+                            "enum": [
+                              "primary",
+                              "alternate"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "description",
+                          "fit"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "season",
+                    "routes"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quick-switch": {
+      "get": {
+        "tags": [
+          "Extras"
+        ],
+        "summary": "How much carries over to another function",
+        "parameters": [
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "string"
+                    },
+                    "to": {
+                      "type": "string"
+                    },
+                    "reusableAnswers": {
+                      "type": "number"
+                    },
+                    "totalAnswers": {
+                      "type": "number"
+                    },
+                    "cvBulletsToReframe": {
+                      "type": "number"
+                    },
+                    "gaps": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to",
+                    "reusableAnswers",
+                    "totalAnswers",
+                    "cvBulletsToReframe",
+                    "gaps"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "unknown_function",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-track": {
+      "get": {
+        "tags": [
+          "Extras"
+        ],
+        "summary": "Case modules (Elite only)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "modules": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "minutes": {
+                            "type": "number"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "minutes",
+                          "done"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "modules"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "elite_only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing": {
+      "get": {
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Plan, credits, receipts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "plan": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "enum": [
+                            "free",
+                            "basic",
+                            "premium",
+                            "elite"
+                          ]
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "paid": {
+                          "type": "number"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "active",
+                            "ended"
+                          ]
+                        },
+                        "endedAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "paid",
+                        "status",
+                        "endedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "credits": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "used": {
+                          "type": "number"
+                        },
+                        "carriedOver": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "used",
+                        "carriedOver"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "invoices": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "receiptNo": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "at": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "receiptNo",
+                          "description",
+                          "amount",
+                          "at"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "canUpgrade": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "plan",
+                    "credits",
+                    "invoices",
+                    "canUpgrade"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/upgrade-quote": {
+      "get": {
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Upgrade price after top-up credit (Proposed)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "string"
+                    },
+                    "to": {
+                      "type": "string"
+                    },
+                    "listPrice": {
+                      "type": "number"
+                    },
+                    "topUpCredit": {
+                      "type": "number"
+                    },
+                    "payable": {
+                      "type": "number"
+                    },
+                    "seatsLeft": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to",
+                    "listPrice",
+                    "topUpCredit",
+                    "payable",
+                    "seatsLeft"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "already_elite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/upgrade": {
+      "post": {
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Upgrade to Elite",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "paid",
+                        "failed"
+                      ]
+                    },
+                    "receiptNo": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "plan": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "receiptNo",
+                    "amount",
+                    "plan",
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "already_elite, cohort_full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Profile and target",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "college": {
+                      "type": "string"
+                    },
+                    "batch": {
+                      "type": "string"
+                    },
+                    "track": {
+                      "type": "string"
+                    },
+                    "background": {
+                      "type": "string"
+                    },
+                    "target": {
+                      "type": "object",
+                      "properties": {
+                        "function": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "function",
+                        "role"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "targetChange": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "changedAt": {
+                              "type": "string"
+                            },
+                            "from": {
+                              "type": "string"
+                            },
+                            "answersToRework": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "changedAt",
+                            "from",
+                            "answersToRework"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "email",
+                    "college",
+                    "batch",
+                    "track",
+                    "background",
+                    "target",
+                    "targetChange"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Update details",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "college": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "batch": {
+                    "type": "string",
+                    "minLength": 4
+                  }
+                },
+                "required": [
+                  "name",
+                  "college",
+                  "batch"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile/change-target": {
+      "post": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Change target role; flags answers",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "function": {
+                    "type": "string",
+                    "enum": [
+                      "Sales & Marketing",
+                      "Finance",
+                      "Operations",
+                      "Consulting",
+                      "HR",
+                      "Product & Analytics"
+                    ]
+                  },
+                  "role": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 10
+                  }
+                },
+                "required": [
+                  "function",
+                  "role",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "answersToRework": {
+                      "type": "number"
+                    },
+                    "cvBulletsToReframe": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "answersToRework",
+                    "cvBulletsToReframe"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/outcome": {
+      "get": {
+        "tags": [
+          "Outcome"
+        ],
+        "summary": "Day 0 outcome",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "placed",
+                        "not-placed"
+                      ]
+                    },
+                    "company": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "role": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ctc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "creditCarried": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "day0Label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "company",
+                    "role",
+                    "ctc",
+                    "creditCarried",
+                    "day0Label"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Outcome"
+        ],
+        "summary": "Report placed or not placed",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "placed"
+                      },
+                      "company": {
+                        "type": "string",
+                        "minLength": 2
+                      },
+                      "role": {
+                        "type": "string",
+                        "minLength": 2
+                      },
+                      "ctc": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    },
+                    "required": [
+                      "state",
+                      "company",
+                      "role",
+                      "ctc"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string",
+                        "const": "not-placed"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "placed",
+                        "not-placed"
+                      ]
+                    },
+                    "company": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "role": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ctc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "creditCarried": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "day0Label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "company",
+                    "role",
+                    "ctc",
+                    "creditCarried",
+                    "day0Label"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Notifications and unread count",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "session",
+                              "feedback",
+                              "billing",
+                              "runway",
+                              "system"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "body": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "at": {
+                            "type": "string"
+                          },
+                          "read": {
+                            "type": "boolean"
+                          },
+                          "href": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "title",
+                          "body",
+                          "at",
+                          "read",
+                          "href"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "unread": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "unread"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/read": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Mark read",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "all": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

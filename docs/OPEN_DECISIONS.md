@@ -28,3 +28,13 @@ Built as drawn in the mockups; confirm or change before launch.
 - Reschedule is free until 24 h before the start; the first no-show is free. Both are shown with the Proposed badge or copy.
 - Verify-email: Gmail-style addresses require verification only under `gmail-unverified`.
 - Mock session is cookie based (`prepco_role`, `prepco_onboarded`). The real backend must replace this with an httpOnly session cookie.
+
+## Phase 4 notes
+
+- CV model: the locked version (V4) is read-only for panelists; students edit a working draft (V5) and send a re-lock request. Ops reviews it, Proposed within one working day (reviewing arrives in Phase 5).
+- Bullet tests (decision, number, trade-off) use a simple text heuristic in the mock. The real scorer is a backend decision.
+- Upgrade price: Elite list price minus credit for unused sessions, proportional to what was paid (Proposed).
+- Not placed: full credit carried to next season (Proposed). Placed: company, role and CTC are self-reported.
+- Case track: Elite only; modules are sample content.
+- Quick Switch and the "Routes open to you" list on Journey are Proposed screens with sample content.
+- Notification drawer on every student page; the bell loads the drawer code on first click to protect the bundle budget.

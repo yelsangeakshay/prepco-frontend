@@ -1,3 +1,6 @@
+import { accountHandlers } from "./account";
+import { answerHandlers } from "./answers";
+import { cvHandlers } from "./cv";
 import { authHandlers } from "./auth";
 import { feedbackHandlers } from "./feedback";
 import { onboardingHandlers } from "./onboarding";
@@ -10,4 +13,7 @@ export const handlers = [
   ...plansHandlers,
   ...runwayHandlers,
   ...feedbackHandlers,
+  ...cvHandlers,
+  ...answerHandlers,
+  ...accountHandlers,
 ];

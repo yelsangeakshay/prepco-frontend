@@ -4,3 +4,4 @@ pnpm-lock.yaml
 public/mockServiceWorker.js
 storybook-static
 PREPCO_UI_BUILD_PROMPT.md
+docs/openapi.json

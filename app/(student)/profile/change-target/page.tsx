@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { ChangeTargetView } from "@/features/profile/components/ChangeTargetView";
+
+export const metadata: Metadata = { title: "Change target role" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="E9" title="Change target role" />;
+  return <ChangeTargetView />;
 }

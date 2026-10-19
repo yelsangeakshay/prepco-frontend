@@ -70,7 +70,9 @@ export const runwaySchema = z.object({
     daysLeft: z.number(),
     movedFrom: z.string().nullable(),
   }),
-  banner: z.enum(["late-joiner", "day0-moved", "first-login", "returning-student"]).nullable(),
+  banner: z
+    .enum(["late-joiner", "day0-moved", "first-login", "returning-student", "placed", "not-placed"])
+    .nullable(),
   steps: z.array(runwayStepSchema),
   doneCount: z.number(),
   totalCount: z.number(),
