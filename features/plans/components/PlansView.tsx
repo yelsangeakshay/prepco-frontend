@@ -13,7 +13,7 @@ import { PlanCard } from "./PlanCard";
 /** S4 plans. E5: sold-out plans send people to the waitlist. */
 export function PlansView() {
   const router = useRouter();
-  const { data, isLoading, isError, refetch } = usePlans();
+  const { data, isPending, isError, refetch } = usePlans();
 
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-8">
@@ -41,7 +41,7 @@ export function PlansView() {
         <ErrorCard onRetry={() => refetch()} />
       ) : (
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {isLoading && Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-96" />)}
+          {isPending && Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-96" />)}
           {data?.items.map((p) => {
             const full = p.seatsTaken >= p.seatsTotal;
             return (

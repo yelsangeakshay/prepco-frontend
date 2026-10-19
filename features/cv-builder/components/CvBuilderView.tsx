@@ -23,8 +23,8 @@ const CvPreview = dynamic(() => import("./CvPreview"), {
 
 /** S6 CV Builder. */
 export function CvBuilderView() {
-  const { data, isLoading, isError, refetch } = useCv();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useCv();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   const { draft, locked, relock } = data;

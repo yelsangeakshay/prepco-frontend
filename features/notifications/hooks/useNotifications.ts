@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getNotifications, markNotificationsRead } from "@/lib/api/endpoints";
+import { getNotifications, markNotificationsRead } from "@/lib/api/endpoints/notifications";
 import { queryKeys, staleTimes } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 import type { MarkReadBody } from "../schemas";

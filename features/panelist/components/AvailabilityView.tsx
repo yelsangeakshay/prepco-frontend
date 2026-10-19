@@ -58,8 +58,8 @@ function Editor({ initial, booked }: { initial: AvailabilityValue; booked: strin
 
 /** P5 availability. */
 export function AvailabilityView() {
-  const { data, isLoading, isError, refetch } = useAvailability();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useAvailability();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-4 md:p-8">

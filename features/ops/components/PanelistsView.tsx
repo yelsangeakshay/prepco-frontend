@@ -200,7 +200,7 @@ export function PanelistsView() {
           onPageChange={(p) => set({ page: p })}
           sort={sorting}
           onSortChange={(s) => set({ sort: formatSort(s) }, { resetPage: true })}
-          loading={query.isLoading}
+          loading={query.isPending}
           error={query.isError}
           onRetry={() => query.refetch()}
           emptyTitle="No panelists match"

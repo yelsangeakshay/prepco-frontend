@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { SignInForm } from "@/features/auth/components/SignInForm";
+import { SignInFormLazy } from "@/features/auth/components/lazy";
 
 export const metadata: Metadata = { title: "Sign in" };
 
 export default function Page() {
-  return <SignInForm />;
+  return <SignInFormLazy />;
 }

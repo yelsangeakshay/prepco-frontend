@@ -35,6 +35,7 @@ export const queryKeys = {
   ops: {
     all: ["ops"] as const,
     cohort: ["ops", "cohort"] as const,
+    badges: ["ops", "badges"] as const,
     students: (p?: object) => ["ops", "students", p ?? {}] as const,
     student: (id: string) => ["ops", "student", id] as const,
     assignments: ["ops", "assignments"] as const,

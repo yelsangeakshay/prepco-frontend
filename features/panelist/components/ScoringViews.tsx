@@ -12,15 +12,16 @@ import { PageSkeleton } from "@/components/shared/Skeletons";
 import { ApiError } from "@/lib/api/client";
 import { ROUTES } from "@/lib/config/routes";
 import { useLocalDraft } from "@/lib/utils/useLocalDraft";
-import { ScoringForm, type ScoringValues } from "../scoring/components/ScoringForm";
+import type { ScoringValues } from "../scoring/components/ScoringForm";
+import { ScoringFormLazy } from "./lazy";
 import { useBrief, useScoringList, useSubmitScore } from "../hooks/usePanelist";
 import { BriefBody } from "./BriefViews";
 import { PanelRow } from "./PanelRow";
 
 /** P4 list. */
 export function ScoringList() {
-  const { data, isLoading, isError, refetch } = useScoringList();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useScoringList();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-8">
@@ -58,7 +59,7 @@ export function LiveScoring({ sessionId }: { sessionId: string }) {
 
   const onChange = useCallback((v: ScoringValues) => saveDraft(JSON.stringify(v)), [saveDraft]);
 
-  if (brief.isLoading) return <PageSkeleton />;
+  if (brief.isPending) return <PageSkeleton />;
   if (brief.isError || !brief.data) {
     const notFound = brief.error instanceof ApiError && brief.error.status === 404;
     return (
@@ -131,7 +132,7 @@ export function LiveScoring({ sessionId }: { sessionId: string }) {
               {err?.message ?? "We could not send your feedback. Please try again."}
             </p>
           )}
-          <ScoringForm
+          <ScoringFormLazy
             defaultValues={restored}
             submitting={submit.isPending}
             onChange={onChange}

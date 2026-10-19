@@ -12,10 +12,10 @@ import { NotificationItem } from "./NotificationItem";
 /** The list used by both the /notifications page and the bell drawer. */
 export function NotificationList({ onNavigate }: { onNavigate?: () => void }) {
   const router = useRouter();
-  const { data, isLoading, isError, refetch } = useNotifications();
+  const { data, isPending, isError, refetch } = useNotifications();
   const mark = useMarkRead();
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div role="status" aria-label="Loading notifications" className="space-y-2 p-4">
         {Array.from({ length: 4 }, (_, i) => (

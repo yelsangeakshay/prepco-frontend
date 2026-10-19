@@ -13,8 +13,8 @@ import { useCaseTrack } from "../hooks/useJourney";
 
 /** S12 case track. Locked view for anyone not on Elite. */
 export function CaseTrackView() {
-  const { data, isLoading, isError, error, refetch } = useCaseTrack();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, error, refetch } = useCaseTrack();
+  if (isPending) return <PageSkeleton />;
 
   if (error instanceof ApiError && error.code === "elite_only") {
     return (

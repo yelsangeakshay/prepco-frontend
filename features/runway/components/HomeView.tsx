@@ -21,10 +21,10 @@ import { TaskList } from "./TaskList";
 /** S5 home. */
 export function HomeView() {
   const router = useRouter();
-  const { data, isLoading, isError, refetch } = useRunway();
+  const { data, isPending, isError, refetch } = useRunway();
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
 
-  if (isLoading) return <PageSkeleton />;
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   const firstName = data.student.name.split(" ")[0];

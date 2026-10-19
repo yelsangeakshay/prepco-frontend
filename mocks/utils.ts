@@ -7,8 +7,16 @@ export function scenarioOf(request: Request): Scenario | null {
 }
 
 /** 200 to 600 ms so skeletons are real. Skipped under Vitest. */
+declare global {
+  interface Window {
+    /** Set by the Web Vitals test so the budget measures our front end, not the artificial delay. */
+    __PREPCO_NO_LATENCY__?: boolean;
+  }
+}
+
 export async function latency() {
   if (typeof process !== "undefined" && process.env.VITEST) return;
+  if (typeof window !== "undefined" && window.__PREPCO_NO_LATENCY__) return;
   await delay(200 + Math.random() * 400);
 }
 

@@ -19,7 +19,7 @@ export function CvVersionsView() {
   const cv = useCv();
   const lock = useLockVersion();
 
-  if (versions.isLoading || cv.isLoading) return <PageSkeleton />;
+  if (versions.isPending || cv.isPending) return <PageSkeleton />;
   if (versions.isError || cv.isError || !versions.data || !cv.data) {
     return (
       <ErrorCard

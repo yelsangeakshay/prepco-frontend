@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { NAV, NAV_FOOTER, type NavItem } from "@/lib/config/nav";
 import { ROLE_HOME, type Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils/cn";
-import { useOpsAssignments } from "@/features/ops/hooks/useOps";
+import { useOpsBadge } from "@/features/ops/hooks/useOpsBadge";
 import { ROUTES } from "@/lib/config/routes";
 import { Logo } from "./Logo";
 
@@ -60,7 +60,7 @@ export function Sidebar({ role }: { role: Role }) {
   const pathname = usePathname();
   const config = NAV[role];
   // Live count of panels waiting for a panelist.
-  const unassigned = useOpsAssignments(role === "ops").data?.unassigned.length;
+  const unassigned = useOpsBadge(role === "ops").data?.unassigned;
 
   return (
     <aside

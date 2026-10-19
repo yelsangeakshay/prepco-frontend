@@ -40,3 +40,16 @@ export function FormAlert({ children }: { children: ReactNode }) {
     </p>
   );
 }
+
+/** Placeholder while a lazily loaded auth form arrives. */
+export function AuthSkeleton() {
+  return (
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-4 py-8">
+      <div
+        role="status"
+        aria-label="Loading"
+        className="bg-cream-soft h-80 animate-pulse rounded-2xl"
+      />
+    </main>
+  );
+}

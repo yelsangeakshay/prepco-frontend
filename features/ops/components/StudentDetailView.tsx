@@ -22,9 +22,9 @@ const STATUS_TONE = {
 
 /** A2 detail. */
 export function StudentDetailView({ id }: { id: string }) {
-  const { data, isLoading, isError, error, refetch } = useOpsStudent(id);
+  const { data, isPending, isError, error, refetch } = useOpsStudent(id);
   const relock = useRelockDecision(id);
-  if (isLoading) return <PageSkeleton />;
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) {
     const notFound = error instanceof ApiError && error.status === 404;
     return (

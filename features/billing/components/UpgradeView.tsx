@@ -47,7 +47,7 @@ export function UpgradeView() {
     );
   }
 
-  if (quote.isLoading) return <PageSkeleton />;
+  if (quote.isPending) return <PageSkeleton />;
 
   const qErr = quote.error instanceof ApiError ? quote.error : null;
   if (qErr?.code === "already_elite") {

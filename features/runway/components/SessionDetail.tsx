@@ -34,7 +34,7 @@ export function SessionDetail({ id }: { id: string }) {
   const needsSlot = !!s && ["unbooked", "cancelled", "no-show"].includes(s.status);
   const slots = useSessionSlots(id, needsSlot || picking);
 
-  if (session.isLoading) return <PageSkeleton />;
+  if (session.isPending) return <PageSkeleton />;
   if (session.isError || !s) {
     const notFound = session.error instanceof ApiError && session.error.status === 404;
     return (
@@ -173,7 +173,7 @@ export function SessionDetail({ id }: { id: string }) {
           </h2>
           <SlotPicker
             slots={slots.data?.items ?? []}
-            loading={slots.isLoading || slots.isFetching}
+            loading={slots.isPending || slots.isFetching}
             slotTakenError={slotTaken}
             confirming={mutation.isPending}
             onConfirm={onConfirm}

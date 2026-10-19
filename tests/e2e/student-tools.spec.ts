@@ -184,12 +184,6 @@ test.describe("After Day 0", () => {
     await expect(page.getByTestId("outcome-placed")).toContainText("₹12,00,000");
   });
 
-  test("not placed: credit carried over in full", async ({ page, context }) => {
-    await signInAsRiya(context, "not-placed");
-    await gotoReady(page, "/outcome");
-    await expect(page.getByTestId("outcome-not-placed")).toContainText("₹36,999");
-  });
-
   test("report an outcome yourself", async ({ page, context }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/outcome");
@@ -271,5 +265,18 @@ test.describe("On a phone, start to finish", () => {
     await openFromNav(page, "Sessions & runway", true);
     await expect(page).toHaveURL(/\/sessions$/);
     expect(await noHScroll()).toBe(true);
+  });
+});
+
+test.describe("Not placed, credit carried over", () => {
+  test("outcome page, home banner, and billing agree", async ({ page, context, isMobile }) => {
+    await signInAsRiya(context, "not-placed");
+    await gotoReady(page, "/home");
+    await expect(page.getByTestId("banner-not-placed")).toContainText("credit is carried over");
+    await openFromNav(page, "Plan & billing", isMobile);
+    await expect(page.getByRole("heading", { name: "Plan & billing" })).toBeVisible();
+    await gotoReady(page, "/outcome");
+    await expect(page.getByTestId("outcome-not-placed")).toContainText("₹36,999");
+    await expect(page.getByTestId("outcome-not-placed")).toContainText("in full");
   });
 });

@@ -17,3 +17,13 @@ export function PageSkeleton() {
     </div>
   );
 }
+
+/** Stand-in for a form that loads right after first paint. */
+export function FormSkeleton({ className }: { className?: string }) {
+  return (
+    <div role="status" aria-label="Loading form" className={cn("space-y-3 p-4 md:p-8", className)}>
+      <Skeleton className="h-8 w-56" />
+      <Skeleton className="h-64 w-full max-w-xl" />
+    </div>
+  );
+}

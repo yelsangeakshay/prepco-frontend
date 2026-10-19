@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getPlans, postCheckout, postWaitlist } from "@/lib/api/endpoints";
+import { getPlans, postCheckout, postWaitlist } from "@/lib/api/endpoints/plans";
 import { queryKeys, staleTimes } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

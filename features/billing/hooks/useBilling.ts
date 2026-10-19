@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getBilling, getUpgradeQuote, postUpgrade } from "@/lib/api/endpoints";
+import { getBilling, getUpgradeQuote, postUpgrade } from "@/lib/api/endpoints/billing";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

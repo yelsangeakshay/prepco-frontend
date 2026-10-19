@@ -15,7 +15,7 @@ import { useJourney } from "../hooks/useJourney";
 export function JourneyView() {
   const journey = useJourney();
   const runway = useRunway();
-  if (journey.isLoading || runway.isLoading) return <PageSkeleton />;
+  if (journey.isPending || runway.isPending) return <PageSkeleton />;
   if (journey.isError || !journey.data || !runway.data) {
     return (
       <ErrorCard

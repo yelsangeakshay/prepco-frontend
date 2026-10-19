@@ -92,10 +92,10 @@ function Editor({ answer }: { answer: AnswerDetail }) {
 
 /** S8 detail: draft, inline critique, optimistic flag / rehearsed. */
 export function AnswerDetailView({ id }: { id: string }) {
-  const { data, isLoading, isError, error, refetch } = useAnswer(id);
+  const { data, isPending, isError, error, refetch } = useAnswer(id);
   const patch = usePatchAnswer(id);
 
-  if (isLoading) return <PageSkeleton />;
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) {
     const notFound = error instanceof ApiError && error.status === 404;
     return (

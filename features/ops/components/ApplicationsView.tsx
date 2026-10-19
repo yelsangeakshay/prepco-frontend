@@ -79,7 +79,7 @@ const TABS = [
 export function ApplicationsView() {
   const { params, set } = useUrlState();
   const status = params.get("status") ?? "pending";
-  const { data, isLoading, isError, refetch } = useOpsApplications(status);
+  const { data, isPending, isError, refetch } = useOpsApplications(status);
 
   return (
     <div className="mx-auto max-w-4xl space-y-4 p-4 md:p-8">
@@ -110,7 +110,7 @@ export function ApplicationsView() {
         })}
       </div>
 
-      {isLoading ? (
+      {isPending ? (
         <PageSkeleton />
       ) : isError || !data ? (
         <ErrorCard onRetry={() => refetch()} />

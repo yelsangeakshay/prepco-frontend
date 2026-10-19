@@ -23,8 +23,8 @@ const WeekChart = dynamic(() => import("./Charts").then((m) => m.WeekChart), {
 
 /** A1 cohort overview. */
 export function OpsOverview() {
-  const { data, isLoading, isError, refetch } = useCohort();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useCohort();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   return (

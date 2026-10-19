@@ -9,7 +9,7 @@ import {
   getSessionSlots,
   getSessions,
   rescheduleSession,
-} from "@/lib/api/endpoints";
+} from "@/lib/api/endpoints/runway";
 import { queryKeys, staleTimes } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

@@ -25,7 +25,7 @@ export function ChangeTargetView() {
     formState: { errors },
   } = useForm<ChangeTargetBody>({ resolver: zodResolver(changeTargetBodySchema) });
 
-  if (profile.isLoading) return <PageSkeleton />;
+  if (profile.isPending) return <PageSkeleton />;
   if (profile.isError || !profile.data) return <ErrorCard onRetry={() => profile.refetch()} />;
 
   if (change.data) {

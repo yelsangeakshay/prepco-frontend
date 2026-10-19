@@ -47,7 +47,7 @@ export function QuickSwitchView() {
         </FormField>
       </Card>
 
-      {to && q.isLoading && <Skeleton className="h-40 w-full" />}
+      {to && q.isPending && <Skeleton className="h-40 w-full" />}
       {to && q.isError && <ErrorCard onRetry={() => q.refetch()} />}
       {q.data && to && (
         <Card variant="feature" data-testid="quick-switch-result">

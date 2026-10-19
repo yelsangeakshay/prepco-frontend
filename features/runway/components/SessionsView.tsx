@@ -19,7 +19,7 @@ export function SessionsView() {
   const runway = useRunway();
   const sessions = useSessions();
 
-  if (runway.isLoading || sessions.isLoading) return <PageSkeleton />;
+  if (runway.isPending || sessions.isPending) return <PageSkeleton />;
   if (runway.isError || sessions.isError || !runway.data || !sessions.data) {
     return (
       <ErrorCard

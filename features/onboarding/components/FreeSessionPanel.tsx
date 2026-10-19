@@ -15,10 +15,10 @@ import { useFreeSession } from "../hooks/useOnboarding";
 
 /** S3 (pick a slot) and E12 (free session already used). */
 export function FreeSessionPanel() {
-  const { data, isLoading, isError, refetch } = useFreeSession();
+  const { data, isPending, isError, refetch } = useFreeSession();
   const book = useBookSession("free");
 
-  if (isLoading) return <PageSkeleton />;
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   const wrap = (children: React.ReactNode) => (

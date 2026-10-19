@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getOutcome, postOutcome } from "@/lib/api/endpoints";
+import { getOutcome, postOutcome } from "@/lib/api/endpoints/outcome";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

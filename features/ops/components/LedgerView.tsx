@@ -121,7 +121,7 @@ export function LedgerView() {
         page={page}
         pageSize={pageSize}
         onPageChange={(p) => set({ page: p })}
-        loading={query.isLoading}
+        loading={query.isPending}
         error={query.isError}
         onRetry={() => query.refetch()}
         emptyTitle="No entries"

@@ -51,3 +51,7 @@ Not verified: visual match to `cover.png` (file absent). Gold text is not used o
 - Charts (Recharts) and the data table (TanStack Table + Virtual) are lazy-loaded
 - Tests: 55 unit tests (world numbers, the three-role flow, conflicts, roster health), 119 Playwright runs on desktop and phone including Become a panelist, Run a panel, Set availability, Weekly ops loop, Keep the panel healthy, One panel three roles, CV re-lock review
 - Bundle: panelist and ops routes are 164 to 171 kB except apply and profile (180 kB, React Hook Form). Phase 6 should look at the remaining form routes.
+
+## Phase 6: Hardening and handover: in progress
+
+(See the end of this file once the gate has run.)

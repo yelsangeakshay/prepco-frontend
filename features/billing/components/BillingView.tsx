@@ -16,8 +16,8 @@ import { useBilling } from "../hooks/useBilling";
 
 /** S14 plan and billing. */
 export function BillingView() {
-  const { data, isLoading, isError, refetch } = useBilling();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useBilling();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   const { plan, credits, invoices } = data;

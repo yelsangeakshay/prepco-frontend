@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { forgotPassword, resetPassword, signIn, signUp } from "@/lib/api/endpoints";
+import { forgotPassword, resetPassword, signIn, signUp } from "@/lib/api/endpoints/auth";
 import { startMockSession } from "@/lib/auth/client";
 
 export function useSignIn() {

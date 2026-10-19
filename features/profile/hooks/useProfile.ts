@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { changeTarget, getProfile, updateProfile } from "@/lib/api/endpoints";
+import { changeTarget, getProfile, updateProfile } from "@/lib/api/endpoints/profile";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

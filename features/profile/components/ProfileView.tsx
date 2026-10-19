@@ -1,74 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@/lib/forms/zodResolver";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/field";
-import { FormField } from "@/components/ui/form-field";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageSkeleton } from "@/components/shared/Skeletons";
 import { ROUTES } from "@/lib/config/routes";
 import { formatDay } from "@/lib/utils/dates";
-import { notify } from "@/lib/utils/notify";
-import { useProfile, useUpdateProfile } from "../hooks/useProfile";
-import {
-  updateProfileBodySchema,
-  type ProfileView as Profile,
-  type UpdateProfileBody,
-} from "../schemas";
-
-function DetailsForm({ profile }: { profile: Profile }) {
-  const update = useUpdateProfile();
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm<UpdateProfileBody>({
-    resolver: zodResolver(updateProfileBodySchema),
-    defaultValues: { name: profile.name, college: profile.college, batch: profile.batch },
-  });
-
-  return (
-    <form
-      noValidate
-      className="space-y-4"
-      onSubmit={handleSubmit((v) =>
-        update.mutate(v, {
-          onSuccess: () => {
-            reset(v);
-            notify("Profile saved");
-          },
-        }),
-      )}
-    >
-      <FormField id="name" label="Full name" error={errors.name?.message}>
-        <Input id="name" aria-invalid={!!errors.name} {...register("name")} />
-      </FormField>
-      <FormField id="college" label="College" error={errors.college?.message}>
-        <Input id="college" aria-invalid={!!errors.college} {...register("college")} />
-      </FormField>
-      <FormField id="batch" label="Batch" error={errors.batch?.message}>
-        <Input id="batch" aria-invalid={!!errors.batch} {...register("batch")} />
-      </FormField>
-      {update.isError && (
-        <p role="alert" className="text-maroon-600 text-sm">
-          We could not save. Please try again.
-        </p>
-      )}
-      <Button type="submit" disabled={!isDirty || update.isPending}>
-        {update.isPending ? "Saving…" : "Save Profile"}
-      </Button>
-    </form>
-  );
-}
+import { useProfile } from "../hooks/useProfile";
+import { ProfileDetailsFormLazy } from "./lazy";
 
 /** S15 profile. */
 export function ProfileView() {
-  const { data, isLoading, isError, refetch } = useProfile();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useProfile();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   return (
@@ -113,7 +58,7 @@ export function ProfileView() {
       <Card variant="feature">
         <h2 className="font-display mb-4 text-xl font-bold">Your details</h2>
         <p className="text-navy-400 mb-4 text-sm">{data.email}</p>
-        <DetailsForm profile={data} />
+        <ProfileDetailsFormLazy profile={data} />
       </Card>
     </div>
   );

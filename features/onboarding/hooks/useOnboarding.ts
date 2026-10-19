@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getFreeSession, saveProfile, uploadCv } from "@/lib/api/endpoints";
+import { getFreeSession, saveProfile, uploadCv } from "@/lib/api/endpoints/onboarding";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

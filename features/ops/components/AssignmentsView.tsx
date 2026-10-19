@@ -76,8 +76,8 @@ function AssignRow({ row }: { row: Row }) {
 
 /** A3 panel assignment: load per function, then the unassigned queue. */
 export function AssignmentsView() {
-  const { data, isLoading, isError, refetch } = useOpsAssignments();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useOpsAssignments();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   return (

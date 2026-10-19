@@ -4,13 +4,13 @@
   --cream-soft: #efe9dc; /* inset panels, tip boxes */
   --white: #ffffff; /* cards */
   --navy-900: #0f1b2d; /* text, sidebar, hero card */
-  --navy-400: #6b7785; /* secondary text */
+  --navy-400: #566170; /* secondary text (darkened from #6B7785 to pass AA on cream) */
   --maroon-600: #7c1f34; /* primary button, active nav, accent */
   --maroon-700: #611829; /* hover */
   --maroon-100: #f6e4e8; /* flagged badge bg */
   --gold-500: #c0993d; /* Elite, Day 0 */
   --gold-300: #e2c383; /* accent on navy */
-  --green-600: #2f7d4f; /* done */
+  --green-600: #256a41; /* done */
   --green-100: #e3f1e8;
   --line: #e2dccd; /* hairlines on cream */
 

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { WaitlistView } from "@/features/checkout/components/WaitlistView";
+import { WaitlistViewLazy } from "@/features/checkout/components/lazy";
 
 export const metadata: Metadata = { title: "Waitlist" };
 
 export default function Page() {
-  return <WaitlistView />;
+  return <WaitlistViewLazy />;
 }

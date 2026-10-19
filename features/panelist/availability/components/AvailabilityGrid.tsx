@@ -48,7 +48,7 @@ export function AvailabilityGrid({ value, onChange, booked = [] }: Props) {
                     <button
                       type="button"
                       aria-pressed={on || isBooked}
-                      aria-label={`${d} ${h}${isBooked ? ", booked" : ""}`}
+                      aria-label={`${d} ${h}${isBooked ? ", booked" : on ? ", open" : ""}`}
                       disabled={isBooked}
                       onClick={() => onChange({ ...value, [key]: !on })}
                       className={cn(

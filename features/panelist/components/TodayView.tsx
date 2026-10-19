@@ -9,8 +9,8 @@ import { PanelRow } from "./PanelRow";
 
 /** P2 today. */
 export function TodayView() {
-  const { data, isLoading, isError, refetch } = usePanelistToday();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = usePanelistToday();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   const { panelist, today, upcoming, awaitingScore, stats } = data;

@@ -12,7 +12,7 @@ import {
   postScore,
   putAvailability,
   putPanelistProfile,
-} from "@/lib/api/endpoints";
+} from "@/lib/api/endpoints/panelist";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 import type { ScoreBody } from "../schemas";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getCaseTrack, getJourney, getQuickSwitch } from "@/lib/api/endpoints";
+import { getCaseTrack, getJourney, getQuickSwitch } from "@/lib/api/endpoints/journey";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

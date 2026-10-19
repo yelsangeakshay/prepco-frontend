@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ChangeTargetView } from "@/features/profile/components/ChangeTargetView";
+import { ChangeTargetViewLazy } from "@/features/profile/components/lazy";
 
 export const metadata: Metadata = { title: "Change target role" };
 
 export default function Page() {
-  return <ChangeTargetView />;
+  return <ChangeTargetViewLazy />;
 }

@@ -104,7 +104,13 @@ export function DataTable<T>({
 
   return (
     <div className="rounded-card border-line overflow-hidden border bg-white">
-      <div ref={scrollRef} className={cn("overflow-auto", virtual && "max-h-[640px]")}>
+      <div
+        ref={scrollRef}
+        role="region"
+        aria-label={caption}
+        tabIndex={0}
+        className={cn("relative overflow-auto", virtual && "max-h-[640px]")}
+      >
         <table className="w-full text-left text-sm">
           <caption className="sr-only">{caption}</caption>
           <thead className="bg-cream-soft sticky top-0 z-10">

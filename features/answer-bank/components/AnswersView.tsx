@@ -40,7 +40,7 @@ export function AnswersView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced]);
 
-  const { data, isLoading, isError, refetch, isFetching } = useAnswers({
+  const { data, isPending, isError, refetch, isFetching } = useAnswers({
     status: status || undefined,
     q: urlQ || undefined,
     page,
@@ -97,7 +97,7 @@ export function AnswersView() {
 
       {isError ? (
         <ErrorCard onRetry={() => refetch()} />
-      ) : isLoading ? (
+      ) : isPending ? (
         <div role="status" aria-label="Loading answers" className="space-y-3">
           {Array.from({ length: 5 }, (_, i) => (
             <Skeleton key={i} className="h-28" />

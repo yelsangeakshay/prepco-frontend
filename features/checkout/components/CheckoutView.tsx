@@ -42,7 +42,7 @@ export function CheckoutView({ planId }: { planId: string }) {
   const plans = usePlans();
   const pay = useCheckout();
 
-  if (plans.isLoading) return <PageSkeleton />;
+  if (plans.isPending) return <PageSkeleton />;
   if (plans.isError || !plans.data) return <ErrorCard onRetry={() => plans.refetch()} />;
 
   const plan = plans.data.items.find((p) => p.id === planId);

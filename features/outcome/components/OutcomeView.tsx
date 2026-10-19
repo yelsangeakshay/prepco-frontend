@@ -2,61 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@/lib/forms/zodResolver";
 import { PartyPopper, HeartHandshake } from "lucide-react";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/field";
-import { FormField } from "@/components/ui/form-field";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { ProposedBadge } from "@/components/shared/Badges";
 import { PageSkeleton } from "@/components/shared/Skeletons";
 import { ROUTES } from "@/lib/config/routes";
 import { formatINR } from "@/lib/utils/currency";
 import { useOutcome, usePostOutcome } from "../hooks/useOutcome";
-
-const placedForm = z.object({
-  company: z.string().trim().min(2, "Enter the company"),
-  role: z.string().trim().min(2, "Enter the role"),
-  ctc: z.coerce.number({ message: "Enter the CTC in ₹" }).positive("Enter the CTC in ₹"),
-});
-type PlacedValues = z.input<typeof placedForm>;
-
-function PlacedForm({ onDone }: { onDone: (v: z.output<typeof placedForm>) => void }) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<PlacedValues, unknown, z.output<typeof placedForm>>({
-    resolver: zodResolver(placedForm),
-  });
-  return (
-    <form noValidate className="space-y-4" onSubmit={handleSubmit(onDone)}>
-      <FormField id="company" label="Company" error={errors.company?.message}>
-        <Input id="company" aria-invalid={!!errors.company} {...register("company")} />
-      </FormField>
-      <FormField id="role" label="Role" error={errors.role?.message}>
-        <Input id="role" aria-invalid={!!errors.role} {...register("role")} />
-      </FormField>
-      <FormField id="ctc" label="Annual CTC (₹)" error={errors.ctc?.message}>
-        <Input id="ctc" inputMode="numeric" aria-invalid={!!errors.ctc} {...register("ctc")} />
-      </FormField>
-      <Button type="submit" className="w-full">
-        Save Outcome
-      </Button>
-    </form>
-  );
-}
+import { PlacedFormLazy } from "./lazy";
 
 /** E7 report outcome; E11 the placed and not-placed result states. */
 export function OutcomeView() {
-  const { data, isLoading, isError, refetch } = useOutcome();
+  const { data, isPending, isError, refetch } = useOutcome();
   const post = usePostOutcome();
   const [mode, setMode] = useState<"choose" | "placed">("choose");
 
-  if (isLoading) return <PageSkeleton />;
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   const shell = (children: React.ReactNode) => (
@@ -138,7 +101,7 @@ export function OutcomeView() {
             </Button>
           </div>
         ) : (
-          <PlacedForm onDone={(v) => post.mutate({ state: "placed", ...v })} />
+          <PlacedFormLazy onDone={(v) => post.mutate({ state: "placed", ...v })} />
         )}
         {post.isError && (
           <p role="alert" className="text-maroon-600 mt-3 text-sm">

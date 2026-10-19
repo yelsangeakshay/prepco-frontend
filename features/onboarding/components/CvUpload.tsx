@@ -78,6 +78,7 @@ export function CvUpload() {
           <input
             ref={inputRef}
             id="cv-file"
+            aria-label="Choose your CV file"
             type="file"
             accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             className="sr-only"

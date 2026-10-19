@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ForgotPasswordForm } from "@/features/auth/components/RecoveryForms";
+import { ForgotPasswordFormLazy } from "@/features/auth/components/lazy";
 
 export const metadata: Metadata = { title: "Forgot password" };
 
 export default function Page() {
-  return <ForgotPasswordForm />;
+  return <ForgotPasswordFormLazy />;
 }

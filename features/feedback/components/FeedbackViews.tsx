@@ -14,8 +14,8 @@ import { FeedbackNote } from "./FeedbackNote";
 
 /** S10 list. */
 export function FeedbackList() {
-  const { data, isLoading, isError, refetch } = useFeedbackList();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = useFeedbackList();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   return (
@@ -61,8 +61,8 @@ export function FeedbackList() {
 
 /** S10 detail. */
 export function FeedbackDetailView({ panelId }: { panelId: string }) {
-  const { data, isLoading, isError, error, refetch } = useFeedbackDetail(panelId);
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, error, refetch } = useFeedbackDetail(panelId);
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) {
     const notFound = error instanceof ApiError && error.status === 404;
     return (

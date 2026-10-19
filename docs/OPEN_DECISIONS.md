@@ -49,3 +49,26 @@ Built as drawn in the mockups; confirm or change before launch.
 - No-show: ops can excuse it (first no-show is free). What a non-excused no-show costs is not implemented.
 - Ledger revenue by tier counts payments and top-ups per tier; Riya's upgrade is counted under Elite while her Premium payment stays under Premium.
 - Panel capacity per week (5 to 8) is sample data.
+
+## Phase 6 notes
+
+- **Design token changed for accessibility.** `--navy-400` (secondary text) is `#566170`, darker than the
+  `#6B7785` on the cover sheet. The original fails WCAG AA (about 4.0:1) on the cream background. `--green-600`
+  was darkened to `#256A41` for the same reason. Confirm with design, or keep the lighter value only on
+  large text.
+- **Mockups were never available.** All layout comes from the brief's text and tokens. Nothing here has been
+  compared with the PNGs. See `docs/DEFINITION_OF_DONE.md`.
+- **Form pages render after first paint.** Sign-in, sign-up, password pages, onboarding, waitlist, change
+  target, panelist apply and the profile forms load React Hook Form and Zod as a separate chunk (client only).
+  This keeps first-load JS under 170 KiB. The cost is a short skeleton before the form on slow links. The
+  alternative is server-rendering them and moving to lighter form code.
+- **First-load budget is measured in KiB** (1024 bytes), like the `next build` report: `pnpm check:bundle`.
+- **Web Vitals profile.** "4G" is 9 Mbps down, 1.5 Mbps up, 100 ms RTT, with 4x CPU throttling. The stricter
+  Lighthouse "Slow 4G" profile (1.6 Mbps, 150 ms) gives an LCP of about 4 s with the mock worker on; the mock
+  worker itself loads about 100 kB of extra script that a real backend would not need.
+- **Scenario by URL** works for every page in the student app through the middleware cookie. Panelist and ops
+  pages read the same cookie but only the student scenarios change what they show.
+- **Payment gateway, Calendly versus a native slot picker, dark mode, tablet layouts** remain as listed in the
+  brief: not built, tokens ready, light only.
+- **Mock latency** (200 to 600 ms) is switched off only by the Web Vitals test, through
+  `window.__PREPCO_NO_LATENCY__`.

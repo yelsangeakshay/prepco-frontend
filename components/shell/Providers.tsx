@@ -5,6 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { API_MOCKING } from "@/lib/api/client";
 
+// Start loading the mock worker as soon as this module runs in the browser, not after hydration.
+const workerStarted: Promise<void> | null =
+  API_MOCKING && typeof window !== "undefined"
+    ? import("@/mocks/browser").then(async ({ worker }) => {
+        await worker.start({ onUnhandledFrame: "bypass", quiet: true });
+      })
+    : null;
+
 const ApiReadyContext = createContext(!API_MOCKING);
 
 /** False until the MSW worker is up. Feature hooks pass this as `enabled`. */
@@ -22,9 +30,7 @@ export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!API_MOCKING) return;
     let cancelled = false;
-    import("@/mocks/browser")
-      .then(({ worker }) => worker.start({ onUnhandledFrame: "bypass", quiet: true }))
-      .then(() => !cancelled && setReady(true));
+    workerStarted?.then(() => !cancelled && setReady(true));
     return () => {
       cancelled = true;
     };

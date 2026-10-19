@@ -15,8 +15,8 @@ import { PanelRow } from "./PanelRow";
 
 /** P3 list. */
 export function BriefList() {
-  const { data, isLoading, isError, refetch } = usePanelBriefs();
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, refetch } = usePanelBriefs();
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
   return (
     <div className="mx-auto max-w-4xl space-y-4 p-4 md:p-8">
@@ -97,8 +97,8 @@ export function BriefBody({ brief }: { brief: Brief }) {
 
 /** P3 detail. */
 export function BriefDetail({ sessionId }: { sessionId: string }) {
-  const { data, isLoading, isError, error, refetch } = useBrief(sessionId);
-  if (isLoading) return <PageSkeleton />;
+  const { data, isPending, isError, error, refetch } = useBrief(sessionId);
+  if (isPending) return <PageSkeleton />;
   if (isError || !data) {
     const notFound = error instanceof ApiError && error.status === 404;
     return (

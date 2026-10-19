@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getFeedback, getFeedbackDetail } from "@/lib/api/endpoints";
+import { getFeedback, getFeedbackDetail } from "@/lib/api/endpoints/feedback";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 

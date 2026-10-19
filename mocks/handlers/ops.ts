@@ -172,6 +172,13 @@ export const opsHandlers = [
     });
   }),
 
+  http.get(`${API_BASE_URL}/ops/badges`, async ({ request }) => {
+    const scenario = scenarioOf(request);
+    return HttpResponse.json({
+      unassigned: allBookings(scenario).filter((x) => x.status === "unassigned").length,
+    });
+  }),
+
   // Students -----------------------------------------------------------------
   http.get(`${API_BASE_URL}/ops/students`, async ({ request }) => {
     await latency();

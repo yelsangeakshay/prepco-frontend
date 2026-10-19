@@ -15,8 +15,8 @@ import {
   getOpsStudents,
   panelistAction,
   postAssignment,
-  type ListParams,
-} from "@/lib/api/endpoints";
+} from "@/lib/api/endpoints/ops";
+import { type ListParams } from "@/lib/api/endpoints/qs";
 import { queryKeys } from "@/lib/api/query-keys";
 import { useApiReady } from "@/components/shell/Providers";
 
@@ -61,13 +61,9 @@ export function useRelockDecision(id: string) {
   });
 }
 
-export function useOpsAssignments(enabled = true) {
+export function useOpsAssignments() {
   const ready = useApiReady();
-  return useQuery({
-    queryKey: k.assignments,
-    queryFn: getOpsAssignments,
-    enabled: ready && enabled,
-  });
+  return useQuery({ queryKey: k.assignments, queryFn: getOpsAssignments, enabled: ready });
 }
 
 /** Assigning is not optimistic: the panelist may be taken between click and confirm. */
