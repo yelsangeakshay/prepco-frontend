@@ -40,7 +40,10 @@ export function PlansView() {
       {isError ? (
         <ErrorCard onRetry={() => refetch()} />
       ) : (
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div
+          className="mt-6 grid gap-4 md:grid-cols-3"
+          {...(isPending ? { role: "status", "aria-label": "Loading plans" } : {})}
+        >
           {isPending && Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-96" />)}
           {data?.items.map((p) => {
             const full = p.seatsTaken >= p.seatsTotal;

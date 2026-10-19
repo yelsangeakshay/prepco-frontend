@@ -8,7 +8,10 @@ const Link = forwardRef<
     prefetch?: boolean;
     children?: ReactNode;
   }
->(function Link({ href, prefetch: _prefetch, children, onClick, ...rest }, ref) {
+>(function Link({ href, children, onClick, ...rest }, ref) {
+  // next/link takes a prefetch prop; a plain anchor must not receive it.
+  const { prefetch, ...anchor } = rest;
+  void prefetch;
   return (
     <a
       ref={ref}
@@ -18,7 +21,7 @@ const Link = forwardRef<
         e.preventDefault();
         onClick?.(e);
       }}
-      {...rest}
+      {...anchor}
     >
       {children}
     </a>
