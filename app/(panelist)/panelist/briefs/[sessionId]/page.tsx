@@ -1,6 +1,9 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { BriefDetail } from "@/features/panelist/components/BriefViews";
+
+export const metadata: Metadata = { title: "Brief" };
 
 export default async function Page({ params }: { params: Promise<{ sessionId: string }> }) {
-  const p = await params;
-  return <ScreenPlaceholder code="P3" title="Brief" params={p} />;
+  const { sessionId } = await params;
+  return <BriefDetail sessionId={sessionId} />;
 }

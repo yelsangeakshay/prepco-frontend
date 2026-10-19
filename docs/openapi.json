@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "The Prep Co web API (mock contract)",
-    "version": "0.4.0",
-    "description": "Generated from lib/api/contract.ts. Phase 4 covers the student app; panelist and ops endpoints arrive in Phase 5."
+    "version": "0.5.0",
+    "description": "Generated from lib/api/contract.ts. Student, panelist and ops endpoints."
   },
   "servers": [
     {
@@ -4142,6 +4142,2981 @@
                     "ok"
                   ],
                   "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panelist/applications": {
+      "post": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Apply to be a panelist (public)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "function": {
+                    "type": "string",
+                    "enum": [
+                      "Sales & Marketing",
+                      "Finance",
+                      "Operations",
+                      "Consulting",
+                      "HR",
+                      "Product & Analytics"
+                    ]
+                  },
+                  "company": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "role": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "years": {
+                    "type": "number",
+                    "minimum": 3,
+                    "maximum": 40
+                  },
+                  "linkedin": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      {
+                        "type": "string",
+                        "const": ""
+                      }
+                    ]
+                  },
+                  "hoursPerMonth": {
+                    "type": "number",
+                    "minimum": 2,
+                    "maximum": 40
+                  },
+                  "why": {
+                    "type": "string",
+                    "minLength": 30
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "function",
+                  "company",
+                  "role",
+                  "years",
+                  "linkedin",
+                  "hoursPerMonth",
+                  "why"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "const": "received"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "already_applied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panelist/today": {
+      "get": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Tonight, coming up, waiting for a score",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "panelist": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "function": {
+                          "type": "string"
+                        },
+                        "specialty": {
+                          "type": "string"
+                        },
+                        "panelsThisSeason": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "function",
+                        "specialty",
+                        "panelsThisSeason"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "today": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "college": {
+                            "type": "string"
+                          },
+                          "target": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "awaiting-score",
+                              "scored"
+                            ]
+                          },
+                          "verdict": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "studentId",
+                          "studentName",
+                          "college",
+                          "target",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "verdict"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "upcoming": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "college": {
+                            "type": "string"
+                          },
+                          "target": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "awaiting-score",
+                              "scored"
+                            ]
+                          },
+                          "verdict": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "studentId",
+                          "studentName",
+                          "college",
+                          "target",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "verdict"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "awaitingScore": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "college": {
+                            "type": "string"
+                          },
+                          "target": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "awaiting-score",
+                              "scored"
+                            ]
+                          },
+                          "verdict": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "studentId",
+                          "studentName",
+                          "college",
+                          "target",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "verdict"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "rating": {
+                          "type": "number"
+                        },
+                        "feedbackOnTimePct": {
+                          "type": "number"
+                        },
+                        "unscored": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "rating",
+                        "feedbackOnTimePct",
+                        "unscored"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "panelist",
+                    "today",
+                    "upcoming",
+                    "awaitingScore",
+                    "stats"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panelist/briefs": {
+      "get": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Upcoming briefs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "college": {
+                            "type": "string"
+                          },
+                          "target": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "awaiting-score",
+                              "scored"
+                            ]
+                          },
+                          "verdict": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "studentId",
+                          "studentName",
+                          "college",
+                          "target",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "verdict"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/briefs/{sessionId}": {
+      "get": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Pre-panel brief",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "startsAt": {
+                      "type": "string"
+                    },
+                    "student": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "college": {
+                          "type": "string"
+                        },
+                        "track": {
+                          "type": "string"
+                        },
+                        "target": {
+                          "type": "string"
+                        },
+                        "background": {
+                          "type": "string"
+                        },
+                        "readiness": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "college",
+                        "track",
+                        "target",
+                        "background",
+                        "readiness"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "cvHighlights": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "answersToProbe": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "question": {
+                            "type": "string"
+                          },
+                          "why": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "question",
+                          "why"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "previousFeedback": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "panelist": {
+                              "type": "string"
+                            },
+                            "verdict": {
+                              "type": "string"
+                            },
+                            "headline": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "panelist",
+                            "verdict",
+                            "headline"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "suggestedQuestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "sessionId",
+                    "title",
+                    "startsAt",
+                    "student",
+                    "cvHighlights",
+                    "answersToProbe",
+                    "previousFeedback",
+                    "suggestedQuestions"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "brief_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panelist/scoring": {
+      "get": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Panels to score and sent feedback",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "awaiting": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "college": {
+                            "type": "string"
+                          },
+                          "target": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "awaiting-score",
+                              "scored"
+                            ]
+                          },
+                          "verdict": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "studentId",
+                          "studentName",
+                          "college",
+                          "target",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "verdict"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "done": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "college": {
+                            "type": "string"
+                          },
+                          "target": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "awaiting-score",
+                              "scored"
+                            ]
+                          },
+                          "verdict": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "studentId",
+                          "studentName",
+                          "college",
+                          "target",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "verdict"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "awaiting",
+                    "done"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scores/{sessionId}": {
+      "post": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Send scores and feedback (never optimistic). Send-back flags answers for the student",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scores": {
+                    "type": "object",
+                    "properties": {
+                      "Structure": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 5
+                      },
+                      "Defensibility": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 5
+                      },
+                      "Composure": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 5
+                      }
+                    },
+                    "required": [
+                      "Structure",
+                      "Defensibility",
+                      "Composure"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "Ready",
+                      "Almost There",
+                      "Needs Work"
+                    ]
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 20
+                  },
+                  "sendBack": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "scores",
+                  "verdict",
+                  "note",
+                  "sendBack"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    },
+                    "feedbackId": {
+                      "type": "string"
+                    },
+                    "sentBack": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "feedbackId",
+                    "sentBack"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "not_your_panel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "already_scored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/availability": {
+      "get": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Weekly availability and booked slots",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "slots": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "boolean"
+                      }
+                    },
+                    "booked": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "slots",
+                    "booked"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Save availability",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slots": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "required": [
+                  "slots"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "slots": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "boolean"
+                      }
+                    },
+                    "booked": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "slots",
+                    "booked"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "slot_booked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panelist/profile": {
+      "get": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Panelist profile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "function": {
+                      "type": "string"
+                    },
+                    "specialty": {
+                      "type": "string"
+                    },
+                    "company": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "bio": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "email",
+                    "function",
+                    "specialty",
+                    "company",
+                    "role",
+                    "bio"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Panelist"
+        ],
+        "summary": "Update profile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "company": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "role": {
+                    "type": "string",
+                    "minLength": 2
+                  },
+                  "bio": {
+                    "type": "string",
+                    "minLength": 20
+                  }
+                },
+                "required": [
+                  "name",
+                  "company",
+                  "role",
+                  "bio"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/cohort": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Cohort overview",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "season": {
+                      "type": "string"
+                    },
+                    "day0": {
+                      "type": "object",
+                      "properties": {
+                        "label": {
+                          "type": "string"
+                        },
+                        "daysLeft": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "daysLeft"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "totals": {
+                      "type": "object",
+                      "properties": {
+                        "students": {
+                          "type": "number"
+                        },
+                        "paid": {
+                          "type": "number"
+                        },
+                        "revenue": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "students",
+                        "paid",
+                        "revenue"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "seats": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "plan": {
+                            "type": "string"
+                          },
+                          "taken": {
+                            "type": "number"
+                          },
+                          "total": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "plan",
+                          "taken",
+                          "total"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "funnel": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "value"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "revenueByTier": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tier": {
+                            "type": "string"
+                          },
+                          "count": {
+                            "type": "number"
+                          },
+                          "amount": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "tier",
+                          "count",
+                          "amount"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "needsAttention": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "count": {
+                            "type": "number"
+                          },
+                          "href": {
+                            "type": "string"
+                          },
+                          "tone": {
+                            "type": "string",
+                            "enum": [
+                              "maroon",
+                              "neutral"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "count",
+                          "href",
+                          "tone"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "thisWeek": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "day": {
+                            "type": "string"
+                          },
+                          "panels": {
+                            "type": "number"
+                          },
+                          "unassigned": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "day",
+                          "panels",
+                          "unassigned"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "season",
+                    "day0",
+                    "totals",
+                    "seats",
+                    "funnel",
+                    "revenueByTier",
+                    "needsAttention",
+                    "thisWeek"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/students": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Students (1,000)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "plan",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "function",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "college": {
+                            "type": "string"
+                          },
+                          "track": {
+                            "type": "string"
+                          },
+                          "function": {
+                            "type": "string"
+                          },
+                          "plan": {
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "basic",
+                              "premium",
+                              "elite"
+                            ]
+                          },
+                          "readiness": {
+                            "type": "number"
+                          },
+                          "panelsDone": {
+                            "type": "number"
+                          },
+                          "noShows": {
+                            "type": "number"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "active",
+                              "at-risk",
+                              "unpaid"
+                            ]
+                          },
+                          "joinedAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "email",
+                          "college",
+                          "track",
+                          "function",
+                          "plan",
+                          "readiness",
+                          "panelsDone",
+                          "noShows",
+                          "status",
+                          "joinedAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/students/{id}": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Student detail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "college": {
+                      "type": "string"
+                    },
+                    "track": {
+                      "type": "string"
+                    },
+                    "function": {
+                      "type": "string"
+                    },
+                    "plan": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "basic",
+                        "premium",
+                        "elite"
+                      ]
+                    },
+                    "readiness": {
+                      "type": "number"
+                    },
+                    "panelsDone": {
+                      "type": "number"
+                    },
+                    "noShows": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "active",
+                        "at-risk",
+                        "unpaid"
+                      ]
+                    },
+                    "joinedAt": {
+                      "type": "string"
+                    },
+                    "background": {
+                      "type": "string"
+                    },
+                    "cv": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "score": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "score"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "answers": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "prepared": {
+                          "type": "number"
+                        },
+                        "needWork": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "prepared",
+                        "needWork"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "sessions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "function": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "completed",
+                              "no-show",
+                              "cancelled",
+                              "unassigned"
+                            ]
+                          },
+                          "panelistId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "panelistName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "excused": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "studentId",
+                          "studentName",
+                          "function",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "panelistId",
+                          "panelistName",
+                          "excused"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "at": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "at",
+                          "description",
+                          "amount"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "relockRequest": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "requestedAt": {
+                              "type": "string"
+                            },
+                            "reason": {
+                              "type": "string"
+                            },
+                            "draftScore": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "requestedAt",
+                            "reason",
+                            "draftScore"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "college",
+                    "track",
+                    "function",
+                    "plan",
+                    "readiness",
+                    "panelsDone",
+                    "noShows",
+                    "status",
+                    "joinedAt",
+                    "background",
+                    "cv",
+                    "answers",
+                    "sessions",
+                    "payments",
+                    "relockRequest"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "student_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/students/{id}/relock": {
+      "post": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Approve or decline a CV re-lock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "approve",
+                      "reject"
+                    ]
+                  }
+                },
+                "required": [
+                  "decision"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "no_request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/assignments": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Unassigned panels with candidates, and load per function",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unassigned": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "booking": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "studentId": {
+                                "type": "string"
+                              },
+                              "studentName": {
+                                "type": "string"
+                              },
+                              "function": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "startsAt": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "upcoming",
+                                  "completed",
+                                  "no-show",
+                                  "cancelled",
+                                  "unassigned"
+                                ]
+                              },
+                              "panelistId": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "panelistName": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "excused": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "studentId",
+                              "studentName",
+                              "function",
+                              "title",
+                              "startsAt",
+                              "status",
+                              "panelistId",
+                              "panelistName",
+                              "excused"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "candidates": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "panelistId": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "specialty": {
+                                  "type": "string"
+                                },
+                                "load": {
+                                  "type": "number"
+                                },
+                                "capacity": {
+                                  "type": "number"
+                                },
+                                "free": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "panelistId",
+                                "name",
+                                "specialty",
+                                "load",
+                                "capacity",
+                                "free"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "booking",
+                          "candidates"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "load": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "function": {
+                            "type": "string"
+                          },
+                          "panelists": {
+                            "type": "number"
+                          },
+                          "booked": {
+                            "type": "number"
+                          },
+                          "capacity": {
+                            "type": "number"
+                          },
+                          "unassigned": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "function",
+                          "panelists",
+                          "booked",
+                          "capacity",
+                          "unassigned"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "unassigned",
+                    "load"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Assign a panelist (never optimistic)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "panelistId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sessionId",
+                  "panelistId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "booking": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "studentName": {
+                          "type": "string"
+                        },
+                        "function": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "startsAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "upcoming",
+                            "completed",
+                            "no-show",
+                            "cancelled",
+                            "unassigned"
+                          ]
+                        },
+                        "panelistId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "panelistName": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "excused": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "studentId",
+                        "studentName",
+                        "function",
+                        "title",
+                        "startsAt",
+                        "status",
+                        "panelistId",
+                        "panelistName",
+                        "excused"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "booking"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "booking_not_found, panelist_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "not_unassigned, panelist_paused, slot_conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/bookings": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Sessions and bookings",
+        "parameters": [
+          {
+            "name": "tab",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "function": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "upcoming",
+                              "completed",
+                              "no-show",
+                              "cancelled",
+                              "unassigned"
+                            ]
+                          },
+                          "panelistId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "panelistName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "excused": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "studentId",
+                          "studentName",
+                          "function",
+                          "title",
+                          "startsAt",
+                          "status",
+                          "panelistId",
+                          "panelistName",
+                          "excused"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    },
+                    "counts": {
+                      "type": "object",
+                      "properties": {
+                        "all": {
+                          "type": "number"
+                        },
+                        "unassigned": {
+                          "type": "number"
+                        },
+                        "noShows": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "all",
+                        "unassigned",
+                        "noShows"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize",
+                    "counts"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/bookings/{id}/excuse": {
+      "post": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Excuse a no-show",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "booking": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "studentName": {
+                          "type": "string"
+                        },
+                        "function": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "startsAt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "upcoming",
+                            "completed",
+                            "no-show",
+                            "cancelled",
+                            "unassigned"
+                          ]
+                        },
+                        "panelistId": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "panelistName": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "excused": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "studentId",
+                        "studentName",
+                        "function",
+                        "title",
+                        "startsAt",
+                        "status",
+                        "panelistId",
+                        "panelistName",
+                        "excused"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "booking"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "not_a_no_show",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/ledger": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Plans and credits ledger",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "at": {
+                            "type": "string"
+                          },
+                          "studentId": {
+                            "type": "string"
+                          },
+                          "studentName": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "payment",
+                              "refund",
+                              "credit",
+                              "top-up"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "at",
+                          "studentId",
+                          "studentName",
+                          "description",
+                          "amount",
+                          "type"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    },
+                    "totals": {
+                      "type": "object",
+                      "properties": {
+                        "payments": {
+                          "type": "number"
+                        },
+                        "refunds": {
+                          "type": "number"
+                        },
+                        "credits": {
+                          "type": "number"
+                        },
+                        "net": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "payments",
+                        "refunds",
+                        "credits",
+                        "net"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize",
+                    "totals"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/panelists": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Panelist roster (52)",
+        "parameters": [
+          {
+            "name": "function",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "health",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "function": {
+                            "type": "string"
+                          },
+                          "specialty": {
+                            "type": "string"
+                          },
+                          "company": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "active",
+                              "paused"
+                            ]
+                          },
+                          "panelsThisSeason": {
+                            "type": "number"
+                          },
+                          "load": {
+                            "type": "number"
+                          },
+                          "capacity": {
+                            "type": "number"
+                          },
+                          "rating": {
+                            "type": "number"
+                          },
+                          "feedbackOverdue": {
+                            "type": "number"
+                          },
+                          "cancellations": {
+                            "type": "number"
+                          },
+                          "health": {
+                            "type": "string",
+                            "enum": [
+                              "good",
+                              "watch",
+                              "needs-attention"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "function",
+                          "specialty",
+                          "company",
+                          "status",
+                          "panelsThisSeason",
+                          "load",
+                          "capacity",
+                          "rating",
+                          "feedbackOverdue",
+                          "cancellations",
+                          "health"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "pageSize": {
+                      "type": "number"
+                    },
+                    "counts": {
+                      "type": "object",
+                      "properties": {
+                        "all": {
+                          "type": "number"
+                        },
+                        "needsAttention": {
+                          "type": "number"
+                        },
+                        "paused": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "all",
+                        "needsAttention",
+                        "paused"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "total",
+                    "page",
+                    "pageSize",
+                    "counts"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/panelists/{id}/action": {
+      "post": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Pause, resume, or send a feedback reminder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "pause",
+                      "resume",
+                      "nudge"
+                    ]
+                  }
+                },
+                "required": [
+                  "action"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "panelist_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/applications": {
+      "get": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Panelist application queue",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "function": {
+                            "type": "string"
+                          },
+                          "company": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "years": {
+                            "type": "number"
+                          },
+                          "why": {
+                            "type": "string"
+                          },
+                          "submittedAt": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "pending",
+                              "approved",
+                              "rejected"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "email",
+                          "function",
+                          "company",
+                          "role",
+                          "years",
+                          "why",
+                          "submittedAt",
+                          "status"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "counts": {
+                      "type": "object",
+                      "properties": {
+                        "pending": {
+                          "type": "number"
+                        },
+                        "approved": {
+                          "type": "number"
+                        },
+                        "rejected": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "pending",
+                        "approved",
+                        "rejected"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "counts"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ops/applications/{id}/decision": {
+      "post": {
+        "tags": [
+          "Ops"
+        ],
+        "summary": "Approve or reject an application",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "decision": {
+                    "type": "string",
+                    "enum": [
+                      "approve",
+                      "reject"
+                    ]
+                  }
+                },
+                "required": [
+                  "decision"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "application_not_found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "already_decided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }

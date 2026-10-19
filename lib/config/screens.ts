@@ -202,7 +202,7 @@ export const SCREENS: ScreenEntry[] = [
   },
   {
     pattern: "/panelist/briefs/[sessionId]",
-    sample: "/panelist/briefs/s-1001",
+    sample: "/panelist/briefs/s-1002",
     code: "P3",
     title: "Brief",
     access: "panelist",
@@ -216,7 +216,7 @@ export const SCREENS: ScreenEntry[] = [
   },
   {
     pattern: "/panelist/scoring/[sessionId]",
-    sample: "/panelist/scoring/s-1001",
+    sample: "/panelist/scoring/s-1002",
     code: "P4",
     title: "Live scoring",
     access: "panelist",
@@ -245,7 +245,7 @@ export const SCREENS: ScreenEntry[] = [
   },
   {
     pattern: "/ops/students/[id]",
-    sample: "/ops/students/st-0001",
+    sample: "/ops/students/st-riya",
     code: "A2",
     title: "Student detail",
     access: "ops",

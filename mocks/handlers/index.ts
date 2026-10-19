@@ -3,7 +3,9 @@ import { answerHandlers } from "./answers";
 import { cvHandlers } from "./cv";
 import { authHandlers } from "./auth";
 import { feedbackHandlers } from "./feedback";
+import { opsHandlers } from "./ops";
 import { onboardingHandlers } from "./onboarding";
+import { panelistHandlers } from "./panelist";
 import { plansHandlers } from "./plans";
 import { runwayHandlers } from "./runway";
 
@@ -16,4 +18,6 @@ export const handlers = [
   ...cvHandlers,
   ...answerHandlers,
   ...accountHandlers,
+  ...panelistHandlers,
+  ...opsHandlers,
 ];

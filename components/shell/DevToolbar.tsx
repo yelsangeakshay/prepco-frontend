@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Wrench } from "lucide-react";
 import {
   ONBOARDED_COOKIE,
@@ -35,6 +36,7 @@ function writeCookie(name: string, value: string) {
 /** Dev-only: switch role and scenario. Hidden in production builds. */
 export function DevToolbar() {
   const router = useRouter();
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState<string>(() => readCookie(ROLE_COOKIE));
   const [scenario, setScenario] = useState<string>(() => readCookie(SCENARIO_COOKIE));
@@ -45,6 +47,8 @@ export function DevToolbar() {
     setRole(value);
     writeCookie(ROLE_COOKIE, value);
     writeCookie(ONBOARDED_COOKIE, "");
+    // The three roles share one mock world: drop cached answers from the old role.
+    qc.clear();
     router.push(isRole(value) ? ROLE_HOME[value as Role] : ROUTES.signIn);
     router.refresh();
   };
@@ -52,6 +56,7 @@ export function DevToolbar() {
   const onScenario = (value: string) => {
     setScenario(value);
     writeCookie(SCENARIO_COOKIE, value);
+    qc.clear();
     router.refresh();
   };
 

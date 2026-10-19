@@ -64,6 +64,7 @@ export function DataTable<T>({
     getRowId: getRowId ? (row) => getRowId(row) : undefined,
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
+    sortDescFirst: false,
     manualPagination: true,
     state: { sorting: sort },
     onSortingChange: (u) => onSortChange?.(typeof u === "function" ? u(sort) : u),

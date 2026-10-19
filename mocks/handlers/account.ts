@@ -1,4 +1,5 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse } from "msw";
+import { http } from "../http";
 import { API_BASE_URL } from "@/lib/api/client";
 import { getDb } from "../db";
 import { getState } from "../state";

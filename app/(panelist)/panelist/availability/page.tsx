@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { AvailabilityView } from "@/features/panelist/components/AvailabilityView";
+
+export const metadata: Metadata = { title: "Availability" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="P5" title="Availability" />;
+  return <AvailabilityView />;
 }

@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { NAV, NAV_FOOTER, type NavItem } from "@/lib/config/nav";
 import { ROLE_HOME, type Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils/cn";
+import { useOpsAssignments } from "@/features/ops/hooks/useOps";
+import { ROUTES } from "@/lib/config/routes";
 import { Logo } from "./Logo";
 
 export function isActive(pathname: string, item: NavItem) {
@@ -57,6 +59,8 @@ function FooterCard({ role }: { role: Role }) {
 export function Sidebar({ role }: { role: Role }) {
   const pathname = usePathname();
   const config = NAV[role];
+  // Live count of panels waiting for a panelist.
+  const unassigned = useOpsAssignments(role === "ops").data?.unassigned.length;
 
   return (
     <aside
@@ -74,6 +78,12 @@ export function Sidebar({ role }: { role: Role }) {
               {section.items.map((item) => {
                 const active = isActive(pathname, item);
                 const Icon = item.icon;
+                const badge =
+                  role === "ops" && item.href === ROUTES.ops.assignments
+                    ? unassigned
+                      ? String(unassigned)
+                      : undefined
+                    : item.badge;
                 return (
                   <li key={item.href}>
                     <Link
@@ -89,7 +99,7 @@ export function Sidebar({ role }: { role: Role }) {
                     >
                       <Icon className="size-[18px] shrink-0" aria-hidden />
                       <span className="max-xl:sr-only">{item.label}</span>
-                      {item.badge && (
+                      {badge && (
                         <span
                           className={cn(
                             "ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold max-xl:hidden",
@@ -98,7 +108,7 @@ export function Sidebar({ role }: { role: Role }) {
                               : "bg-maroon-100 text-maroon-600",
                           )}
                         >
-                          {item.badge}
+                          {badge}
                         </span>
                       )}
                     </Link>

@@ -40,4 +40,14 @@ Not verified: visual match to `cover.png` (file absent). Gold text is not used o
 - API: contract in lib/api/contract.ts, docs/openapi.json generated from it
 - Tests: 41 unit tests; Playwright journeys for Prepare for Day 0, Routes and extras, Upgrade mid-season, Day 0 moves, After Day 0, Target role changes, and On a phone start to finish
 - Bundle (First Load JS, budget 170 kB): most routes now 162 to 170 kB. Still over: forms with React Hook Form + Zod (onboarding steps, waitlist, profile, change target, outcome, forgot/reset password, sign-in and sign-up, at 173 to 180 kB). Phase 6 options: zod/mini, or plain controlled forms for the small ones.
-- Known limit: mock state lives in the page, so a hard reload resets bookings, upgrades and edits. Phase 5 needs to decide whether to persist it for the one-panel-three-roles demo.
+- Known limit (fixed in Phase 5): mock state used to reset on a hard reload.
+
+## Phase 5: Panelist and Ops: done
+
+- Shared mock world (): 1,000 students (plans 212 / 312 / 41 / 435 free), 52 panelists in six functions, about 700 bookings, ledger, application queue. Riya's real sessions are merged in live, so one panel is the same record for student, ops and panelist
+- Persistence: every mock write saves the world to sessionStorage before the response goes out (mocks/http.ts + mocks/persist.ts), so reloads and role switches keep state
+- Panelist: P1 apply and submitted, P2 today, P3 briefs and brief, P4 scoring list and live scoring (brief beside the form, verdict, note, send-back switch, local draft), P5 availability, profile
+- Ops: A1 overview (stat cards, needs attention, seat gauges, funnel, revenue chart, this week chart), A2 students (1,000 rows virtualised, filters, sort and paging in the URL) and detail with CV re-lock review, A3 assignment (load per function, unassigned queue with candidates, live sidebar badge), A4 bookings (unassigned and no-show tabs, excuse), A5 ledger, A6 roster (health, reminders, pause) and application queue
+- Charts (Recharts) and the data table (TanStack Table + Virtual) are lazy-loaded
+- Tests: 55 unit tests (world numbers, the three-role flow, conflicts, roster health), 119 Playwright runs on desktop and phone including Become a panelist, Run a panel, Set availability, Weekly ops loop, Keep the panel healthy, One panel three roles, CV re-lock review
+- Bundle: panelist and ops routes are 164 to 171 kB except apply and profile (180 kB, React Hook Form). Phase 6 should look at the remaining form routes.

@@ -6,6 +6,7 @@ import type { Billing } from "@/features/billing/schemas";
 import type { Outcome } from "@/features/outcome/schemas";
 import { getDb, type Db } from "./db";
 import type { Scenario } from "@/lib/config/scenarios";
+import { readSection, registerSection } from "./persist";
 
 /** Mock state for Phase 4 features. Rebuilt whenever the scenario (and so the Db) changes. */
 
@@ -479,7 +480,11 @@ export function getState(scenario: Scenario | null): State {
   let st = cache.get(db);
   if (!st) {
     st = buildState(db);
+    const snap = readSection<State>("state", scenario);
+    if (snap) Object.assign(st, snap);
     cache.set(db, st);
+    const ref = st;
+    registerSection("state", scenario, () => ref);
   }
   return st;
 }

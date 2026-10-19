@@ -1,49 +1,37 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse } from "msw";
+import { http } from "../http";
 import { API_BASE_URL } from "@/lib/api/client";
 import { getDb } from "../db";
-import { ARJUN } from "../fixtures/personas";
 import { apiError, latency, paginate, scenarioOf } from "../utils";
+import { getWorld } from "../world";
 
-const DETAIL = {
-  panelId: "p-1001",
-  sessionId: "s-1002",
-  panelist: ARJUN.name,
-  function: ARJUN.function,
-  startsAt: "2026-09-21T19:00:00+05:30",
-  verdict: "Almost There",
-  headline: "Strong structure, thin on the pricing trade-off.",
-  note: "You framed the problem well and your FMCG numbers were credible. When I pushed on why the distributor margin should change, you went quiet. Prepare one number you can defend and the trade-off behind it.",
-  scores: [
-    { label: "Structure", value: 82 },
-    { label: "Defensibility", value: 61 },
-    { label: "Composure", value: 74 },
-  ],
-  sentBackToBuilder: true,
-};
-
-const SUMMARY = {
-  panelId: DETAIL.panelId,
-  sessionId: DETAIL.sessionId,
-  panelist: DETAIL.panelist,
-  function: DETAIL.function,
-  startsAt: DETAIL.startsAt,
-  verdict: DETAIL.verdict,
-  headline: DETAIL.headline,
-};
+/** Student feedback = notes whose session is actually completed in this scenario. */
+function visible(scenario: ReturnType<typeof scenarioOf>) {
+  const db = getDb(scenario);
+  return getWorld(scenario)
+    .feedbacks.filter((f) => db.sessions.find((s) => s.id === f.sessionId)?.status === "completed")
+    .sort((a, b) => b.startsAt.localeCompare(a.startsAt));
+}
 
 export const feedbackHandlers = [
   http.get(`${API_BASE_URL}/feedback`, async ({ request }) => {
     await latency();
-    const db = getDb(scenarioOf(request));
-    const has = db.sessions.some((s) => s.feedbackId === "p-1001" && s.status === "completed");
-    return HttpResponse.json(paginate(has ? [SUMMARY] : [], new URL(request.url)));
+    const items = visible(scenarioOf(request)).map((f) => ({
+      panelId: f.panelId,
+      sessionId: f.sessionId,
+      panelist: f.panelist,
+      function: f.function,
+      startsAt: f.startsAt,
+      verdict: f.verdict,
+      headline: f.headline,
+    }));
+    return HttpResponse.json(paginate(items, new URL(request.url)));
   }),
 
-  http.get(`${API_BASE_URL}/feedback/:panelId`, async ({ params }) => {
+  http.get(`${API_BASE_URL}/feedback/:panelId`, async ({ request, params }) => {
     await latency();
-    if (params.panelId !== DETAIL.panelId) {
-      return apiError(404, "feedback_not_found", "We could not find that feedback.");
-    }
-    return HttpResponse.json(DETAIL);
+    const f = visible(scenarioOf(request)).find((x) => x.panelId === params.panelId);
+    if (!f) return apiError(404, "feedback_not_found", "We could not find that feedback.");
+    return HttpResponse.json(f);
   }),
 ];

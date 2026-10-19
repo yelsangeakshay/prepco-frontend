@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { OpsOverview } from "@/features/ops/components/OpsOverview";
+
+export const metadata: Metadata = { title: "Cohort overview" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="A1" title="Cohort overview" />;
+  return <OpsOverview />;
 }

@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { PanelistsView } from "@/features/ops/components/PanelistsView";
+
+export const metadata: Metadata = { title: "Panelists" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="A6" title="Panelists" />;
+  return <PanelistsView />;
 }

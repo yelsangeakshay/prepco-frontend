@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { TodayView } from "@/features/panelist/components/TodayView";
+
+export const metadata: Metadata = { title: "Today" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="P2" title="Today" />;
+  return <TodayView />;
 }

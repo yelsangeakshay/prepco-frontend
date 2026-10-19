@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { ScoringList } from "@/features/panelist/components/ScoringViews";
+
+export const metadata: Metadata = { title: "Scoring & feedback" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="P4" title="Scoring & feedback" />;
+  return <ScoringList />;
 }

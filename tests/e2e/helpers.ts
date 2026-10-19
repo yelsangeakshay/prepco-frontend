@@ -36,3 +36,15 @@ export async function openFromNav(page: Page, label: string, isMobile: boolean) 
   await page.getByRole("button", { name: "More" }).click();
   await page.getByRole("dialog").getByRole("link", { name: label }).click();
 }
+
+export type RoleName = "student" | "panelist" | "ops";
+
+/** Switch the mock session. Mock state survives because it is persisted in sessionStorage. */
+export async function signInAs(context: BrowserContext, role: RoleName, scenario?: string) {
+  await context.clearCookies();
+  const cookies: { name: string; value: string; url: string }[] = [
+    { name: "prepco_role", value: role, url: BASE },
+  ];
+  if (scenario) cookies.push({ name: "prepco_scenario", value: scenario, url: BASE });
+  await context.addCookies(cookies);
+}

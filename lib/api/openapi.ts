@@ -71,9 +71,8 @@ export function buildOpenApi() {
     openapi: "3.0.3",
     info: {
       title: "The Prep Co web API (mock contract)",
-      version: "0.4.0",
-      description:
-        "Generated from lib/api/contract.ts. Phase 4 covers the student app; panelist and ops endpoints arrive in Phase 5.",
+      version: "0.5.0",
+      description: "Generated from lib/api/contract.ts. Student, panelist and ops endpoints.",
     },
     servers: [{ url: "/api/v1" }],
     paths,

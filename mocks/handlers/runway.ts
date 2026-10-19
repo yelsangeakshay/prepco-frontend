@@ -1,4 +1,5 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse } from "msw";
+import { http } from "../http";
 import { API_BASE_URL } from "@/lib/api/client";
 import { formatDay, formatSession } from "@/lib/utils/dates";
 import type { Runway, Session } from "@/features/runway/schemas";
@@ -197,8 +198,8 @@ export const runwayHandlers = [
     Object.assign(s, {
       startsAt: slot.startsAt,
       status: "upcoming",
-      panelist: s.panelist ?? "Karan Shah",
-      panelFunction: s.panelFunction ?? "External specialist",
+      panelist: s.panelist,
+      panelFunction: s.panelFunction,
       note: null,
       freeRescheduleUntil: new Date(
         new Date(slot.startsAt).getTime() - 24 * 3_600_000,

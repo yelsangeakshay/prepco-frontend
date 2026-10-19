@@ -18,7 +18,7 @@ export function apiError(status: number, code: string, message: string) {
 
 export function paginate<T>(items: T[], url: URL) {
   const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
-  const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 25)));
+  const pageSize = Math.min(1000, Math.max(1, Number(url.searchParams.get("pageSize") ?? 25)));
   return {
     items: items.slice((page - 1) * pageSize, page * pageSize),
     total: items.length,

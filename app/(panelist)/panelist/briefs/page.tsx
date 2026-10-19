@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { BriefList } from "@/features/panelist/components/BriefViews";
+
+export const metadata: Metadata = { title: "Pre-panel briefs" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="P3" title="Pre-panel briefs" />;
+  return <BriefList />;
 }

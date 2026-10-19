@@ -1,5 +1,8 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { ApplyForm } from "@/features/panelist/components/ApplyForm";
+
+export const metadata: Metadata = { title: "Become a panelist" };
 
 export default function Page() {
-  return <ScreenPlaceholder code="P1" title="Apply to be a panelist" />;
+  return <ApplyForm />;
 }

@@ -1,6 +1,9 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { LiveScoring } from "@/features/panelist/components/ScoringViews";
+
+export const metadata: Metadata = { title: "Live scoring" };
 
 export default async function Page({ params }: { params: Promise<{ sessionId: string }> }) {
-  const p = await params;
-  return <ScreenPlaceholder code="P4" title="Live scoring" params={p} />;
+  const { sessionId } = await params;
+  return <LiveScoring sessionId={sessionId} />;
 }

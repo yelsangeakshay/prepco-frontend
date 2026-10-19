@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@/lib/forms/zodResolver";
 import { z } from "zod";
@@ -25,15 +26,18 @@ export type ScoringValues = z.infer<typeof scoringSchema>;
 
 interface Props {
   defaultValues?: Partial<ScoringValues>;
+  /** Called on every change, so the caller can persist a local draft. */
+  onChange?: (values: ScoringValues) => void;
   submitting?: boolean;
   onSubmit: (values: ScoringValues) => void;
 }
 
-export function ScoringForm({ defaultValues, submitting, onSubmit }: Props) {
+export function ScoringForm({ defaultValues, submitting, onSubmit, onChange }: Props) {
   const {
     control,
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ScoringValues>({
     resolver: zodResolver(scoringSchema),
@@ -44,6 +48,12 @@ export function ScoringForm({ defaultValues, submitting, onSubmit }: Props) {
       ...defaultValues,
     },
   });
+
+  useEffect(() => {
+    if (!onChange) return;
+    const sub = watch((v) => onChange(v as ScoringValues));
+    return () => sub.unsubscribe();
+  }, [watch, onChange]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">

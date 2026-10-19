@@ -24,6 +24,25 @@ export const queryKeys = {
   profile: ["profile"] as const,
   outcome: ["outcome"] as const,
   notifications: ["notifications"] as const,
+  panelist: {
+    today: ["panelist", "today"] as const,
+    briefs: ["panelist", "briefs"] as const,
+    brief: (id: string) => ["panelist", "brief", id] as const,
+    scoring: ["panelist", "scoring"] as const,
+    availability: ["panelist", "availability"] as const,
+    profile: ["panelist", "profile"] as const,
+  },
+  ops: {
+    all: ["ops"] as const,
+    cohort: ["ops", "cohort"] as const,
+    students: (p?: object) => ["ops", "students", p ?? {}] as const,
+    student: (id: string) => ["ops", "student", id] as const,
+    assignments: ["ops", "assignments"] as const,
+    bookings: (p?: object) => ["ops", "bookings", p ?? {}] as const,
+    ledger: (p?: object) => ["ops", "ledger", p ?? {}] as const,
+    panelists: (p?: object) => ["ops", "panelists", p ?? {}] as const,
+    applications: (s?: string) => ["ops", "applications", s ?? ""] as const,
+  },
 };
 
 /** Stale times in ms (brief section 7). */

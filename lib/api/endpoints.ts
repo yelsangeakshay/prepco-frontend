@@ -45,6 +45,30 @@ import {
 import { outcomeSchema, type OutcomeBody } from "@/features/outcome/schemas";
 import { notificationsSchema, type MarkReadBody } from "@/features/notifications/schemas";
 
+import {
+  applicationResultSchema,
+  availabilitySchema,
+  briefListSchema,
+  briefSchema,
+  panelistProfileSchema,
+  scoreResultSchema,
+  scoringListSchema,
+  todaySchema,
+  type ScoreBody,
+  type UpdatePanelistProfile,
+} from "@/features/panelist/schemas";
+import {
+  applicationListSchema,
+  assignResultSchema,
+  assignmentsSchema,
+  bookingListSchema,
+  cohortSchema,
+  ledgerSchema,
+  rosterSchema,
+  studentDetailSchema,
+  studentListSchema,
+} from "@/features/ops/schemas";
+
 export const meSchema = z.object({
   id: z.string(),
   role: z.enum(["student", "panelist", "ops"]),
@@ -166,3 +190,50 @@ export const postOutcome = (body: OutcomeBody) =>
 export const getNotifications = () => api("/notifications", notificationsSchema);
 export const markNotificationsRead = (body: MarkReadBody) =>
   api("/notifications/read", okSchema, { method: "POST", json: body });
+
+// Query-string helper for list endpoints.
+const qs = (params: Record<string, string | number | undefined | null>) => {
+  const q = new URLSearchParams();
+  for (const [k, v] of Object.entries(params))
+    if (v !== undefined && v !== null && v !== "") q.set(k, String(v));
+  const s = q.toString();
+  return s ? `?${s}` : "";
+};
+export type ListParams = Record<string, string | number | undefined | null>;
+
+// Panelist
+export const getPanelistToday = () => api("/panelist/today", todaySchema);
+export const getPanelBriefs = () => api("/panelist/briefs", briefListSchema);
+export const getBrief = (sessionId: string) => api(`/briefs/${sessionId}`, briefSchema);
+export const getScoringList = () => api("/panelist/scoring", scoringListSchema);
+export const postScore = (sessionId: string, body: ScoreBody) =>
+  api(`/scores/${sessionId}`, scoreResultSchema, { method: "POST", json: body });
+export const getAvailability = () => api("/availability", availabilitySchema);
+export const putAvailability = (slots: Record<string, boolean>) =>
+  api("/availability", availabilitySchema, { method: "PUT", json: { slots } });
+export const postApplication = (body: unknown) =>
+  api("/panelist/applications", applicationResultSchema, { method: "POST", json: body });
+export const getPanelistProfile = () => api("/panelist/profile", panelistProfileSchema);
+export const putPanelistProfile = (body: UpdatePanelistProfile) =>
+  api("/panelist/profile", okSchema, { method: "PUT", json: body });
+
+// Ops
+export const getOpsCohort = () => api("/ops/cohort", cohortSchema);
+export const getOpsStudents = (p: ListParams) => api(`/ops/students${qs(p)}`, studentListSchema);
+export const getOpsStudent = (id: string) => api(`/ops/students/${id}`, studentDetailSchema);
+export const decideRelock = (id: string, decision: "approve" | "reject") =>
+  api(`/ops/students/${id}/relock`, okSchema, { method: "POST", json: { decision } });
+export const getOpsAssignments = () => api("/ops/assignments", assignmentsSchema);
+export const postAssignment = (body: { sessionId: string; panelistId: string }) =>
+  api("/ops/assignments", assignResultSchema, { method: "POST", json: body });
+export const getOpsBookings = (p: ListParams) => api(`/ops/bookings${qs(p)}`, bookingListSchema);
+export const excuseBooking = (id: string) =>
+  api(`/ops/bookings/${id}/excuse`, assignResultSchema, { method: "POST" });
+export const getOpsLedger = (p: ListParams) => api(`/ops/ledger${qs(p)}`, ledgerSchema);
+export const getOpsPanelists = (p: ListParams) => api(`/ops/panelists${qs(p)}`, rosterSchema);
+export const panelistAction = (id: string, action: "pause" | "resume" | "nudge") =>
+  api(`/ops/panelists/${id}/action`, okSchema, { method: "POST", json: { action } });
+export const getOpsApplications = (status?: string) =>
+  api(`/ops/applications${qs({ status })}`, applicationListSchema);
+export const decideApplication = (id: string, decision: "approve" | "reject") =>
+  api(`/ops/applications/${id}/decision`, okSchema, { method: "POST", json: { decision } });

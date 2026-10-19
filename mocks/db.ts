@@ -3,6 +3,7 @@ import { formatSession } from "@/lib/utils/dates";
 import type { Session, SlotDto } from "@/features/runway/schemas";
 import type { Checkout } from "@/features/plans/schemas";
 import { ARJUN } from "./fixtures/personas";
+import { readSection, registerSection } from "./persist";
 
 const at = (day: string, hour: number) =>
   `2026-${day}T${String(hour).padStart(2, "0")}:00:00+05:30`;
@@ -167,9 +168,23 @@ export interface Db {
 let db: Db | null = null;
 
 /** Shared mock state. Rebuilt whenever the scenario changes. */
+interface DbSnapshot extends Omit<Db, "checkouts" | "signedUpEmails"> {
+  checkouts: [string, Checkout][];
+  signedUpEmails: string[];
+}
+
+function serialize(d: Db): DbSnapshot {
+  return {
+    ...d,
+    checkouts: [...d.checkouts.entries()],
+    signedUpEmails: [...d.signedUpEmails],
+  };
+}
+
+/** Shared mock state. Rebuilt whenever the scenario changes; restored from the saved snapshot on reload. */
 export function getDb(scenario: Scenario | null): Db {
   if (!db || db.scenario !== scenario) {
-    db = {
+    const fresh: Db = {
       scenario,
       sessions: buildSessions(scenario),
       raceHit: false,
@@ -178,6 +193,16 @@ export function getDb(scenario: Scenario | null): Db {
       freeSessionBookedAt: scenario === "returning-student" ? at("09-02", 19) : null,
       signedUpEmails: new Set(),
     };
+    const snap = readSection<DbSnapshot>("db", scenario);
+    if (snap) {
+      Object.assign(fresh, snap, {
+        checkouts: new Map(snap.checkouts),
+        signedUpEmails: new Set(snap.signedUpEmails),
+      });
+    }
+    db = fresh;
+    const ref = fresh;
+    registerSection("db", scenario, () => serialize(ref));
   }
   return db;
 }

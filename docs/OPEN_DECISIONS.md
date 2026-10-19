@@ -38,3 +38,14 @@ Built as drawn in the mockups; confirm or change before launch.
 - Case track: Elite only; modules are sample content.
 - Quick Switch and the "Routes open to you" list on Journey are Proposed screens with sample content.
 - Notification drawer on every student page; the bell loads the drawer code on first click to protect the bundle budget.
+
+## Phase 5 notes
+
+- Panelist profile (P-profile) and tablet layouts for panelist and ops are not mocked; built from the student profile (S15) patterns and marked Proposed.
+- Scoring (P4): three dimensions (Structure, Defensibility, Composure) scored 1 to 5, a verdict, a note, and a send-back switch. In the mock a panel can be scored as soon as it is assigned, so the three-role journey runs end to end.
+- Send-back flags up to two rehearsed answers for the student. The real rule (which answers or CV bullets) is a product decision.
+- Assignment: a panelist is "free" when the slot is in their weekly availability and they have no panel at that time. Ops can still choose a panelist who is not free; clashes at the same time are refused.
+- Panelist health: needs attention when feedback is overdue or three or more cancellations; watch when over capacity, rated below 4.3 or paused. Thresholds are Proposed.
+- No-show: ops can excuse it (first no-show is free). What a non-excused no-show costs is not implemented.
+- Ledger revenue by tier counts payments and top-ups per tier; Riya's upgrade is counted under Elite while her Premium payment stays under Premium.
+- Panel capacity per week (5 to 8) is sample data.

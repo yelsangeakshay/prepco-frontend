@@ -1,4 +1,5 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse } from "msw";
+import { http } from "../http";
 import { API_BASE_URL } from "@/lib/api/client";
 import { SCENARIO_HEADER } from "@/lib/config/scenarios";
 import { apiError, latency, scenarioOf } from "../utils";

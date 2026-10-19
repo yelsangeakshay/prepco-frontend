@@ -1,6 +1,9 @@
-import { ScreenPlaceholder } from "@/components/shared/ScreenPlaceholder";
+import type { Metadata } from "next";
+import { StudentDetailView } from "@/features/ops/components/StudentDetailView";
+
+export const metadata: Metadata = { title: "Student" };
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const p = await params;
-  return <ScreenPlaceholder code="A2" title="Student detail" params={p} />;
+  const { id } = await params;
+  return <StudentDetailView id={id} />;
 }
