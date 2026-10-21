@@ -103,6 +103,56 @@ const FAIL_TITLE: Record<PayMethod, string> = {
 const trackOf = (url: string): Track =>
   new URL(url).searchParams.get("track") === "summers" ? "summers" : "finals";
 
+const LATE_JOINER = {
+  daysLeft: 19,
+  rows: [
+    {
+      when: "This week",
+      title: "Profiling call + CV lock",
+      note: "Same day, back to back",
+      status: "fits",
+      reason: null,
+    },
+    {
+      when: "Week -2",
+      title: "P1 + domain deep-dive",
+      note: "Two days apart instead of two weeks",
+      status: "fits",
+      reason: null,
+    },
+    {
+      when: "Week -1",
+      title: "P3: pressure mock",
+      note: "Seven days out, as normal",
+      status: "fits",
+      reason: null,
+    },
+    {
+      when: "Week -4",
+      title: "P2 specialist panel",
+      note: null,
+      status: "dropped",
+      reason: "Dropped",
+    },
+    {
+      when: "Week -2",
+      title: "Group positioning session",
+      note: null,
+      status: "dropped",
+      reason: "Cohort already ran it",
+    },
+  ],
+  recommendation: {
+    title: "Basic + one top-up mock.",
+    price: "₹5,999 + ₹1,799",
+    body: "It covers what still fits. Premium's later stages wouldn't happen in time, so we won't sell it to you this close.",
+    cta: "Choose Basic + top-up",
+    planId: "basic",
+  },
+  nextSeason:
+    "If summers is your real target, the CV Builder is free now and the full runway opens 8 weeks before that Day 0.",
+} as const;
+
 export const plansHandlers = [
   http.get(`${API_BASE_URL}/plans`, async ({ request }) => {
     await latency();
@@ -112,6 +162,7 @@ export const plansHandlers = [
     return HttpResponse.json({
       items: buildPlans(track, full),
       cohortFull: full,
+      lateJoiner: scenarioOf(request) === "late-joiner" ? LATE_JOINER : null,
       track,
       seats: {
         label: `${track === "finals" ? "Finals" : "Summers"} seats, season 1`,

@@ -27,3 +27,5 @@ export const OPS = { id: "ops-1", name: "Ops team", initials: "OP" } as const;
 
 export const DAY0_ISO = "2026-11-09T09:00:00+05:30";
 export const DAY0_MOVED_ISO = "2026-11-16T09:00:00+05:30";
+/** A late joiner sees Day 0 only 19 days away (e03.png). */
+export const DAY0_LATE_ISO = "2026-10-24T09:00:00+05:30";

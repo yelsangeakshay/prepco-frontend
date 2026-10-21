@@ -123,18 +123,6 @@ export const OnboardingStep2Phone: S = {
   render: () => <OnboardingStep step={2} />,
 };
 
-export const OnboardingStep3Success: S = {
-  name: "Onboarding step 3: Success",
-  parameters: { mock: { role: "student" } },
-  render: () => <OnboardingStep step={3} />,
-};
-
-export const OnboardingStep3Phone: S = {
-  name: "Onboarding step 3: Phone",
-  parameters: { mock: { role: "student" }, viewport: { defaultViewport: "phone" } },
-  render: () => <OnboardingStep step={3} />,
-};
-
 export const OnboardingLateJoinerSuccess: S = {
   name: "Onboarding late joiner: Success",
   parameters: { mock: { role: "student" } },

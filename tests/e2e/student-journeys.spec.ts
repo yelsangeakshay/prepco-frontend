@@ -9,25 +9,21 @@ test.describe("Join and buy a plan", () => {
     await page.getByLabel("Password").fill("password123");
     await page.getByRole("button", { name: "Create Account" }).click();
 
-    // Step 1
+    // Step 1: About you
     await expect(page).toHaveURL(/\/onboarding\/1$/);
     await page.getByLabel("College").fill("SCMHRD Pune");
     await page.getByLabel("Batch").fill("2025–27");
-    await page.getByLabel("Track").selectOption("finals");
-    await page.getByRole("button", { name: "Continue" }).click();
-
-    // Step 2
-    await expect(page).toHaveURL(/\/onboarding\/2$/);
-    await page.getByLabel("Target function").selectOption("Sales & Marketing");
-    await page.getByLabel("Target role").fill("Management Trainee");
-    await page.getByRole("button", { name: "Continue" }).click();
-
-    // Step 3
-    await expect(page).toHaveURL(/\/onboarding\/3$/);
+    await page.getByLabel("Years of experience").fill("2");
     await page
       .getByLabel("Experience", { exact: true })
       .fill("Two years as an FMCG sales analyst.");
-    await page.getByLabel("Years of experience").fill("2");
+    await page.getByRole("button", { name: "Continue" }).click();
+
+    // Step 2: Track and target
+    await expect(page).toHaveURL(/\/onboarding\/2$/);
+    await expect(page.getByRole("radio", { name: /Final placements/ })).toBeChecked();
+    await page.getByRole("radio", { name: "Sales & Marketing" }).check({ force: true });
+    await expect(page.getByText("Marketing & Brand", { exact: true })).toBeAttached();
     await page.getByRole("button", { name: "Continue" }).click();
 
     // CV upload (E2)
@@ -41,8 +37,9 @@ test.describe("Join and buy a plan", () => {
     await expect(page.getByText("Please give consent to continue.")).toBeVisible();
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "Upload CV" }).click();
-    await expect(page.getByText("CV read successfully")).toBeVisible();
-    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByText("Done. This is your V1.")).toBeVisible();
+    await expect(page.getByText("46/100")).toBeVisible();
+    await page.getByRole("button", { name: "Finish and book free session" }).click();
 
     // Free session (S3)
     await expect(page).toHaveURL(/\/free-session$/);
@@ -102,7 +99,8 @@ test.describe("Locked out / wrong email", () => {
 
     await page.getByLabel("Email").fill("riya@scmhrd.edu");
     await page.getByRole("button", { name: "Send Reset Link" }).click();
-    await expect(page.getByText("a reset link is on its way")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Resend link" })).toBeDisabled();
   });
 
   test("expired reset link, and gmail-unverified goes to verify email", async ({
@@ -112,7 +110,7 @@ test.describe("Locked out / wrong email", () => {
     await gotoReady(page, "/reset-password/expired");
     await page.getByLabel("New password").fill("newpassword1");
     await page.getByLabel("Confirm password").fill("newpassword1");
-    await page.getByRole("button", { name: "Update Password" }).click();
+    await page.getByRole("button", { name: "Save and sign in" }).click();
     await expect(alerts(page)).toContainText("expired");
 
     await context.addCookies([
@@ -280,8 +278,8 @@ test.describe("Edge scenarios by URL", () => {
     });
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "Upload CV" }).click();
-    await expect(alerts(page)).toContainText("We could not read your CV");
-    await page.getByRole("button", { name: "Skip For Now" }).click();
+    await expect(alerts(page)).toContainText("We couldn't read this file");
+    await page.getByRole("button", { name: "Skip for now" }).click();
     await expect(page).toHaveURL(/\/free-session$/);
   });
 
@@ -293,12 +291,14 @@ test.describe("Edge scenarios by URL", () => {
       mimeType: "image/png",
       buffer: Buffer.from("x"),
     });
-    await expect(page.getByText("Upload a PDF or DOCX file.")).toBeVisible();
+    await expect(page.getByText("Upload a PDF or Word file.")).toBeVisible();
   });
 
   test("returning-student sees the free session already used", async ({ page, context }) => {
     await signInAsRiya(context, "returning-student");
     await gotoReady(page, "/free-session");
-    await expect(page.getByText("Free session already used")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Strong raw material. Not yet defensible." }),
+    ).toBeVisible();
   });
 });

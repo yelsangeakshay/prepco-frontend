@@ -59,3 +59,5 @@ Not verified: visual match to `cover.png` (file absent). Gold text is not used o
 ## Mockup fidelity pass
 
 The mockup PNGs are now in design/mockups/. Home, Panelist Today, Ops Overview, Plans, Checkout and Upgrade were compared against them and the fixtures, screens, stories, API contract and generated openapi were updated to match (plans take a track, checkout takes a payment method, the upgrade quote shows difference, top-ups and unlocks, and the ops cohort has seat cards, funnel and revenue lines). All other screens have not yet been compared. See docs/OPEN_DECISIONS.md for the owner decisions and deviations.
+
+Batch 1 (student early flow) is done: sign in and sign up, account recovery, onboarding steps 1 and 2, CV upload, the free session summary and the late joiner screen were compared with s01, s02, s03 (and phone), e01, e02 and e03 and brought in line. See docs/MOCKUP_REVIEW.md, section "Batch 1". The CV builder (s06) was not touched.

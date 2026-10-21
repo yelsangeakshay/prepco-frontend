@@ -34,9 +34,34 @@ export const planSchema = z.object({
 });
 export type Plan = z.infer<typeof planSchema>;
 
+/** The compressed runway offered to someone who joins too late for the full one (e03.png). Proposed policy. */
+export const lateJoinerSchema = z.object({
+  daysLeft: z.number(),
+  rows: z.array(
+    z.object({
+      when: z.string(),
+      title: z.string(),
+      note: z.string().nullable(),
+      status: z.enum(["fits", "dropped"]),
+      /** Pill text for a dropped row. */
+      reason: z.string().nullable(),
+    }),
+  ),
+  recommendation: z.object({
+    title: z.string(),
+    price: z.string(),
+    body: z.string(),
+    cta: z.string(),
+    planId: z.enum(["basic", "premium", "elite"]),
+  }),
+  nextSeason: z.string(),
+});
+export type LateJoiner = z.infer<typeof lateJoinerSchema>;
+
 export const plansSchema = z.object({
   items: z.array(planSchema),
   cohortFull: z.boolean(),
+  lateJoiner: lateJoinerSchema.nullable(),
   track: z.enum(TRACKS),
   seats: z.object({ label: z.string(), taken: z.number(), total: z.number() }),
 });

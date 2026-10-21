@@ -4,7 +4,7 @@ import { API_BASE_URL } from "@/lib/api/client";
 import { formatDay, formatSession } from "@/lib/utils/dates";
 import type { Runway, Session } from "@/features/runway/schemas";
 import { buildSlots, getDb, type Db } from "../db";
-import { DAY0_ISO, DAY0_MOVED_ISO, RIYA } from "../fixtures/personas";
+import { DAY0_ISO, DAY0_LATE_ISO, DAY0_MOVED_ISO, RIYA } from "../fixtures/personas";
 import { answerCounts, getState } from "../state";
 import { getWorld } from "../world";
 import { apiError, latency, paginate, scenarioOf } from "../utils";
@@ -27,7 +27,7 @@ const needsAction = (s: Session) =>
 export function buildRunway(db: Db): Runway {
   const scenario = db.scenario;
   const moved = scenario === "day0-moved";
-  const day0Iso = moved ? DAY0_MOVED_ISO : DAY0_ISO;
+  const day0Iso = moved ? DAY0_MOVED_ISO : scenario === "late-joiner" ? DAY0_LATE_ISO : DAY0_ISO;
   const sessions = db.sessions;
   const firstOpen = sessions.find(needsAction);
 

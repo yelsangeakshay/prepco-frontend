@@ -24,6 +24,11 @@ const cases: Record<string, (page: Page) => Promise<void>> = {
   "late-joiner": async (page) => {
     await gotoReady(page, "/home?scenario=late-joiner");
     await expect(page.getByTestId("banner-late-joiner")).toBeVisible();
+    await gotoReady(page, "/plans");
+    await expect(
+      page.getByRole("heading", { name: "The full runway doesn't fit. Here's what does." }),
+    ).toBeVisible();
+    await expect(page.getByText("Basic + one top-up mock.")).toBeVisible();
   },
   "cv-upload-failed": async (page) => {
     await gotoReady(page, "/onboarding/cv-upload?scenario=cv-upload-failed");
@@ -34,7 +39,7 @@ const cases: Record<string, (page: Page) => Promise<void>> = {
     });
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "Upload CV" }).click();
-    await expect(alerts(page)).toContainText("We could not read your CV");
+    await expect(alerts(page)).toContainText("We couldn't read this file");
   },
   "panelist-cancelled": async (page) => {
     await gotoReady(page, "/sessions/s-1003?scenario=panelist-cancelled");
@@ -81,7 +86,9 @@ const cases: Record<string, (page: Page) => Promise<void>> = {
   },
   "returning-student": async (page) => {
     await gotoReady(page, "/free-session?scenario=returning-student");
-    await expect(page.getByText("Free session already used")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Strong raw material. Not yet defensible." }),
+    ).toBeVisible();
   },
 };
 

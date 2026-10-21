@@ -207,6 +207,21 @@ export const FreeSessionPhone: S = {
   render: () => <FreeSessionPanel />,
 };
 
+export const FreeSessionSummaryPhone: S = {
+  name: "Free session: Summary on a phone",
+  parameters: {
+    mock: { role: "student", scenario: "returning-student" },
+    viewport: { defaultViewport: "phone" },
+  },
+  render: () => <FreeSessionPanel />,
+};
+
+export const PlansLateJoiner: S = {
+  name: "Plans: Late joiner",
+  parameters: { mock: { role: "student", scenario: "late-joiner" } },
+  render: () => <PlansView />,
+};
+
 export const PlansSuccess: S = {
   name: "Plans: Success",
   parameters: { mock: { role: "student" } },

@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/api/client";
 import {
   bookSession,
   getFeedback,
+  getFreeSession,
   getPlans,
   getRunway,
   getSessions,
@@ -96,6 +97,28 @@ describe("feedback", () => {
     const f = await getFeedback();
     expect(f.total).toBe(1);
     expect(f.items[0]?.panelist).toBe("Arjun Mehta");
+  });
+});
+
+describe("late joiner and free session summary", () => {
+  it("late-joiner has Day 0 in 19 days and a compressed plan offer, others do not", async () => {
+    asScenario("late-joiner");
+    expect((await getRunway()).day0.daysLeft).toBe(19);
+    const late = (await getPlans()).lateJoiner;
+    expect(late?.rows.filter((r) => r.status === "fits")).toHaveLength(3);
+    expect(late?.recommendation.planId).toBe("basic");
+    asScenario(null);
+    expect((await getPlans()).lateJoiner).toBeNull();
+  });
+
+  it("a student who already had the session gets the written summary", async () => {
+    asScenario("returning-student");
+    const r = await getFreeSession();
+    expect(r.eligible).toBe(false);
+    expect(r.summary?.roles).toHaveLength(3);
+    expect(r.summary?.answers.map((a) => a.verdict)).toEqual(["landed", "needs-work"]);
+    asScenario(null);
+    expect((await getFreeSession()).summary).toBeNull();
   });
 });
 

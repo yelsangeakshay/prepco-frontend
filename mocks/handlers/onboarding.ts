@@ -4,6 +4,49 @@ import { API_BASE_URL } from "@/lib/api/client";
 import { getDb, buildSlots } from "../db";
 import { latency, scenarioOf } from "../utils";
 
+const SUMMARY = {
+  headline: "Strong raw material. Not yet defensible.",
+  lede: "Two years of real field work, but your CV describes activity, not decisions. A panel will spend its time asking what you actually did. The fix is in the bullets, not the experience.",
+  ledeShort:
+    "Your CV describes activity, not decisions. The fix is in the bullets, not the experience.",
+  roles: [
+    { title: "Sales & Marketing MT", note: "FMCG and consumer durables" },
+    { title: "Trade marketing associate", note: "Your outlet-level work fits directly" },
+    { title: "Business analytics, retail", note: "Only if you can defend the method" },
+  ],
+  markups: [
+    {
+      quote: "Worked on identifying retail expansion opportunities in West Delhi.",
+      ask: "how many outlets, what method, and what changed because of it?",
+      askShort: "how many outlets, what method, what changed?",
+    },
+    {
+      quote:
+        "Worked on a marketing campaign for the flagship product and coordinated with the design team.",
+      ask: 'what did you decide? "Coordinated" is not a decision.',
+      askShort: 'what did you decide? "Coordinated" is not a decision.',
+    },
+    {
+      quote: "Strong communication and leadership skills.",
+      ask: "nothing. They'll skip it. Cut the line.",
+      askShort: "nothing. They'll skip it. Cut the line.",
+    },
+  ],
+  answers: [
+    {
+      question: "Walk me through your profile.",
+      verdict: "landed",
+      note: "Clear structure. Ran long; cut to 90 seconds and end on why sales.",
+    },
+    {
+      question: "Why Sales & Marketing?",
+      verdict: "needs-work",
+      note: "Generic. Tie it to the outlet work you already did and what you want to own next.",
+    },
+  ],
+  runway: "Premium, finals track: profiling call and CV lock from Week -8.",
+} as const;
+
 export const onboardingHandlers = [
   http.put(`${API_BASE_URL}/students/me/profile`, async () => {
     await latency();
@@ -17,14 +60,14 @@ export const onboardingHandlers = [
     if (scenarioOf(request) === "cv-upload-failed") {
       return HttpResponse.json({
         status: "failed",
-        reason: "We could not read this file. Try a text-based PDF or a DOCX.",
+        reason: "Looks like a photo or scanned page",
         extracted: null,
       });
     }
     return HttpResponse.json({
       status: "done",
       reason: null,
-      extracted: { roles: 2, bullets: 9, education: "SCMHRD Pune, MBA 2025–27" },
+      extracted: { education: 2, workBullets: 4, projects: 2, achievements: 3, score: 46 },
     });
   }),
 
@@ -34,6 +77,7 @@ export const onboardingHandlers = [
     return HttpResponse.json({
       eligible: !db.freeSessionBookedAt,
       usedAt: db.freeSessionBookedAt,
+      summary: db.freeSessionBookedAt ? SUMMARY : null,
       slots: buildSlots("free"),
     });
   }),

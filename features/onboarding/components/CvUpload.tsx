@@ -2,9 +2,10 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, FileText, Loader2, UploadCloud, XCircle } from "lucide-react";
+import { FileText, FileX, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
+import { cn } from "@/lib/utils/cn";
 import { ROUTES } from "@/lib/config/routes";
 import { markOnboarded } from "@/lib/auth/client";
 import { useApiReady } from "@/components/shell/Providers";
@@ -13,7 +14,64 @@ import { useUploadCv } from "../hooks/useOnboarding";
 import { validateCvFile } from "../schemas";
 import { OnboardingLayout } from "./OnboardingLayout";
 
-/** E2: reading / done / failed, plus a consent checkbox. */
+type Tone = "plain" | "done" | "error";
+
+function StatusCard({
+  title,
+  pill,
+  tone,
+  alert,
+  children,
+}: {
+  title: string;
+  pill: string;
+  tone: Tone;
+  alert?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      aria-label={title}
+      role={alert ? "alert" : undefined}
+      className={cn(
+        "rounded-feature bg-white p-6",
+        tone === "plain" && "border-line border",
+        tone === "done" && "border-2 border-green-600/40",
+        tone === "error" && "border-maroon-600 border-2",
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="text-lg font-semibold">{title}</h2>
+        <span
+          className={cn(
+            "rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase",
+            tone === "plain" && "text-navy-400 bg-cream-soft",
+            tone === "done" && "bg-green-100 text-green-600",
+            tone === "error" && "bg-maroon-100 text-maroon-600",
+          )}
+        >
+          {pill}
+        </span>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function FileCard({ name, detail, bad }: { name: string; detail: string; bad?: boolean }) {
+  const Icon = bad ? FileX : FileText;
+  return (
+    <div className="bg-cream rounded-card mt-4 flex items-center gap-3 p-4">
+      <Icon className="text-maroon-600 size-6 shrink-0" aria-hidden />
+      <div className="min-w-0">
+        <p className="truncate font-semibold">{name}</p>
+        <p className="text-navy-400 text-sm">{detail}</p>
+      </div>
+    </div>
+  );
+}
+
+/** E2 (e02.png): reading, done and failed states on one screen, a drop zone and the consent box. */
 export function CvUpload() {
   const router = useRouter();
   const ready = useApiReady();
@@ -25,10 +83,10 @@ export function CvUpload() {
   const [consent, setConsent] = useState(false);
   const [consentError, setConsentError] = useState(false);
 
-  const finish = () => {
+  const finish = (to: string = ROUTES.student.freeSession) => {
     markOnboarded();
     clearDraft();
-    router.push(ROUTES.student.freeSession);
+    router.push(to);
     router.refresh();
   };
 
@@ -49,64 +107,117 @@ export function CvUpload() {
   const result = upload.data;
   const reading = upload.isPending;
   const failed = upload.isError || result?.status === "failed";
+  const done = result?.status === "done" ? result.extracted : null;
 
   return (
     <OnboardingLayout
       step={3}
-      total={3}
-      title="Upload your CV"
-      subtitle="We read it once to pre-fill your CV Builder. PDF or DOCX, up to 5 MB."
+      title="Upload the CV you have today"
+      subtitle="Any version. We read it before your free session, and it becomes V1 in the CV Builder."
     >
-      {result?.status === "done" ? (
-        <div className="space-y-4">
-          <div role="status" className="rounded-card flex gap-3 bg-green-100 p-4 text-sm">
-            <CheckCircle2 className="size-5 shrink-0 text-green-600" aria-hidden />
-            <div>
-              <p className="font-semibold">CV read successfully</p>
-              <p className="text-navy-400">
-                Found {result.extracted?.roles} roles, {result.extracted?.bullets} bullets and{" "}
-                {result.extracted?.education}.
+      <div className="space-y-6">
+        {reading && file && (
+          <StatusCard title="Reading your CV" pill="In progress" tone="plain">
+            <div role="status">
+              <FileCard
+                name={file.name}
+                detail={`${Math.max(1, Math.round(file.size / 1024))} KB`}
+              />
+              <div className="bg-line mt-5 h-2 overflow-hidden rounded-full">
+                <div className="from-maroon-600 to-gold-500 h-full w-3/5 animate-pulse rounded-full bg-gradient-to-r" />
+              </div>
+              <p className="text-navy-400 mt-3 text-sm">
+                Finding sections and bullets... usually under 20 seconds.
               </p>
             </div>
-          </div>
-          <Button className="w-full" onClick={finish}>
-            Continue
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <input
-            ref={inputRef}
-            id="cv-file"
-            aria-label="Choose your CV file"
-            type="file"
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            className="sr-only"
-            onChange={(e) => onPick(e.target.files?.[0])}
-          />
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="rounded-card border-line hover:bg-cream flex min-h-28 w-full flex-col items-center justify-center gap-2 border-2 border-dashed bg-white p-4 text-sm"
-          >
-            {file ? (
-              <>
-                <FileText className="text-maroon-600 size-6" aria-hidden />
-                <span className="font-semibold">{file.name}</span>
-                <span className="text-navy-400">
-                  {(file.size / 1024).toFixed(0)} KB · tap to change
-                </span>
-              </>
-            ) : (
-              <>
-                <UploadCloud className="text-navy-400 size-6" aria-hidden />
-                <span className="font-semibold">Choose your CV</span>
-              </>
-            )}
-          </button>
-          <FieldError>{fileError ?? undefined}</FieldError>
+          </StatusCard>
+        )}
 
-          <label className="flex min-h-11 items-start gap-3 text-sm">
+        {done && (
+          <StatusCard title="Done. This is your V1." pill="Read" tone="done">
+            <div role="status">
+              <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <li>✓ Education · {done.education}</li>
+                <li>✓ Work experience · {done.workBullets} bullets</li>
+                <li>✓ Projects · {done.projects}</li>
+                <li>✓ Achievements · {done.achievements}</li>
+              </ul>
+              <p className="text-navy-400 mt-4 text-sm">
+                First score: <strong className="text-navy-900">{done.score}/100</strong>.
+                That&apos;s normal for a first draft; the builder shows you why.
+              </p>
+              <Button className="mt-5 w-full" onClick={() => finish()}>
+                Finish and book free session
+              </Button>
+            </div>
+          </StatusCard>
+        )}
+
+        {failed && (
+          <StatusCard title="We couldn't read this file" pill="Error" tone="error" alert>
+            <div>
+              <FileCard
+                name={file?.name ?? "Your file"}
+                detail={result?.reason ?? "Something went wrong."}
+                bad
+              />
+              <p className="mt-4 text-[15px]">
+                Upload the Word or PDF version, or type it in. Nothing is lost; your onboarding
+                answers are saved.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button onClick={() => inputRef.current?.click()}>Upload another file</Button>
+                <Button variant="secondary" onClick={() => finish(ROUTES.student.cv)}>
+                  Enter manually
+                </Button>
+              </div>
+            </div>
+          </StatusCard>
+        )}
+
+        {!done && (
+          <>
+            <input
+              ref={inputRef}
+              id="cv-file"
+              aria-label="Choose your CV file"
+              type="file"
+              accept=".pdf,.doc,.docx,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              className="sr-only"
+              onChange={(e) => onPick(e.target.files?.[0])}
+            />
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="rounded-feature border-maroon-600/30 hover:bg-cream-soft flex min-h-36 w-full flex-col items-center justify-center gap-2 border-2 border-dashed bg-white/60 p-4 text-center"
+            >
+              {file ? (
+                <>
+                  <FileText className="text-maroon-600 size-6" aria-hidden />
+                  <span className="font-semibold">{file.name}</span>
+                  <span className="text-navy-400 text-sm">
+                    {(file.size / 1024).toFixed(0)} KB · tap to change
+                  </span>
+                </>
+              ) : (
+                <>
+                  <UploadCloud className="text-maroon-600 size-6" aria-hidden />
+                  <span className="font-semibold">
+                    Drop a PDF or Word file, or <u className="text-maroon-600">browse</u>
+                  </span>
+                  <span className="text-navy-400 text-sm">Up to 5 MB · PDF, DOC, DOCX</span>
+                </>
+              )}
+            </button>
+            <FieldError>{fileError ?? undefined}</FieldError>
+          </>
+        )}
+
+        <section className="rounded-feature border-line border bg-white p-6">
+          <h2 className="text-maroon-600 text-xs font-semibold tracking-[0.18em] uppercase">
+            Your panel sees your history
+          </h2>
+          <label className="mt-4 flex min-h-11 items-start gap-3 text-[15px]">
             <input
               type="checkbox"
               checked={consent}
@@ -114,43 +225,31 @@ export function CvUpload() {
                 setConsent(e.target.checked);
                 setConsentError(false);
               }}
-              className="accent-maroon-600 mt-0.5 size-5"
+              className="accent-maroon-600 mt-0.5 size-5 shrink-0"
             />
             <span>
-              I agree that The Prep Co may read my CV to build my profile and share it with my
-              panelists.
+              Let my assigned panelists read my locked CV, profiling notes, answer bank and past
+              feedback.{" "}
+              <span className="text-navy-400">
+                This continuity is how the panel at P3 knows what you said at P1. You can see
+                exactly what&apos;s shared in Profile.
+              </span>
             </span>
           </label>
           <FieldError>{consentError ? "Please give consent to continue." : undefined}</FieldError>
+        </section>
 
-          {reading && (
-            <p role="status" className="text-navy-400 flex items-center gap-2 text-sm">
-              <Loader2 className="size-4 animate-spin" aria-hidden /> Reading your CV…
-            </p>
-          )}
-          {failed && (
-            <div
-              role="alert"
-              className="bg-maroon-100 text-maroon-600 rounded-card flex gap-3 p-4 text-sm"
-            >
-              <XCircle className="size-5 shrink-0" aria-hidden />
-              <div>
-                <p className="font-semibold">We could not read your CV</p>
-                <p>{result?.reason ?? "Something went wrong. Please try again."}</p>
-              </div>
-            </div>
-          )}
-
+        {!done && (
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button className="flex-1" onClick={onUpload} disabled={reading || !ready}>
-              {failed ? "Try Again" : "Upload CV"}
+              Upload CV
             </Button>
-            <Button variant="secondary" onClick={finish} disabled={reading}>
-              Skip For Now
+            <Button variant="secondary" onClick={() => finish()} disabled={reading}>
+              Skip for now
             </Button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </OnboardingLayout>
   );
 }

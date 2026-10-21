@@ -11,7 +11,7 @@ import { ROUTES } from "@/lib/config/routes";
 import { useApiReady } from "@/components/shell/Providers";
 import { signUpBodySchema, type SignUpBody } from "../schemas";
 import { useSignUp } from "../hooks/useAuth";
-import { AuthLink, AuthShell, FormAlert } from "./AuthShell";
+import { AuthLink, AuthShell, FormAlert, GoogleButton, OrDivider } from "./AuthShell";
 
 export function SignUpForm() {
   const router = useRouter();
@@ -37,12 +37,13 @@ export function SignUpForm() {
 
   return (
     <AuthShell
+      active="sign-up"
       title="Create your account"
       subtitle="Start with a free session. No card needed."
-      footer={
-        <>
+      belowPhone={
+        <p>
           Already have an account? <AuthLink href={ROUTES.signIn}>Sign in</AuthLink>
-        </>
+        </p>
       }
     >
       {signUp.isError && (
@@ -51,11 +52,13 @@ export function SignUpForm() {
           {err?.code === "email_taken" && <AuthLink href={ROUTES.signIn}>Sign in</AuthLink>}
         </FormAlert>
       )}
+      <GoogleButton />
+      <OrDivider />
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
         <FormField id="name" label="Full name" error={errors.name?.message}>
           <Input id="name" autoComplete="name" aria-invalid={!!errors.name} {...register("name")} />
         </FormField>
-        <FormField id="email" label="Email" error={errors.email?.message}>
+        <FormField id="email" label="College email" error={errors.email?.message}>
           <Input
             id="email"
             type="email"

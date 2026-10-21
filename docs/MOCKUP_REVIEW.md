@@ -116,3 +116,43 @@ waitlist order, placed early, colleges, panelist pay, who runs free sessions) sh
 
 The PNGs add about 31 MB. Say whether they should be committed or kept out of git (add `design/mockups/` to
 `.gitignore`).
+
+## Batch 1: student early flow
+
+Compared with the running app (desktop 1440 px and phone 390 px): `s01`, `s01-mobile`, `s02`, `s02-mobile`, `s03`,
+`s03-mobile`, `e01`, `e02`, `e03`. `e01` is the account recovery board (forgot, link sent, new password, plus the
+"add your college email" banner), `e02` is the CV upload step, `e03` is the late joiner screen.
+
+### What differed and what changed
+
+| Screen              | Was                                                                                 | Now                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| S1 sign in, sign up | Centred card, plain fields, a "Sign In" title row                                   | Split frame: navy brand panel (season eyebrow, "You get one shot at The Day.", three ticks, footer line) and cream form with Sign in / Create account tabs, "Continue with Google", "or with email", "College email", "Forgot?", "New here?" card. Phone: navy header, form, "New here? Create an account" at the foot                                                                     |
+| E1 recovery         | Cards with other copy ("works for one hour", success hid the email)                 | Header bar with "Back to sign in". Forgot ("works for 30 minutes"), Link sent (email shown, "Resend link" locked on a 0:42 countdown, "Use a different email"), New password (live "At least 8 characters" and "Passwords match" ticks, "Save and sign in"). Verify page is the "Add your college email" banner with Later and Verify college email                                        |
+| S2 onboarding       | Three plain form steps in a card, a progress bar, target as a select plus free text | Header bar with wordmark, three named steps and "Save & exit". Step 1 About you (college, batch, years, experience). Step 2 "Where are you headed, and when?": process cards, target role pills, panel note, Day 0 date, companies, runway callout, "What happens next" and "CV Builder · always free" side cards. Phone: back chevron, "Step 2 of 3", three bar segments, sticky Continue |
+| E2 CV upload        | Single card, "CV read successfully" with role and bullet counts                     | Title "Upload the CV you have today", Reading (in progress bar), Done ("This is your V1.", section counts, "First score: 46/100", "Finish and book free session") and Error ("We couldn't read this file", "Upload another file", "Enter manually") states, drop zone with "PDF, DOC, DOCX", and the "Your panel sees your history" consent box                                            |
+| S3 free session     | A slot picker, and a "free session already used" card                               | The mockup draws the page after the session: left cards (session with Completed pill, Add to calendar, Reschedule, "What we cover in 30 minutes"), the written summary (headline, 3 roles, CV markup, two answers, "Suggested runway" card). Phone shows the short version. Booked and slot-picking states use the same frame                                                              |
+| E3 late joiner      | A banner on Home and a shortened runway                                             | `/plans` shows "The full runway doesn't fit. Here's what does." for the `late-joiner` scenario: compressed runway table (FITS and DROPPED rows), "Basic + one top-up mock." recommendation (₹5,999 + ₹1,799), "Or start properly next season". Day 0 is 19 days away in that scenario, as drawn                                                                                            |
+
+Supporting changes: the Wordmark tagline uses a darker gold on cream (the shell gold failed contrast there); the
+profile schema moved the track and added the Day 0 date and companies (`targetRole` is gone, the pill is the
+target); the mock CV result now reports education, work bullets, projects, achievements and a first score; the free
+session endpoint returns a `summary` once the session is used; the plans endpoint returns `lateJoiner` for the
+scenario; `/onboarding/3` redirects to the CV upload (step 3 of 3 in the new flow).
+
+### Left as it was, with reason
+
+- Consent for panelists to read the CV history is drawn ticked. It stays unticked and required, because a pre-ticked
+  consent box is not valid consent. The mockup's other copy is used verbatim.
+- "Continue with Google" shows a toast that Google sign-in is not connected. The OAuth provider is undecided.
+- "Add to calendar" downloads a one-event .ics file built in the browser. "Reschedule" opens Sessions. The
+  Calendly flow behind them is an open decision (S9).
+- The mockup's "Edge case ·" and "Three states of one screen" eyebrows are board labels, not page copy, so they are
+  not shown.
+- The "9 weeks to Day 0. Enough for the full runway." example assumes a different "today"; the callout is computed
+  from the mock clock (5 Oct), so the default Day 0 of 9 Nov reads "5 weeks to Day 0" with the compressed note.
+  The wording for under 8 weeks is Proposed. Pick a Day 0 at least 8 weeks out to see the drawn text.
+- E3 rows, the recommendation and the policy are drawn as "Proposed policy" and stay Proposed. "Choose Basic +
+  top-up" goes to the Basic checkout; the top-up is not added to the order in the mock.
+- Sign-up copy and fields (full name, college email) are not drawn; they follow the sign-in frame and stay Proposed.
+- The "About you" summary strip on step 2 only shows after step 1 was filled in this browser.
