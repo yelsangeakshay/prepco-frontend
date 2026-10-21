@@ -8,6 +8,7 @@ import type { AnswerDetail, PatchAnswerBody } from "../schemas";
 
 export interface AnswerParams {
   status?: string;
+  round?: string;
   q?: string;
   page?: number;
   pageSize?: number;
@@ -34,11 +35,15 @@ export function usePatchAnswer(id: string) {
   return useMutation({
     mutationFn: (body: PatchAnswerBody) => patchAnswer(id, body),
     onMutate: async (body) => {
-      if (!body.status) return {};
+      if (!body.status && body.rehearseNext === undefined) return {};
       await qc.cancelQueries({ queryKey: queryKeys.answer(id) });
       const prev = qc.getQueryData<AnswerDetail>(queryKeys.answer(id));
       if (prev)
-        qc.setQueryData<AnswerDetail>(queryKeys.answer(id), { ...prev, status: body.status });
+        qc.setQueryData<AnswerDetail>(queryKeys.answer(id), {
+          ...prev,
+          status: body.status ?? prev.status,
+          rehearseNext: body.rehearseNext ?? prev.rehearseNext,
+        });
       return { prev };
     },
     onError: (_e, _b, ctx) => {

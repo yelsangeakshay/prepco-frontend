@@ -99,3 +99,8 @@ Deviations from the mockups, all Proposed:
 - Feedback overdue is seeded as 0 in the mock world.
 - Student and panelist function taxonomies differ. The mapping in PANEL_FOR_TARGET (features/onboarding/schemas.ts) is an assumption.
 - The 1,000-student fixture is kept as a performance fixture, while the ops overview shows 57 paid students.
+- Batch 2: the top-up prices for a deck review and the 3-mock pack are drawn as "[Premium rate]" (undecided). They show "Rate TBD" and cannot be bought; the extra mock panel is ₹1,299 at the Premium rate.
+- Batch 2: invoices are marked Proposed as drawn. The free session is listed as "No charge". Downloads, the feedback report, deck upload and listing links are not connected (toasts only).
+- Batch 2: what the plan includes for Basic and free accounts on the billing page is Proposed; only Premium and Elite are drawn.
+- Batch 2: the Quick Switch job-hunting agent, its fit score, the job boards and the digest listings are sample content. "Send for review" on an answer saves the draft only.
+- Batch 2: S7 (CV version history) was not touched; it belongs to the CV builder.

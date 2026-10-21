@@ -285,7 +285,7 @@ test.describe("One panel, three roles", () => {
       .click();
     await expect(page.getByText(SCORING_NOTE)).toBeVisible();
     await gotoReady(page, "/answers?status=flagged");
-    await expect(page.getByRole("button", { name: "Open Answer" })).toHaveCount(6);
+    await expect(page.getByTestId("answer-row")).toHaveCount(5);
     await gotoReady(page, "/notifications");
     await expect(page.getByText("Arjun Mehta sent your feedback")).toBeVisible();
   });

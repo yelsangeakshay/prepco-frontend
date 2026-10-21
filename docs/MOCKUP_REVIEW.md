@@ -156,3 +156,58 @@ scenario; `/onboarding/3` redirects to the CV upload (step 3 of 3 in the new flo
   top-up" goes to the Basic checkout; the top-up is not added to the order in the mock.
 - Sign-up copy and fields (full name, college email) are not drawn; they follow the sign-in frame and stay Proposed.
 - The "About you" summary strip on step 2 only shows after step 1 was filled in this browser.
+
+## Batch 2: student sessions, tools and account
+
+Compared with the running app (desktop 1440 px, phone 390 px where a phone mockup exists): `s08`, `s08-mobile`,
+`s09`, `s09-mobile`, `s10`, `s10-mobile`, `s11`, `s12`, `s13`, `s14`, `s14-mobile`, `s15`. `s07` (CV version
+history) was looked at but not changed, see "Left as it was".
+
+### What differed and what changed
+
+| Screen                 | Was                                                                                    | Now                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S9 sessions and runway | Horizontal timeline card plus a list of session cards                                  | One vertical timeline (week label, node, card). Each row has its runway line, DONE with Notes or View feedback, BOOKED with Reschedule, SCHEDULED, OPENS AFTER P2. The first open session shows its slots inline (four P2 slots as drawn, the second chosen) with "Confirm Mon 12 Oct, 7:30 PM". Day 0 closes the line as a navy row. Side cards: "Run out of sessions?" (₹1,299 at the Premium rate, All top-ups) and "Your panel". Phone: flat timeline, the open session is the only card |
+| S10 panel feedback     | A feedback note card with three score bars and a verdict pill                          | Detail page for one panel: P1 eyebrow with the Baseline pill, "Where you are before anyone coaches you.", Download report, panelist card, Ready for Day 0 64% bar, "Question by question" (Strong, Flagged, Okay rows with SITUATION / DECISION / RESULT chips and "In your builder"), "Fix before P2", navy "Panel's summary" and "Book your P2 slot". Phone: readiness, summary, short comments, "Fix flagged answers"                                                                     |
+| S8 HR Question Builder | A list of answer cards, search box, and a separate detail page with a rich text editor | List and editor side by side. Header with the 18 / 12 / 4 counts, Fit round (14) and CV deep-dive (4) tabs, All / Rehearsed / Flagged / Not drafted chips, "+ 7 more in Fit round". The editor has Situation, Decision and Result fields, the panel note with chips, the "Rehearse in my next panel" switch, Save draft, Send for review. The drawn rows and question wording are the fixtures. Phone: stat cards, list, and a row opens its own page                                        |
+| S11 journey and routes | A four-step checklist and three "routes open to you" cards                             | "Where you are": seven stages (dashed before joining, Term 5–6 now with a bar, navy Offer letter), "You joined at Term 5–6", "Four routes to an offer" with Your route and Powered by Quick Switch, and the closing quote                                                                                                                                                                                                                                                                    |
+| S12 case track         | A locked card for anyone below Elite, a plain module list for Elite                    | The track is always shown as a "Sample view" with the drawn steps (Upload deck, Book, Later, Unlocks on placing), "What's in the track", "Route one" and "Elite seats 5 of 22 left". Below Elite a navy banner says "Preview · Included with Elite" with "Upgrade to Elite · ₹4,000"                                                                                                                                                                                                         |
+| S13 Quick Switch       | A "compare two functions" tool                                                         | The job-hunting agent: stats (20, 3, 7+, 7 days), "Today's digest · 3 new matches" with fit scores 96, 91, 88, Save and View listing, and a Preferences card (switch, roles, locations, minimum fit, email, Save preferences). The old comparison stays below, marked Proposed                                                                                                                                                                                                               |
+| S14 plan and billing   | Plan card with a progress bar, one Upgrade button, a flat receipts list                | Plan card with the tagline and what the plan includes (USED, WED 7 OCT, NOT BOOKED, ACTIVE), the navy upgrade card (Elite minus Premium, top-up credit, You pay), "Top-ups at your plan's rate" with Buy, "How upgrade credit works", the not-placed notice, and an Invoices table (Paid with Download, No charge). Phone: price, sessions done bar, top-ups, upgrade, notice                                                                                                                |
+| S15 profile            | Target card and a three-field form                                                     | Header with the avatar, name and "SCMHRD Pune · MBA 2025–27 · finals track", Save changes, an eight-field form (college email, work experience, phone, target role and Day 0 read only), "Target shifted?" with Request panel change, "What your panel can see" with SHARED rows, and the navy "Nothing gets reset" card                                                                                                                                                                     |
+
+Supporting changes: sessions carry a `blurb` (the runway line); the answers API has `round`, `parts`, `noteTags`,
+`flaggedAt`, `draftNo`, `rehearseNext` and `rounds` counts; the feedback detail carries the s10 extras (all
+optional, so a note scored live by a panelist still renders); journey, case track, billing and profile responses
+changed shape (see `docs/API_CONTRACT.md`); new endpoints for the Quick Switch digest and preferences and for
+buying a top-up (it counts toward the upgrade quote). `formatDay` now writes "Sep", not "Sept". The profile email
+is `riya.kulkarni@scmhrd.edu` as drawn (the login mock still accepts `riya@scmhrd.edu`). `PageHeader` has a
+`pillClassName` prop. The answer fixtures were renamed and reordered to the drawn rows.
+
+### Left as it was, with reason
+
+- **S7 CV version history (`s07`)** is part of the CV builder (`features/cv-builder`), which the owner is doing, so it
+  was not touched. The Mockup box stays open for it.
+- **Panel feedback list (`/feedback`)** is not drawn. It still lists panels as before; the sidebar item opens it.
+- **Sessions list rows without a mockup state** (cancelled, moved, missed) keep the earlier badges and notes; only
+  the layout around them follows s09.
+- **Deck review and 3-mock pack top-ups** are drawn with "[Premium rate]" in brackets, which means the price is not
+  decided. They show "Rate TBD" and a toast when bought. Only the extra mock panel (₹1,299 at the Premium rate, from
+  s04) can be bought, and it is added to the top-up credit of the upgrade quote.
+- **Invoices** are marked Proposed as drawn. The free session is listed as "No charge" with no download, and the
+  download buttons show a toast (no invoice files exist). The same toast is used for "Download report" on
+  feedback, "Upload deck" on the case track and "View listing" in Quick Switch.
+- **Entitlement rows for Basic and free plans** reuse the runway sessions of the account; the standing perks row is
+  only shown for Premium and Elite. This is Proposed.
+- **Phone billing** keeps the Buy buttons and the invoices list, which the phone mockup leaves out, so nothing is
+  unreachable on a phone. The phone profile has no mockup; it stacks the desktop layout.
+- **Phone shell bar.** The phone mockups draw a page title bar ("RUNWAY TO THE DAY / Sessions") with a Day 0 pill;
+  the shell keeps its wordmark bar (decided in batch 0) and the page header sits under it.
+- **Answer search** is gone because the mockup does not draw it; the round tabs and status chips replace it. The
+  "Mark rehearsed" and "Flag for work" buttons stay in the editor footer because without them the status could not
+  change; they are not in the mockup.
+- **"Send for review"** saves the draft and shows a toast; there is no reviewer in the mock. A first draft of an
+  empty answer still marks it Flagged (as before).
+- **Quick Switch** copy is as drawn. "Free, and on for as long as you're looking" and the job boards are mock content.
+- **`Day 0 in 35 days` pill, bell and avatar** come from the shell (batch 0) and differ slightly from the single
+  avatar drawn on these boards.

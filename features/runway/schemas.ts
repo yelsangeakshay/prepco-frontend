@@ -15,6 +15,8 @@ export const sessionSchema = z.object({
   id: z.string(),
   title: z.string(),
   week: z.string(),
+  /** One line under the title on the runway (s09.png). */
+  blurb: z.string().nullable().optional(),
   kind: z.enum(["profiling", "panel", "deep-dive", "group", "free"]),
   startsAt: z.string().nullable(),
   /** Previous time, shown when a session was moved. */

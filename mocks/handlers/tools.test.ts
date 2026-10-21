@@ -6,13 +6,18 @@ import {
   changeTarget,
   getAnswer,
   getAnswers,
+  buyTopUp,
   getBilling,
   getCaseTrack,
   getCv,
   getNotifications,
   getOutcome,
+  getJourney,
   getQuickSwitch,
+  getQuickSwitchDigest,
   getRunway,
+  saveQuickSwitchPrefs,
+  toggleQuickSwitchSaved,
   getUpgradeQuote,
   lockCvVersion,
   markNotificationsRead,
@@ -87,8 +92,43 @@ describe("Answers", () => {
     expect(all.counts).toEqual({ all: 18, rehearsed: 12, flagged: 4, notDrafted: 2 });
     expect((await getAnswers({ status: "flagged" })).items).toHaveLength(4);
     expect((await getAnswers({ status: "not-drafted" })).items).toHaveLength(2);
-    expect((await getAnswers({ q: "failure" })).items).toHaveLength(1);
+    expect((await getAnswers({ q: "channels" })).items).toHaveLength(1);
     expect((await getAnswers({ pageSize: 10 })).items).toHaveLength(10);
+  });
+
+  it("s08: fit round has 14 questions, CV deep-dive 4, and the list opens on the drawn rows", async () => {
+    const fit = await getAnswers({ round: "fit" });
+    expect(fit.total).toBe(14);
+    expect(fit.rounds).toEqual({ fit: 14, cv: 4 });
+    expect((await getAnswers({ round: "cv" })).total).toBe(4);
+    expect(fit.items.slice(0, 7).map((a) => a.status)).toEqual([
+      "rehearsed",
+      "rehearsed",
+      "rehearsed",
+      "flagged",
+      "flagged",
+      "not-drafted",
+      "not-drafted",
+    ]);
+    const mt = fit.items[3]!;
+    expect(mt.question).toBe("You already have experience. Why should we hire you as an MT?");
+    expect(mt.noteTags).toEqual(["situation", "decision", "result"]);
+  });
+
+  it("saves the three parts, joins them into the draft and keeps the rehearse switch", async () => {
+    const mt = (await getAnswers({ status: "flagged" })).items.find((a) =>
+      a.question.includes("MT"),
+    )!;
+    const before = await getAnswer(mt.id);
+    expect(before).toMatchObject({ draftNo: 3, flaggedAt: "P1 · 21 Sep", rehearseNext: true });
+    expect(before.parts.result).toBe("");
+    const after = await patchAnswer(mt.id, {
+      parts: { result: "You get a hire who already owns a number." },
+      rehearseNext: false,
+    });
+    expect(after.parts.situation).toBe(before.parts.situation);
+    expect(after.draft.endsWith("a number.")).toBe(true);
+    expect(after).toMatchObject({ draftNo: 4, rehearseNext: false, status: "flagged" });
   });
 
   it("marks rehearsed, validates impossible transitions, and updates counts", async () => {
@@ -103,12 +143,77 @@ describe("Answers", () => {
   });
 });
 
+describe("s11 to s15 screens", () => {
+  it("journey: seven stages with Term 5–6 as now, four routes, Final placements is the route", async () => {
+    const j = await getJourney();
+    expect(j.joinedAt).toBe("Term 5–6");
+    expect(j.stages).toHaveLength(7);
+    expect(j.stages.filter((s) => s.state === "now")).toHaveLength(1);
+    expect(j.routes.map((r) => r.title)).toEqual([
+      "Case competitions",
+      "Summer internship",
+      "Final placements",
+      "Lateral support",
+    ]);
+    expect(j.routes.find((r) => r.fit === "primary")?.title).toBe("Final placements");
+  });
+
+  it("case track: Premium sees the preview with the upgrade prices", async () => {
+    const t = await getCaseTrack();
+    expect(t).toMatchObject({ unlocked: false, plan: "Premium", seats: { left: 5, total: 22 } });
+    expect(t.upgrade).toEqual({ alone: 7999, moreThanPlan: 4000 });
+    expect(t.steps.map((s) => s.state)).toEqual([
+      "done",
+      "upload",
+      "book",
+      "later",
+      "later",
+      "on-placing",
+    ]);
+  });
+
+  it("quick switch agent: three matches, fit filter, save toggle and paused state", async () => {
+    const d = await getQuickSwitchDigest();
+    expect(d.stats).toEqual({ matches: 20, highFit: 3, boards: "7+", oldest: "7 days" });
+    expect(d.items.map((i) => i.fit)).toEqual([96, 91, 88]);
+    expect((await toggleQuickSwitchSaved("l1")).items[0]?.saved).toBe(true);
+    expect((await toggleQuickSwitchSaved("l1")).items[0]?.saved).toBe(false);
+    await saveQuickSwitchPrefs({ ...d.prefs, minFit: 90 });
+    expect((await getQuickSwitchDigest()).items.map((i) => i.fit)).toEqual([96, 91]);
+    await saveQuickSwitchPrefs({ ...d.prefs, enabled: false });
+    expect((await getQuickSwitchDigest()).items).toEqual([]);
+  });
+
+  it("billing: what the plan includes, top-ups at the plan rate, and a bought top-up feeds the upgrade quote", async () => {
+    const b = await getBilling();
+    expect(b.season).toBe("Finals · Season 1");
+    expect(b.entitlements.map((e) => e.state)).toEqual([
+      "used",
+      "used",
+      "booked",
+      "unbooked",
+      "scheduled",
+      "scheduled",
+      "active",
+    ]);
+    expect(b.topUps.map((t) => t.price)).toEqual([1299, null, null]);
+    expect(b.invoices.map((i) => [i.description, i.status])).toEqual([
+      ["Premium · Finals · Season 1", "paid"],
+      ["Free session", "no-charge"],
+    ]);
+    expect(await code(buyTopUp("deck-review"))).toBe("top_up_unpriced");
+    expect((await buyTopUp("mock-panel")).amount).toBe(1299);
+    expect((await getUpgradeQuote()).topUpCredit).toBe(1299);
+    expect((await getBilling()).invoices[0]?.description).toBe("Extra mock panel");
+  });
+});
+
 describe("Extras, billing, profile, outcome, notifications", () => {
   it("quick switch and case track gate", async () => {
     const q = await getQuickSwitch("Finance");
     expect(q.reusableAnswers).toBe(9);
     expect(await code(getQuickSwitch("Astrology"))).toBe("unknown_function");
-    expect(await code(getCaseTrack())).toBe("elite_only");
+    expect((await getCaseTrack()).unlocked).toBe(false);
   });
 
   it("upgrade: quote is next tier minus paid minus top-ups, pay unlocks case track and notifies", async () => {
@@ -123,7 +228,7 @@ describe("Extras, billing, profile, outcome, notifications", () => {
     const paid = await postUpgrade();
     expect(paid.status).toBe("paid");
     expect((await getBilling()).plan.id).toBe("elite");
-    expect((await getCaseTrack()).modules).toHaveLength(5);
+    expect((await getCaseTrack()).steps).toHaveLength(6);
     expect(await code(getUpgradeQuote())).toBe("already_elite");
     expect((await getNotifications()).items[0]?.title).toBe("Welcome to Elite");
   });

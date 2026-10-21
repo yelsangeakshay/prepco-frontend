@@ -14,6 +14,7 @@ function base(): Session[] {
   return [
     {
       id: "s-1001",
+      blurb: "We read the profile and named what you actually need.",
       title: "Profiling call + CV lock",
       week: "Week -8",
       kind: "profiling",
@@ -25,6 +26,7 @@ function base(): Session[] {
     },
     {
       id: "s-1002",
+      blurb: "External industry expert · your baseline",
       title: "P1: first mock panel",
       week: "Week -7",
       kind: "panel",
@@ -36,6 +38,7 @@ function base(): Session[] {
     },
     {
       id: "s-1003",
+      blurb: "run by a practitioner in Marketing & Brand",
       title: "Domain deep-dive",
       week: "Week -5",
       kind: "deep-dive",
@@ -48,6 +51,7 @@ function base(): Session[] {
     },
     {
       id: "s-1004",
+      blurb: "Industry expert on the panel, one of us co-interviewing",
       title: "P2: external specialist panel",
       week: "Week -4",
       kind: "panel",
@@ -59,6 +63,7 @@ function base(): Session[] {
     },
     {
       id: "s-1005",
+      blurb: "how you read against the rest of the shortlist",
       title: "Group positioning session",
       week: "Week -2",
       kind: "group",
@@ -70,6 +75,7 @@ function base(): Session[] {
     },
     {
       id: "s-1006",
+      blurb: "full simulation, seven days out",
       title: "P3: pressure mock",
       week: "Week -1",
       kind: "panel",
@@ -131,6 +137,22 @@ export function buildSlots(sessionId: string): SlotDto[] {
     "s-1001": ["10-08", "10-09", "10-12"],
     free: ["10-06", "10-07", "10-08", "10-09"],
   };
+  if (sessionId === "s-1004") {
+    // s09.png draws exactly these four P2 slots.
+    return (
+      [
+        ["10-12", 18, 0],
+        ["10-12", 19, 30],
+        ["10-13", 18, 30],
+        ["10-14", 20, 0],
+      ] as const
+    ).map(([d, h, m]) => {
+      const startsAt = `2026-${d}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00+05:30`;
+      // The Tue 13 Oct slot looks free but loses a race exactly once.
+      const id = d === "10-13" ? `${sessionId}-race` : `${sessionId}-${d}-${h}${m || ""}`;
+      return { id, startsAt, label: formatSession(startsAt) };
+    });
+  }
   const days = windows[sessionId] ?? windows["s-1004"]!;
   const out: SlotDto[] = [];
   days.forEach((d, i) => {

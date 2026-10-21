@@ -676,6 +676,53 @@ export const P1_FEEDBACK: FeedbackDetail = {
     { label: "Composure", value: 74 },
   ],
   sentBackToBuilder: true,
+  label: "P1 · First mock panel",
+  badge: "Baseline",
+  title: "Where you are before anyone coaches you.",
+  panelistBlurb:
+    "Marketing & Brand panel · brand manager at a consumer-goods company, currently working in the function",
+  readiness: 64,
+  readinessNote: "Measured again at P2 and P3, so you can see the line move.",
+  questions: [
+    {
+      question: "Walk me through your profile.",
+      rating: "strong",
+      comment: "Tight and in order. 90 seconds, ends on why sales. Keep it exactly like this.",
+      tags: [],
+      answerId: null,
+    },
+    {
+      question: "You already have experience. Why should we hire you as an MT?",
+      rating: "flagged",
+      comment:
+        "You name the experience but never say what changes for us. Lead with what an MT track gives you that your last role could not.",
+      short: "Say what changes for us. Sent to your builder.",
+      tags: ["situation", "decision", "result"],
+      answerId: "a-1009",
+    },
+    {
+      question: "Why did you cut those three channels?",
+      rating: "flagged",
+      comment:
+        "Your answer explains what happened but never says why you chose it. Lead with the trade-off you accepted, then the number.",
+      short: "Lead with the trade-off, then the number.",
+      tags: ["situation", "decision", "result"],
+      answerId: "a-1005",
+    },
+    {
+      question: "Why Sales & Marketing?",
+      rating: "okay",
+      comment: "Better than the free session. Now tie it to one outlet you changed, by name.",
+      tags: [],
+      answerId: null,
+    },
+  ],
+  fixBefore: "Mon 12 Oct",
+  fixes: [
+    "Every answer names the trade-off you owned.",
+    "Redraft both flagged answers and send them for review.",
+    "Draft the 400+ outlets answer. Expect it at P2.",
+  ],
 };
 
 const cache = new WeakMap<Db, World>();

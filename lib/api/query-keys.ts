@@ -18,6 +18,7 @@ export const queryKeys = {
   answer: (id: string) => ["answer", id] as const,
   journey: ["journey"] as const,
   quickSwitch: (to: string) => ["quick-switch", to] as const,
+  quickSwitchDigest: ["quick-switch-digest"] as const,
   caseTrack: ["case-track"] as const,
   billing: ["billing"] as const,
   upgradeQuote: ["billing", "quote"] as const,

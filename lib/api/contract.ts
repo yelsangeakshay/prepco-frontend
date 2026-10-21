@@ -39,8 +39,20 @@ import {
   answerListSchema,
   patchAnswerBodySchema,
 } from "@/features/answer-bank/schemas";
-import { caseTrackSchema, journeySchema, quickSwitchSchema } from "@/features/journey/schemas";
-import { billingSchema, upgradeQuoteSchema, upgradeResultSchema } from "@/features/billing/schemas";
+import {
+  caseTrackSchema,
+  journeySchema,
+  quickSwitchDigestSchema,
+  quickSwitchPrefsSchema,
+  quickSwitchSchema,
+} from "@/features/journey/schemas";
+import {
+  billingSchema,
+  buyTopUpBodySchema,
+  buyTopUpResultSchema,
+  upgradeQuoteSchema,
+  upgradeResultSchema,
+} from "@/features/billing/schemas";
 import {
   changeTargetBodySchema,
   changeTargetResultSchema,
@@ -332,7 +344,7 @@ export const OPERATIONS: Operation[] = [
     tag: "Answers",
     summary: "Answer bank",
     response: answerListSchema,
-    query: ["status", "q", "page", "pageSize"],
+    query: ["status", "round", "q", "page", "pageSize"],
   },
   {
     method: "get",
@@ -373,19 +385,49 @@ export const OPERATIONS: Operation[] = [
   },
   {
     method: "get",
+    path: "/quick-switch/digest",
+    tag: "Extras",
+    summary: "Quick Switch job-hunting agent: stats, today's digest and preferences",
+    response: quickSwitchDigestSchema,
+  },
+  {
+    method: "put",
+    path: "/quick-switch/preferences",
+    tag: "Extras",
+    summary: "Save the agent's preferences",
+    request: quickSwitchPrefsSchema,
+    response: quickSwitchPrefsSchema,
+  },
+  {
+    method: "post",
+    path: "/quick-switch/saved/{id}",
+    tag: "Extras",
+    summary: "Save or unsave a listing from the digest",
+    response: quickSwitchDigestSchema,
+  },
+  {
+    method: "get",
     path: "/case-track",
     tag: "Extras",
-    summary: "Case modules (Elite only)",
+    summary: "Case track steps; a preview with upgrade prices below Elite",
     response: caseTrackSchema,
-    errors: [[403, "elite_only"]],
   },
 
   {
     method: "get",
     path: "/billing",
     tag: "Billing",
-    summary: "Plan, credits, receipts",
+    summary: "Plan, what it includes, top-up rates, credits, invoices",
     response: billingSchema,
+  },
+  {
+    method: "post",
+    path: "/billing/top-ups",
+    tag: "Billing",
+    summary: "Buy a top-up at the plan rate; it counts toward an upgrade",
+    request: buyTopUpBodySchema,
+    response: buyTopUpResultSchema,
+    errors: [[422, "top_up_unpriced"]],
   },
   {
     method: "get",

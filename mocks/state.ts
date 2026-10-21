@@ -1,6 +1,7 @@
 import type { Bullet, CvScores, CvVersion } from "@/features/cv-builder/schemas";
 import { scoreBulletText } from "@/features/cv-builder/schemas";
 import type { AnswerDetail } from "@/features/answer-bank/schemas";
+import type { QuickSwitchPrefs } from "@/features/journey/schemas";
 import type { Notification } from "@/features/notifications/schemas";
 import type { Billing } from "@/features/billing/schemas";
 import type { Outcome } from "@/features/outcome/schemas";
@@ -27,17 +28,25 @@ export interface State {
     relock: { status: "none" | "pending"; requestedAt: string | null; reason: string | null };
   };
   answers: AnswerDetail[];
+  /** Quick Switch agent (s13.png): preferences and the listings saved from the digest. */
+  quickSwitch: { prefs: QuickSwitchPrefs; saved: string[] };
   notifications: Notification[];
   plan: Billing["plan"];
   credits: Billing["credits"];
-  invoices: Billing["invoices"];
+  invoices: Omit<Billing["invoices"][number], "status">[];
   upgradeAttempts: number;
   /** Top-up mocks bought this season; they count toward an upgrade. */
   topUps: { label: string; amount: number; at: string }[];
   outcome: Outcome;
   target: { function: string; role: string };
   targetChange: { changedAt: string; from: string; answersToRework: number } | null;
-  profile: { name: string; college: string; batch: string };
+  profile: {
+    name: string;
+    college: string;
+    batch: string;
+    workExperience: string;
+    phone: string;
+  };
 }
 
 const at = (day: string, hour = 19) => `2026-${day}T${String(hour).padStart(2, "0")}:00:00+05:30`;
@@ -91,7 +100,7 @@ export function computeScores(s: State["cv"]): CvScores {
 
 const QUESTIONS: [string, string, string][] = [
   [
-    "Tell me about yourself",
+    "Walk me through your profile.",
     "Opening",
     "I spent two years as an FMCG sales analyst, which taught me that distributor margins decide shelf presence. I now want a Management Trainee role where I own those calls.",
   ],
@@ -101,9 +110,9 @@ const QUESTIONS: [string, string, string][] = [
     "Because I have seen how one pricing decision changes a region's numbers, and I want to make those decisions myself.",
   ],
   [
-    "Why this company?",
+    "Why MBA, and why now?",
     "Motivation",
-    "Your brand sits in categories where distribution is the moat, which is exactly where my analyst work was.",
+    "I want to move from reporting on decisions to making them. The MBA is the shortest route to a Management Trainee role.",
   ],
   [
     "Walk me through a time you led without authority",
@@ -111,9 +120,9 @@ const QUESTIONS: [string, string, string][] = [
     "As placement lead I got 40 peers to submit on time by publishing a daily tracker.",
   ],
   [
-    "Tell me about a failure",
-    "Behavioural",
-    "We missed a Q3 target by 6% because I trusted a forecast without checking distributor stock.",
+    "Why did you cut those three channels?",
+    "Analytical",
+    "I cut three of five channels after week two to protect the budget.",
   ],
   [
     "Describe a conflict with a teammate",
@@ -133,7 +142,7 @@ const QUESTIONS: [string, string, string][] = [
   [
     "You already have experience. Why should we hire you as an MT?",
     "Pitch",
-    "Running a regional team and owning a P&L.",
+    "Two years as a sales analyst covering 400+ outlets in West Delhi. I could see the numbers but not set the plan. I chose the MBA to move from reporting on decisions to making them.",
   ],
   [
     "Why should we hire you over others?",
@@ -160,8 +169,8 @@ const QUESTIONS: [string, string, string][] = [
     "Influence",
     "I persuaded a sceptical distributor to stock a new pack by showing his own sell-through data.",
   ],
-  ["How would you launch a product in a new city?", "Case", ""],
-  ["What would you do in your first 90 days?", "Career", ""],
+  ["You mention 400+ outlets. What exactly did you analyse?", "Analytical", ""],
+  ["Walk me through a time you were wrong.", "Behavioural", ""],
   [
     "Tell me about a trade-off you made",
     "Analytical",
@@ -175,12 +184,34 @@ const QUESTIONS: [string, string, string][] = [
 ];
 
 const FLAGGED = new Set([4, 5, 8, 16]);
+/** The four CV deep-dive questions; the other fourteen are the fit round (s08.png). */
+const CV_ROUND = new Set([10, 13, 16, 17]);
+/** List order on the answer bank (s08.png): the drawn rows first, the rest in order. */
+const DISPLAY_FIRST = [0, 2, 1, 8, 4, 14, 15];
+const NOTE_TAGS: Record<number, AnswerDetail["noteTags"]> = {
+  4: ["situation", "decision", "result"],
+  5: ["decision"],
+  8: ["situation", "decision", "result"],
+  16: ["result"],
+};
+
+/** First sentence is the situation, the second the decision, the rest the result. */
+function splitParts(draft: string): AnswerDetail["parts"] {
+  const sentences =
+    draft.match(/[^.!?]+[.!?]+(s|$)/g)?.map((s) => s.trim()) ?? (draft ? [draft] : []);
+  return {
+    situation: sentences[0] ?? "",
+    decision: sentences[1] ?? "",
+    result: sentences.slice(2).join(" "),
+  };
+}
 const CRITIQUE: Record<number, { critique: string; inline: { quote: string; note: string }[] }> = {
   4: {
-    critique: "No number and no lesson. A panel will ask what you changed.",
+    critique:
+      "Your answer explains what happened but never says why you chose it. Lead with the trade-off you accepted, then the number.",
     inline: [
-      { quote: "missed a Q3 target by 6%", note: "Good: a real number. Now say what it cost." },
-      { quote: "trusted a forecast", note: "Name the check you now run instead." },
+      { quote: "cut three of five channels", note: "Say what you gave up to do it." },
+      { quote: "after week two", note: "What did week two show you?" },
     ],
   },
   5: {
@@ -188,8 +219,14 @@ const CRITIQUE: Record<number, { critique: string; inline: { quote: string; note
     inline: [{ quote: "ran both options", note: "Which one won, and what did you give up?" }],
   },
   8: {
-    critique: "Too short. Give one milestone per year.",
-    inline: [{ quote: "Running a regional team", note: "How many people? Which region?" }],
+    critique:
+      "You name the experience but never say what changes for us. Lead with what an MT track gives you that your last role could not.",
+    inline: [
+      {
+        quote: "I chose the MBA",
+        note: "What does the MT track give you that the MBA alone does not?",
+      },
+    ],
   },
   16: {
     critique: "Trade-off is there, but the cost is missing.",
@@ -199,7 +236,7 @@ const CRITIQUE: Record<number, { critique: string; inline: { quote: string; note
 
 function buildAnswers(scenario: Scenario | null): AnswerDetail[] {
   const reworked = scenario === "target-change";
-  return QUESTIONS.map(([question, category, draft], i): AnswerDetail => {
+  const list = QUESTIONS.map(([question, category, draft], i): AnswerDetail => {
     const id = `a-${1001 + i}`;
     let status: AnswerDetail["status"] = draft ? "rehearsed" : "not-drafted";
     if (FLAGGED.has(i) || (reworked && draft && i % 2 === 1 && i < 14)) status = "flagged";
@@ -215,9 +252,32 @@ function buildAnswers(scenario: Scenario | null): AnswerDetail[] {
           ? (c?.critique ?? "Your target changed: reframe this for the new role.")
           : null,
       draft,
+      round: CV_ROUND.has(i) ? "cv" : "fit",
+      noteTags: status === "flagged" ? (NOTE_TAGS[i] ?? ["situation"]) : [],
+      parts:
+        i === 8
+          ? {
+              situation:
+                "Two years as a sales analyst covering 400+ outlets in West Delhi. I could see the numbers but not set the plan.",
+              decision: "I chose the MBA to move from reporting on decisions to making them.",
+              result: "",
+            }
+          : splitParts(draft),
       inlineCritique: status === "flagged" ? (c?.inline ?? []) : [],
+      flaggedAt:
+        status === "flagged" ? (FLAGGED.has(i) ? "P1 · 21 Sep" : "Target change · 5 Oct") : null,
+      draftNo: i === 8 ? 3 : draft ? 1 + (i % 3) : 0,
+      savedLabel: i === 8 ? "2 min ago" : null,
+      rehearseNext: i === 8,
+      nextPanel: "P2 · Mon 12 Oct",
     };
   });
+  const rank = (a: AnswerDetail) => {
+    const i = Number(a.id.slice(2)) - 1001;
+    const first = DISPLAY_FIRST.indexOf(i);
+    return first >= 0 ? first : DISPLAY_FIRST.length + i;
+  };
+  return list.sort((a, b) => rank(a) - rank(b));
 }
 
 function buildNotifications(db: Db): Notification[] {
@@ -445,6 +505,16 @@ function buildState(db: Db): State {
   return {
     cv,
     answers,
+    quickSwitch: {
+      prefs: {
+        enabled: true,
+        roles: "Sales & Marketing, Strategy, Business Analytics",
+        locations: "Mumbai, Pune, Bengaluru",
+        minFit: 85,
+        email: "riya.kulkarni@scmhrd.edu",
+      },
+      saved: [],
+    },
     notifications: buildNotifications(db),
     plan,
     credits: firstLogin
@@ -476,7 +546,13 @@ function buildState(db: Db): State {
           answersToRework: 6,
         }
       : null,
-    profile: { name: "Riya Kulkarni", college: "SCMHRD Pune", batch: "2025–27" },
+    profile: {
+      name: "Riya Kulkarni",
+      college: "SCMHRD Pune",
+      batch: "MBA 2025–27",
+      workExperience: "2 yrs · FMCG sales analyst",
+      phone: "+91 98XXX XXXXX",
+    },
   };
 }
 
