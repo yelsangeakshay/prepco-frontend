@@ -1,29 +1,71 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ErrorCard } from "@/components/shared/ErrorCard";
-import { SeatGauge } from "@/features/ops/roster/components/SeatGauge";
+import { ProgressBar } from "@/components/shared/ProgressBar";
 import { Skeleton } from "@/components/shared/Skeletons";
-import { ProposedBadge, SampleDataBadge } from "@/components/shared/Badges";
+import { ProposedBadge } from "@/components/shared/Badges";
+import { CheckoutPanel } from "@/features/checkout/components/CheckoutPanel";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { ROUTES } from "@/lib/config/routes";
+import { cn } from "@/lib/utils/cn";
 import { usePlans } from "../hooks/usePlans";
+import { TRACKS, type Plan, type Track } from "../schemas";
 import { PlanCard } from "./PlanCard";
+
+const TRACK_LABEL: Record<Track, string> = { finals: "Finals", summers: "Summers" };
 
 /** S4 plans. E5: sold-out plans send people to the waitlist. */
 export function PlansView() {
   const router = useRouter();
-  const { data, isPending, isError, refetch } = usePlans();
+  const [track, setTrack] = useState<Track>("finals");
+  const [chosen, setChosen] = useState<Plan["id"]>("premium");
+  const { data, isPending, isError, refetch } = usePlans(track);
+  const selected = data?.items.find((p) => p.id === chosen);
 
   return (
-    <div className="mx-auto max-w-5xl p-4 md:p-8">
-      <div className="flex flex-wrap items-center gap-2">
-        <h1 className="font-display text-3xl font-bold">Choose your plan</h1>
-        <SampleDataBadge />
+    <div className="mx-auto max-w-6xl p-4 md:p-8">
+      <PageHeader
+        eyebrow="Plans"
+        title="Pick how far down the runway you want cover."
+        pill="Sample data"
+        subtitle="Seats are limited per cohort. Prices include GST."
+      />
+
+      <div className="mt-6 flex flex-wrap items-center gap-4">
+        <div role="group" aria-label="Track" className="bg-cream-soft inline-flex rounded-full p-1">
+          {TRACKS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              aria-pressed={track === t}
+              onClick={() => setTrack(t)}
+              className={cn(
+                "min-h-11 rounded-full px-5 text-sm font-semibold md:min-h-9",
+                track === t ? "bg-navy-900 text-white" : "text-navy-400",
+              )}
+            >
+              {TRACK_LABEL[t]}
+            </button>
+          ))}
+        </div>
+        {data && (
+          <div className="min-w-60 flex-1">
+            <p className="text-sm font-semibold">
+              {data.seats.label} · {Math.max(0, data.seats.total - data.seats.taken)} of{" "}
+              {data.seats.total} left
+            </p>
+            <ProgressBar
+              className="mt-1"
+              value={data.seats.taken}
+              max={data.seats.total}
+              label={`${data.seats.label} taken`}
+            />
+          </div>
+        )}
       </div>
-      <p className="text-navy-400 mt-1 text-sm">
-        Seats are limited per cohort. Prices include GST.
-      </p>
 
       {data?.cohortFull && (
         <div role="status" className="bg-maroon-100 text-maroon-600 rounded-card mt-4 p-4 text-sm">
@@ -48,25 +90,32 @@ export function PlansView() {
           {data?.items.map((p) => {
             const full = p.seatsTaken >= p.seatsTotal;
             return (
-              <div key={p.id} className="flex flex-col gap-3">
-                <PlanCard
-                  name={p.name}
-                  price={p.price}
-                  tagline={p.tagline}
-                  features={p.features}
-                  mostChosen={p.mostChosen}
-                  elite={p.elite}
-                  ctaLabel={full ? "Join Waitlist" : `Choose ${p.name}`}
-                  onSelect={() =>
-                    router.push(full ? ROUTES.student.waitlist : ROUTES.student.checkout(p.id))
-                  }
-                />
-                <SeatGauge label={`${p.name} seats`} taken={p.seatsTaken} total={p.seatsTotal} />
-              </div>
+              <PlanCard
+                key={p.id}
+                {...p}
+                mostChosen={p.id === "premium"}
+                elite={p.id === "elite"}
+                selected={!full && chosen === p.id}
+                ctaLabel={full ? "Join Waitlist" : `Choose ${p.name}`}
+                onSelect={() => {
+                  if (full) return router.push(ROUTES.student.waitlist);
+                  setChosen(p.id);
+                  document
+                    .getElementById("checkout")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              />
             );
           })}
         </div>
       )}
+
+      {data && selected && selected.seatsTaken < selected.seatsTotal && (
+        <div id="checkout" className="mt-8 scroll-mt-4">
+          <CheckoutPanel key={`${selected.id}-${track}`} plan={selected} track={track} />
+        </div>
+      )}
+
       <p className="mt-6 flex items-center gap-2 text-xs">
         <ProposedBadge />
         <span className="text-navy-400">

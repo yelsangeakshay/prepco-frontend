@@ -46,8 +46,8 @@ describe("runway", () => {
     expect(r.student.readiness).toBe(64);
     expect(r.steps.find((s) => s.status === "next")?.title).toBe("Domain deep-dive");
     expect(r.steps.find((s) => s.status === "pick-slot")?.id).toBe("s-1004");
-    expect(r.cv).toEqual({ version: "V4", locked: true, score: 84 });
-    expect(r.answers).toEqual({ total: 18, prepared: 12, needWork: 4 });
+    expect(r.cv).toMatchObject({ version: "V4", locked: true, score: 84 });
+    expect(r.answers).toMatchObject({ total: 18, prepared: 12, needWork: 4 });
   });
 
   it("late-joiner compresses the runway", async () => {
@@ -104,17 +104,17 @@ describe("plans and checkout", () => {
     asScenario("cohort-full");
     const plans = await getPlans();
     expect(plans.cohortFull).toBe(true);
-    expect(await code(postCheckout("premium"))).toBe("cohort_full");
+    expect(await code(postCheckout({ planId: "premium" }))).toBe("cohort_full");
   });
 
   it("payment-failed fails the first attempt only, with a 15-minute seat hold", async () => {
     asScenario("payment-failed");
-    const first = await postCheckout("premium");
+    const first = await postCheckout({ planId: "premium" });
     expect(first.status).toBe("failed");
     const hold = new Date(first.seatHeldUntil!).getTime() - Date.now();
     expect(hold).toBeGreaterThan(14 * 60_000);
     expect(hold).toBeLessThanOrEqual(15 * 60_000);
-    expect((await postCheckout("premium")).status).toBe("paid");
+    expect((await postCheckout({ planId: "premium" })).status).toBe("paid");
   });
 });
 

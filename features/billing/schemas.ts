@@ -22,13 +22,20 @@ export const billingSchema = z.object({
 });
 export type Billing = z.infer<typeof billingSchema>;
 
+/** e08: next tier price, minus what you paid for the current tier, minus top-ups bought this season. */
 export const upgradeQuoteSchema = z.object({
   from: z.string(),
   to: z.string(),
+  /** Price of the next tier. */
   listPrice: z.number(),
-  /** Credit for unused sessions on the current plan (Proposed). */
+  /** Next tier price minus the current tier price paid. */
+  difference: z.number(),
+  topUps: z.array(z.object({ label: z.string(), amount: z.number(), at: z.string() })),
+  /** Sum of the top-up credits. */
   topUpCredit: z.number(),
   payable: z.number(),
+  /** What the next tier adds over the current one. */
+  unlocks: z.array(z.string()),
   seatsLeft: z.number(),
 });
 export type UpgradeQuote = z.infer<typeof upgradeQuoteSchema>;

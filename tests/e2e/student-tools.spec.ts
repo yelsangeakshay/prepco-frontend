@@ -110,8 +110,8 @@ test.describe("Upgrade mid-season", () => {
     await expect(page.getByTestId("credits")).toHaveText("2 of 6 used");
     await page.getByRole("link", { name: "Upgrade To Elite" }).click();
 
-    await expect(page.getByTestId("payable")).toHaveText("₹35,333");
-    await page.getByRole("button", { name: /^Pay ₹35,333/ }).click();
+    await expect(page.getByTestId("payable")).toHaveText("₹4,000");
+    await page.getByRole("button", { name: /^Upgrade for ₹4,000/ }).click();
     await expect(page.getByTestId("upgrade-receipt")).toContainText("You are on Elite");
 
     await page.getByRole("link", { name: "Open Case Track" }).click();
@@ -125,7 +125,7 @@ test.describe("Upgrade mid-season", () => {
   test("payment-failed upgrade can be retried", async ({ page, context }) => {
     await signInAsRiya(context, "payment-failed");
     await gotoReady(page, "/billing/upgrade");
-    await page.getByRole("button", { name: /^Pay/ }).click();
+    await page.getByRole("button", { name: /^Upgrade for/ }).click();
     await expect(alerts(page)).toContainText("Payment failed");
     await page.getByRole("button", { name: /^Retry Payment/ }).click();
     await expect(page.getByTestId("upgrade-receipt")).toBeVisible();
@@ -151,10 +151,10 @@ test.describe("Day 0 moves", () => {
     await signInAsRiya(context, "day0-moved");
     await gotoReady(page, "/home");
     await expect(page.getByTestId("banner-day0-moved")).toContainText("Mon 9 Nov");
-    await expect(page.getByText("42", { exact: true })).toBeVisible();
+    await expect(page.getByText("42", { exact: true }).locator("visible=true")).toBeVisible();
 
     // Bell drawer, on a page that is not /notifications
-    await expect(page.getByTestId("bell-dot")).toBeVisible();
+    await expect(page.locator("[data-testid=bell-dot]:visible")).toBeVisible();
     await page.getByRole("button", { name: /^Notifications, \d+ unread/ }).click();
     const drawer = page.getByRole("dialog", { name: "Notifications" });
     await expect(drawer.getByText("Day 0 moved to Mon 16 Nov")).toBeVisible();
@@ -276,7 +276,7 @@ test.describe("Not placed, credit carried over", () => {
     await openFromNav(page, "Plan & billing", isMobile);
     await expect(page.getByRole("heading", { name: "Plan & billing" })).toBeVisible();
     await gotoReady(page, "/outcome");
-    await expect(page.getByTestId("outcome-not-placed")).toContainText("₹36,999");
+    await expect(page.getByTestId("outcome-not-placed")).toContainText("₹9,999");
     await expect(page.getByTestId("outcome-not-placed")).toContainText("in full");
   });
 });

@@ -9,7 +9,7 @@ import { FormField } from "@/components/ui/form-field";
 import { Logo } from "@/components/shell/Logo";
 import { Card } from "@/components/ui/card";
 import { FormAlert } from "@/features/auth/components/AuthShell";
-import { FUNCTIONS } from "@/features/onboarding/schemas";
+import { PANELIST_FUNCTIONS } from "@/features/onboarding/schemas";
 import { ApiError } from "@/lib/api/client";
 import { ROUTES } from "@/lib/config/routes";
 import { useApiReady } from "@/components/shell/Providers";
@@ -81,7 +81,7 @@ export function ApplyForm() {
                 <option value="" disabled>
                   Select a function
                 </option>
-                {FUNCTIONS.map((f) => (
+                {PANELIST_FUNCTIONS.map((f) => (
                   <option key={f} value={f}>
                     {f}
                   </option>

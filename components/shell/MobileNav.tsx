@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MoreHorizontal } from "lucide-react";
-import { NAV } from "@/lib/config/nav";
+import { MoreHorizontal, UserRound } from "lucide-react";
+import { MORE_LABEL, NAV } from "@/lib/config/nav";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils/cn";
 import { isActive } from "./Sidebar";
@@ -41,7 +41,9 @@ export function MobileNav({ role }: { role: Role }) {
             )}
           >
             <Icon className="size-5" aria-hidden />
-            <span className="max-w-full truncate px-1">{item.label.split(" ")[0]}</span>
+            <span className="max-w-full truncate px-1">
+              {item.mobileLabel ?? item.label.split(" ")[0]}
+            </span>
           </Link>
         );
       })}
@@ -55,11 +57,16 @@ export function MobileNav({ role }: { role: Role }) {
           moreActive ? "text-maroon-600" : "text-navy-400",
         )}
       >
-        <MoreHorizontal className="size-5" aria-hidden />
-        More
+        {role === "student" ? (
+          <UserRound className="size-5" aria-hidden />
+        ) : (
+          <MoreHorizontal className="size-5" aria-hidden />
+        )}
+        {MORE_LABEL[role]}
       </button>
       {open && (
         <MoreSheet
+          title={MORE_LABEL[role]}
           items={rest}
           pathname={pathname}
           onClose={() => {

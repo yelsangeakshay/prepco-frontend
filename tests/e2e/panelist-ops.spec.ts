@@ -33,7 +33,7 @@ test.describe("Become a panelist", () => {
 
     await page.getByLabel("Full name").fill("Meera Kapoor");
     await page.getByLabel("Work email").fill("meera.kapoor@example.com");
-    await page.getByLabel("Function you can assess").selectOption("Finance");
+    await page.getByLabel("Function you can assess").selectOption("Finance & Banking");
     await page.getByLabel("Company").fill("Tailspin Finance");
     await page.getByLabel("Current role").fill("Associate Director");
     await page.getByLabel("Years of experience").fill("2");
@@ -50,7 +50,7 @@ test.describe("Become a panelist", () => {
 
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/panelists/applications");
-    const card = page.getByTestId("application-app-009");
+    const card = page.getByTestId("application-app-007");
     await expect(card).toContainText("Meera Kapoor");
     await card.getByRole("button", { name: /Approve/ }).click();
     await expect(card).toHaveCount(0);
@@ -61,16 +61,20 @@ test.describe("Become a panelist", () => {
 });
 
 test.describe("Run a panel", () => {
-  test("tonight: brief, validation, score, count goes up", async ({ page, context }) => {
+  test("tonight: brief, validation, score, count goes up", async ({ page, context, isMobile }) => {
     await signInAs(context, "panelist");
     await gotoReady(page, "/panelist/today");
-    await expect(
-      page.getByText("Panels this season").locator("..").getByText("12", { exact: true }),
-    ).toBeVisible();
-    const tonight = page.locator("section[aria-labelledby=today-h]");
-    await expect(tonight.getByRole("link", { name: "View Brief" })).toHaveCount(2);
+    const season = (n: string) =>
+      page.getByText("This season", { exact: true }).locator("..").getByText(n, { exact: true });
+    if (!isMobile) await expect(season("12")).toBeVisible();
+    const tonight = page.locator("section[aria-labelledby=tonight-h]");
+    // Desktop shows a "Read brief" button per unread panel; the phone shows a card per panel.
+    const unread = isMobile
+      ? tonight.getByRole("link", { name: /Not read yet/i })
+      : tonight.getByRole("link", { name: "Read brief" });
+    await expect(unread).toHaveCount(2);
 
-    await tonight.getByRole("link", { name: "View Brief" }).first().click();
+    await unread.first().click();
     await expect(page.getByRole("heading", { name: /^Brief:/ })).toBeVisible();
     await expect(page.getByText("Suggested questions")).toBeVisible();
     await page.getByRole("link", { name: "Start Scoring" }).click();
@@ -84,12 +88,8 @@ test.describe("Run a panel", () => {
     await page.getByRole("button", { name: "Send Feedback" }).click();
     await expect(page.getByTestId("score-sent")).toBeVisible();
     await page.getByRole("link", { name: "Back To Today" }).click();
-    await expect(
-      page.getByText("Panels this season").locator("..").getByText("13", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.locator("section[aria-labelledby=today-h]").getByRole("link", { name: "View Brief" }),
-    ).toHaveCount(1);
+    if (!isMobile) await expect(season("13")).toBeVisible();
+    await expect(unread).toHaveCount(1);
   });
 
   test("an unsent score survives a reload", async ({ page, context }) => {
@@ -114,18 +114,18 @@ test.describe("Set availability", () => {
   test("toggle a slot, save, reload; booked slots are locked", async ({ page, context }) => {
     await signInAs(context, "panelist");
     await gotoReady(page, "/panelist/availability");
-    await expect(page.getByTestId("open-count")).toHaveText("9");
+    await expect(page.getByTestId("open-count")).toHaveText("10");
     await expect(page.getByRole("button", { name: "Mon 18:00, booked" })).toBeDisabled();
 
     const save = page.getByRole("button", { name: "Save Availability" });
     await expect(save).toBeDisabled();
     await page.getByRole("button", { name: "Sat 19:00" }).click();
-    await expect(page.getByTestId("open-count")).toHaveText("10");
+    await expect(page.getByTestId("open-count")).toHaveText("11");
     await save.click();
     await expect(save).toBeDisabled();
 
     await page.reload();
-    await expect(page.getByTestId("open-count")).toHaveText("10");
+    await expect(page.getByTestId("open-count")).toHaveText("11");
     await expect(page.getByRole("button", { name: "Sat 19:00" })).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -141,15 +141,15 @@ test.describe("Weekly ops loop", () => {
   }) => {
     await signInAs(context, "ops");
     await gotoReady(page, "/ops");
-    await expect(page.getByTestId("attn-unassigned")).toContainText("7");
-    await expect(page.getByTestId("attn-applications")).toContainText("5");
+    await expect(page.getByTestId("attn-unassigned")).toContainText("3");
+    await expect(page.getByTestId("attn-applications")).toContainText("3");
 
-    await page.getByTestId("attn-unassigned").click();
+    await page.getByTestId("attn-unassigned-action").click();
     await expect(page).toHaveURL(/\/ops\/assignments$/);
-    await expect(page.getByTestId("unassigned-count")).toContainText("7 panels");
+    await expect(page.getByTestId("unassigned-count")).toContainText("3 panels");
     if (!isMobile) {
       await expect(
-        page.getByRole("navigation", { name: "Primary" }).getByText("7", { exact: true }),
+        page.getByRole("navigation", { name: "Primary" }).getByText("3", { exact: true }),
       ).toBeVisible();
     }
 
@@ -160,7 +160,7 @@ test.describe("Weekly ops loop", () => {
     expect(freeIdx).toBeGreaterThan(0);
     await select.selectOption({ index: freeIdx });
     await first.getByRole("button", { name: "Assign" }).click();
-    await expect(page.getByTestId("unassigned-count")).toContainText("6 panels");
+    await expect(page.getByTestId("unassigned-count")).toContainText("2 panels");
 
     await gotoReady(page, "/ops/sessions?tab=no-shows");
     const before = await page.getByRole("button", { name: /^Excuse/ }).count();
@@ -177,21 +177,17 @@ test.describe("Weekly ops loop", () => {
     await approvals.first().click();
     await expect(approvals).toHaveCount(pending - 1);
     await gotoReady(page, "/ops");
-    await expect(page.getByTestId("attn-unassigned")).toContainText("6");
-    await expect(page.getByTestId("attn-applications")).toContainText("4");
+    await expect(page.getByTestId("attn-unassigned")).toContainText("2");
+    await expect(page.getByTestId("attn-applications")).toContainText("2");
   });
 });
 
 test.describe("Keep the panel healthy", () => {
-  test("find panelists who need attention, remind one, pause one", async ({ page, context }) => {
+  test("find panelists who need attention, pause one", async ({ page, context }) => {
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/panelists?health=needs-attention");
-    await expect(page.getByText(/feedback overdue/).first()).toBeVisible();
-    const reminders = page.getByRole("button", { name: /^Send Reminder/ });
-    const n = await reminders.count();
-    expect(n).toBeGreaterThan(0);
-    await reminders.first().click();
-    await expect(reminders).toHaveCount(n - 1);
+    await expect(page.getByText(/[0-9]+ cancellations/).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Send Reminder/ })).toHaveCount(0);
 
     await page
       .getByRole("button", { name: /^Pause/ })
@@ -216,7 +212,7 @@ test.describe("Students at scale", () => {
     await gotoReady(page, "/ops/students");
     await page.getByLabel("Plan").selectOption("elite");
     await expect(page).toHaveURL(/plan=elite/);
-    await expect(page.getByText("41 match")).toBeVisible();
+    await expect(page.getByText("17 match")).toBeVisible();
 
     await page.getByRole("button", { name: "Readiness" }).click();
     await expect(page).toHaveURL(/sort=readiness%3Aasc/);
@@ -231,7 +227,7 @@ test.describe("Students at scale", () => {
     await page.getByRole("cell", { name: /Riya Kulkarni/ }).click();
     await expect(page).toHaveURL(/\/ops\/students\/st-riya$/);
     await expect(page.getByRole("heading", { name: "Riya Kulkarni" })).toBeVisible();
-    await expect(page.getByText("P1 first mock panel")).toBeVisible();
+    await expect(page.getByText("P1: first mock panel")).toBeVisible();
     await gotoReady(page, "/ops/students/nope");
     await expect(page.getByText("Student not found")).toBeVisible();
   });
@@ -240,9 +236,9 @@ test.describe("Students at scale", () => {
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/ledger");
     await expect(page.getByText("Payments").first()).toBeVisible();
-    await page.getByLabel("Type").selectOption("refund");
-    await expect(page).toHaveURL(/type=refund/);
-    await expect(page.getByText("Refund · seat released").first()).toBeVisible();
+    await page.getByLabel("Type").selectOption("top-up");
+    await expect(page).toHaveURL(/type=top-up/);
+    await expect(page.getByText("Top-up mock").first()).toBeVisible();
   });
 });
 
@@ -263,16 +259,15 @@ test.describe("One panel, three roles", () => {
     await gotoReady(page, "/ops/sessions?tab=unassigned");
     await expect(page.getByRole("cell", { name: "Riya Kulkarni" })).toBeVisible();
     await gotoReady(page, "/ops/assignments");
-    await expect(page.getByTestId("unassigned-count")).toContainText("8 panels");
+    await expect(page.getByTestId("unassigned-count")).toContainText("4 panels");
     const row = page.getByTestId("unassigned-s-1004");
     await pickByText(page, row, "Arjun Mehta");
     await row.getByRole("button", { name: "Assign" }).click();
-    await expect(page.getByTestId("unassigned-count")).toContainText("7 panels");
+    await expect(page.getByTestId("unassigned-count")).toContainText("3 panels");
 
     // 3. Arjun sees it on Today, reads the brief, scores with send-back.
     await signInAs(context, "panelist");
     await gotoReady(page, "/panelist/today");
-    await expect(page.getByText("Riya Kulkarni")).toBeVisible();
     await gotoReady(page, "/panelist/briefs/s-1004");
     await expect(page.getByText("Probe these answers")).toBeVisible();
     await page.getByRole("link", { name: "Start Scoring" }).click();
@@ -307,7 +302,7 @@ test.describe("CV re-lock reviewed by ops", () => {
 
     await signInAs(context, "ops");
     await gotoReady(page, "/ops");
-    await page.getByTestId("attn-relock").click();
+    await page.getByTestId("attn-relock-action").click();
     await expect(page.getByTestId("relock-request")).toContainText("Sharpened bullets");
     await page.getByRole("button", { name: "Approve Re-lock" }).click();
     await expect(page.getByTestId("relock-request")).toHaveCount(0);

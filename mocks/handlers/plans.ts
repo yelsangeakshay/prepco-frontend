@@ -1,98 +1,170 @@
 import { HttpResponse } from "msw";
 import { http } from "../http";
 import { API_BASE_URL } from "@/lib/api/client";
-import type { Checkout, Plan } from "@/features/plans/schemas";
+import {
+  PAY_METHOD_LABEL,
+  type Checkout,
+  type PayMethod,
+  type Plan,
+  type Track,
+} from "@/features/plans/schemas";
 import { getDb } from "../db";
+import { PLAN_PRICE, SEATS } from "../world";
 import { apiError, latency, scenarioOf } from "../utils";
 
-/** Sample prices. Real pricing is an open decision. */
-function buildPlans(cohortFull: boolean): Plan[] {
+/** Plans exactly as drawn in s04.png (Season 1 pricing). */
+function buildPlans(track: Track, full: boolean): Plan[] {
+  const seats = track === "finals" ? SEATS.finals : SEATS.summers;
+  const taken = full ? seats.total : seats.taken;
+  const eliteTaken = full ? SEATS.elite.total : SEATS.elite.taken;
   return [
     {
       id: "basic",
       name: "Basic",
-      price: 14999,
-      tagline: "Start your runway",
-      features: ["Profiling call + CV lock", "One mock panel", "CV Builder"],
-      mostChosen: false,
-      elite: false,
-      seatsTotal: 300,
-      seatsTaken: 212,
+      price: PLAN_PRICE.basic,
+      listPrice: 8999,
+      badge: "33% off · Season 1",
+      suggested: false,
+      tagline:
+        "A diagnostic and one real panel. Enough to find out where you stand, not enough to fix it.",
+      coverage: { done: 2, total: 6, caption: "CV lock · P1, then stops" },
+      inherits: null,
+      features: [
+        { text: "CV Builder + expert review, 1 re-lock", included: true },
+        { text: "HR Question Builder access", included: true },
+        { text: "Profiling & strategy call", included: true },
+        { text: "P1 mock with an external industry expert", included: true },
+        { text: "No P2 or P3 panel", included: false },
+        { text: "No domain deep-dive", included: false },
+        { text: "No shortlist strategy support", included: false },
+      ],
+      note: null,
+      topUp: 1799,
+      seatsTotal: seats.total,
+      seatsTaken: taken,
     },
     {
       id: "premium",
       name: "Premium",
-      price: 36999,
-      tagline: "The full runway to Day 0",
+      price: PLAN_PRICE.premium,
+      listPrice: 17999,
+      badge: "Most chosen",
+      suggested: true,
+      tagline: "The full runway, from CV lock to the pressure mock seven days before Day 0.",
+      coverage: { done: 6, total: 6, caption: "CV lock → P1 → deep-dive → P2 → P3 → Day 0" },
+      inherits: "Basic",
       features: [
-        "Six runway sessions",
-        "Three mock panels",
-        "CV Builder + HR Question Builder",
-        "Quick Switch",
+        { text: "P2 panel with an external specialist", included: true },
+        { text: "Domain deep-dive with a practitioner", included: true },
+        { text: "P3 pressure mock, one week out", included: true },
+        { text: "Group positioning session", included: true },
+        { text: "Shortlist, JD & application strategy", included: true },
+        { text: "Unlimited answer reviews in the builder", included: true },
+        { text: "Company-specific prep pack", included: true },
+        { text: "Priority slot booking", included: true },
       ],
-      mostChosen: true,
-      elite: false,
-      seatsTotal: 400,
-      seatsTaken: cohortFull ? 400 : 312,
+      note: null,
+      topUp: 1299,
+      seatsTotal: seats.total,
+      seatsTaken: taken,
     },
     {
       id: "elite",
       name: "Elite",
-      price: 59999,
-      tagline: "Premium plus the case track",
-      features: ["Everything in Premium", "Case track", "Extra pressure mock", "1:1 mentor review"],
-      mostChosen: false,
-      elite: true,
-      seatsTotal: 50,
-      seatsTaken: cohortFull ? 50 : 41,
+      price: PLAN_PRICE.elite,
+      listPrice: 26999,
+      badge: "Best value",
+      suggested: false,
+      tagline:
+        "Premium, plus the case competition track: the fastest route to an offer before the process even opens.",
+      coverage: { done: 6, total: 6, caption: "Full runway + case track from Week -12" },
+      inherits: "Premium",
+      features: [
+        { text: "Case competition track: 3 sessions", included: true },
+        { text: "2 expert deck reviews", included: true },
+        { text: "PPI conversion preparation", included: true },
+        { text: "Builders stay open across both seasons", included: true },
+        { text: "Lowest top-up rates all season", included: true },
+      ],
+      note: "The case track alone is ₹7,999 on its own. Elite costs ₹4,000 more than Premium.",
+      topUp: 999,
+      seatsTotal: SEATS.elite.total,
+      seatsTaken: eliteTaken,
     },
   ];
 }
 
+const FAIL_TITLE: Record<PayMethod, string> = {
+  upi: "The UPI payment timed out",
+  card: "Your card was declined",
+  netbanking: "The net banking session ended",
+};
+
+const trackOf = (url: string): Track =>
+  new URL(url).searchParams.get("track") === "summers" ? "summers" : "finals";
+
 export const plansHandlers = [
   http.get(`${API_BASE_URL}/plans`, async ({ request }) => {
     await latency();
-    const cohortFull = scenarioOf(request) === "cohort-full";
-    return HttpResponse.json({ items: buildPlans(cohortFull), cohortFull });
+    const track = trackOf(request.url);
+    const full = scenarioOf(request) === "cohort-full";
+    const seats = track === "finals" ? SEATS.finals : SEATS.summers;
+    return HttpResponse.json({
+      items: buildPlans(track, full),
+      cohortFull: full,
+      track,
+      seats: {
+        label: `${track === "finals" ? "Finals" : "Summers"} seats, season 1`,
+        taken: full ? seats.total : seats.taken,
+        total: seats.total,
+      },
+    });
   }),
 
   http.post(`${API_BASE_URL}/checkout`, async ({ request }) => {
     await latency();
     const scenario = scenarioOf(request);
-    const { planId } = (await request.json()) as { planId: Plan["id"] };
-    const plan = buildPlans(scenario === "cohort-full").find((p) => p.id === planId);
+    const body = (await request.json()) as { planId: Plan["id"]; method?: PayMethod };
+    const method: PayMethod = body.method ?? "upi";
+    const plan = buildPlans("finals", scenario === "cohort-full").find((p) => p.id === body.planId);
     if (!plan) return apiError(404, "plan_not_found", "That plan does not exist.");
     if (plan.seatsTaken >= plan.seatsTotal) {
       return apiError(409, "cohort_full", "This plan is full. Join the waitlist instead.");
     }
 
     const db = getDb(scenario);
-    const attempts = [...db.checkouts.values()].filter((c) => c.planId === planId).length;
+    const attempts = [...db.checkouts.values()].filter((c) => c.planId === body.planId).length;
     const id = `co-${1000 + db.checkouts.size + 1}`;
     const failFirst = scenario === "payment-failed" && attempts === 0;
+    const base = {
+      id,
+      planId: plan.id,
+      planName: plan.name,
+      track: "finals" as const,
+      method,
+      amount: plan.price,
+      email: "riya.kulkarni@scmhrd.edu",
+    };
 
     const checkout: Checkout = failFirst
       ? {
-          id,
-          planId,
-          planName: plan.name,
-          amount: plan.price,
+          ...base,
           status: "failed",
-          failureReason: "Your bank declined the payment. No money was taken.",
+          failureTitle: FAIL_TITLE[method],
+          failureReason:
+            "Nothing was charged. If your bank shows a debit, it reverses on its own within 5–7 working days, and we'll email you the reference.",
           seatHeldUntil: new Date(Date.now() + 15 * 60_000).toISOString(),
           receiptNo: null,
           paidAt: null,
         }
       : {
-          id,
-          planId,
-          planName: plan.name,
-          amount: plan.price,
+          ...base,
           status: "paid",
+          failureTitle: null,
           failureReason: null,
           seatHeldUntil: null,
-          receiptNo: `PC-2026-${String(4200 + db.checkouts.size + 1)}`,
-          paidAt: "2026-10-05T12:00:00+05:30",
+          receiptNo: `PC-${24816 + db.checkouts.size}`,
+          paidAt: "2026-09-10T12:00:00+05:30",
         };
     db.checkouts.set(id, checkout);
     return HttpResponse.json(checkout);
@@ -112,3 +184,5 @@ export const plansHandlers = [
     return HttpResponse.json({ position: db.waitlistCount, claimWindowHours: 24, priceKept: true });
   }),
 ];
+
+void PAY_METHOD_LABEL;

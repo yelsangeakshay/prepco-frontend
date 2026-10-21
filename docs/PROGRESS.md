@@ -55,3 +55,7 @@ Not verified: visual match to `cover.png` (file absent). Gold text is not used o
 ## Phase 6: Hardening and handover: in progress
 
 (See the end of this file once the gate has run.)
+
+## Mockup fidelity pass
+
+The mockup PNGs are now in design/mockups/. Home, Panelist Today, Ops Overview, Plans, Checkout and Upgrade were compared against them and the fixtures, screens, stories, API contract and generated openapi were updated to match (plans take a track, checkout takes a payment method, the upgrade quote shows difference, top-ups and unlocks, and the ops cohort has seat cards, funnel and revenue lines). All other screens have not yet been compared. See docs/OPEN_DECISIONS.md for the owner decisions and deviations.

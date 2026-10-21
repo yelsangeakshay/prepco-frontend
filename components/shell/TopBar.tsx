@@ -1,24 +1,33 @@
 import { ROLE_HOME, type Role } from "@/lib/auth/roles";
-import { ROLE_PROFILE } from "@/lib/config/nav";
+import { ROLE_TAGLINE } from "@/lib/config/nav";
 import { Logo } from "./Logo";
-import { NotificationBell } from "./NotificationBell";
+import { ShellActions } from "./ShellActions";
 
+/**
+ * Phone: a slim bar with the wordmark and avatar (s05-mobile). Tablet and desktop: no bar; the action
+ * cluster floats top right, level with each page's heading (s05, p02, a01).
+ */
 export function TopBar({ role }: { role: Role }) {
-  const profile = ROLE_PROFILE[role];
+  const dark = role !== "student";
   return (
-    <header className="border-line sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-[var(--cream)]/90 px-4 backdrop-blur md:px-8">
-      <Logo href={ROLE_HOME[role]} className="md:hidden" compact />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold">{profile.name}</p>
-        <p className="text-navy-400 truncate text-xs">{profile.subtitle}</p>
-      </div>
-      {role === "student" && <NotificationBell />}
-      <span
-        aria-label={profile.name}
-        className="bg-navy-900 flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+    <>
+      <header
+        className={
+          dark
+            ? "sticky top-0 z-30 flex h-[60px] items-center justify-between bg-[var(--navy-900)] px-4 md:hidden"
+            : "border-line sticky top-0 z-30 flex h-[60px] items-center justify-between border-b bg-[var(--cream)] px-4 md:hidden"
+        }
       >
-        {profile.initials}
-      </span>
-    </header>
+        <Logo
+          href={ROLE_HOME[role]}
+          tone={dark ? "dark" : "light"}
+          tagline={dark ? ROLE_TAGLINE[role] : undefined}
+        />
+        <ShellActions role={role} />
+      </header>
+      <div className="absolute top-6 right-6 z-30 hidden md:block xl:right-10">
+        <ShellActions role={role} />
+      </div>
+    </>
   );
 }

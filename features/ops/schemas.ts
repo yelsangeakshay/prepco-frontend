@@ -6,19 +6,39 @@ export const cohortSchema = z.object({
   season: z.string(),
   day0: z.object({ label: z.string(), daysLeft: z.number() }),
   totals: z.object({ students: z.number(), paid: z.number(), revenue: z.number() }),
-  seats: z.array(z.object({ plan: z.string(), taken: z.number(), total: z.number() })),
+  /** Finals, Summers and Elite seat cards (a01.png). */
+  seats: z.array(
+    z.object({ id: z.string(), label: z.string(), taken: z.number(), total: z.number() }),
+  ),
+  seatsNote: z.string(),
+  /** Free session booked, attended, bought a plan. */
   funnel: z.array(z.object({ label: z.string(), value: z.number() })),
-  revenueByTier: z.array(z.object({ tier: z.string(), count: z.number(), amount: z.number() })),
+  conversionPct: z.number(),
+  revenue: z.object({
+    lines: z.array(
+      z.object({ tier: z.string(), count: z.number(), unit: z.number(), amount: z.number() }),
+    ),
+    topUps: z.number(),
+    total: z.number(),
+  }),
   needsAttention: z.array(
     z.object({
       id: z.string(),
       title: z.string(),
+      detail: z.string(),
       count: z.number(),
+      action: z.string(),
       href: z.string(),
       tone: z.enum(["maroon", "neutral"]),
     }),
   ),
-  thisWeek: z.array(z.object({ day: z.string(), panels: z.number(), unassigned: z.number() })),
+  thisWeek: z.object({
+    sessionsScheduled: z.number(),
+    freeSessions: z.number(),
+    feedbackOverdue: z.number(),
+    panelistsActive: z.number(),
+    panelistsTotal: z.number(),
+  }),
 });
 export type Cohort = z.infer<typeof cohortSchema>;
 

@@ -59,7 +59,7 @@ test("axe: open overlays (bell drawer, more sheet, re-lock dialog)", async ({
   await page.keyboard.press("Escape");
 
   if (isMobile) {
-    await page.getByRole("button", { name: "More" }).click();
+    await page.getByRole("button", { name: /^(More|Account)$/ }).click();
     await page.getByRole("dialog").waitFor();
     await scan("more sheet");
   }

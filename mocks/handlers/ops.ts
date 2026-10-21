@@ -3,6 +3,8 @@ import { http } from "../http";
 import { API_BASE_URL } from "@/lib/api/client";
 import type { Booking } from "@/features/ops/schemas";
 import type { Scenario } from "@/lib/config/scenarios";
+import { formatDay } from "@/lib/utils/dates";
+import { formatINR } from "@/lib/utils/currency";
 import { getDb } from "../db";
 import { RIYA } from "../fixtures/personas";
 import { computeScores, getState } from "../state";
@@ -13,8 +15,10 @@ import {
   findBooking,
   getWorld,
   ledgerAll,
+  panelFunctionFor,
   panelistLoad,
-  PLAN_SEATS,
+  PLAN_PRICE,
+  SEATS,
   slotKey,
   studentStatus,
   type BookingRec,
@@ -67,10 +71,6 @@ function health(p: PanelistRec, load: number): "good" | "watch" | "needs-attenti
   return "good";
 }
 
-function noShowsToReview(scenario: Scenario | null) {
-  return allBookings(scenario).filter((x) => x.status === "no-show" && !x.excused);
-}
-
 export const opsHandlers = [
   http.get(`${API_BASE_URL}/ops/cohort`, async ({ request }) => {
     await latency();
@@ -80,95 +80,181 @@ export const opsHandlers = [
     const students = allStudents(scenario);
     const bookings = allBookings(scenario);
     const ledger = ledgerAll(scenario);
+    const paidStudents = students.filter((s) => s.plan !== "none");
 
+    // Seats (a01.png): Finals, Summers and Elite.
+    const finals = paidStudents.filter((s) => s.track === "Finals").length;
+    const summers = paidStudents.filter((s) => s.track === "Summers").length;
+    const elite = students.filter((s) => s.plan === "elite").length;
+
+    // Free session funnel.
+    const booked = students.filter((s) => s.freeSession !== "none").length;
+    const attended = students.filter((s) => s.freeSession === "attended").length;
+    const paid = paidStudents.length;
+
+    // Revenue: plan payments by tier, top-ups on their own line.
     const count = (plan: string) => students.filter((s) => s.plan === plan).length;
-    const paid = students.filter((s) => s.plan !== "none").length;
-    const sum = (tier: string) =>
-      ledger.filter((e) => e.tier === tier).reduce((n, e) => n + e.amount, 0);
-    const revenue = ledger.reduce((n, e) => n + e.amount, 0);
-
-    const unassigned = bookings.filter((x) => x.status === "unassigned").length;
-    const pendingApps = w.applications.filter((a) => a.status === "pending").length;
-    const relock = st.cv.relock.status === "pending" ? 1 : 0;
-    const roster = w.panelists.filter(
-      (p) => health(p, panelistLoad(scenario, p.id)) === "needs-attention",
-    ).length;
-
-    const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const thisWeek = weekDays.map((day, i) => {
-      const date = new Date(Date.UTC(2026, 9, 5 + i)).toISOString().slice(0, 10);
-      const dayItems = bookings.filter(
-        (x) =>
-          x.startsAt &&
-          new Date(new Date(x.startsAt).getTime() + 5.5 * 3_600_000).toISOString().slice(0, 10) ===
-            date &&
-          (x.status === "upcoming" || x.status === "unassigned"),
-      );
+    const tiers = (["basic", "premium", "elite"] as const).map((tier) => {
+      const unit = PLAN_PRICE[tier];
+      // Riya's upgrade is a top-up, so the tier line is count x unit.
       return {
-        day,
-        panels: dayItems.length,
-        unassigned: dayItems.filter((x) => x.status === "unassigned").length,
+        tier: tier[0]!.toUpperCase() + tier.slice(1),
+        count: count(tier),
+        unit,
+        amount: count(tier) * unit,
       };
     });
+    const topUps = ledger.filter((e) => e.type === "top-up").reduce((n, e) => n + e.amount, 0);
+    const revenueTotal = tiers.reduce((n, t) => n + t.amount, 0) + topUps;
+
+    // Needs attention (a01.png).
+    const unassigned = bookings.filter((x) => x.status === "unassigned");
+    const withChange = unassigned
+      .map((x) => students.find((s) => s.id === x.studentId))
+      .find((s) => s?.targetChange);
+    const noShows = bookings.filter((x) => x.status === "no-show" && !x.excused);
+    const hasP2 = (id: string) =>
+      bookings.some((x) => x.studentId === id && /P2/.test(x.title) && x.status !== "cancelled");
+    const noP2 = students.filter(
+      (s) =>
+        s.id !== RIYA.id &&
+        (s.plan === "premium" || s.plan === "elite") &&
+        bookings.some((x) => x.studentId === s.id && x.status === "completed") &&
+        !hasP2(s.id),
+    );
+    const karan = students.find((s) => s.name === "Karan Shah");
+    const pendingApps = w.applications.filter((a) => a.status === "pending").length;
+    const relock = st.cv.relock.status === "pending";
+    const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+
+    const needsAttention = [
+      {
+        id: "unassigned",
+        title: unassigned.length
+          ? `${unassigned.length} ${plural(unassigned.length, "session", "sessions")} without a panelist`
+          : "Every session has a panelist",
+        detail: withChange
+          ? `Including 1 target change: ${withChange.name}, now ${withChange.targetChange}`
+          : unassigned.length
+            ? "Assign a panelist so the student can prepare."
+            : "Nothing to assign.",
+        count: unassigned.length,
+        action: "Assign",
+        href: "/ops/assignments",
+        tone: unassigned.length ? ("maroon" as const) : ("neutral" as const),
+      },
+      {
+        id: "no-p2",
+        title: noP2.length
+          ? noP2.length === 1
+            ? `${noP2[0]!.name} hasn't booked P2`
+            : `${noP2.length} students haven't booked P2`
+          : "Everyone has booked P2",
+        detail: noP2.length
+          ? `${noP2.map((s) => s.name).join(", ")} · Week -4 starts Mon 12 Oct`
+          : "Week -4 starts Mon 12 Oct.",
+        count: noP2.length,
+        action: "Nudge",
+        href: noP2[0] ? `/ops/students/${noP2[0].id}` : "/ops/students",
+        tone: "neutral" as const,
+      },
+      {
+        id: "basic-ended",
+        title: karan ? `${karan.name}: Basic ended after P1` : "No Basic plans have ended",
+        detail: karan
+          ? `Upgrade quote sent · ${formatINR(PLAN_PRICE.premium - PLAN_PRICE.basic - 1799)} after top-up credit`
+          : "Nothing to follow up.",
+        count: karan ? 1 : 0,
+        action: "View",
+        href: karan ? `/ops/students/${karan.id}` : "/ops/students",
+        tone: "neutral" as const,
+      },
+      {
+        id: "no-shows",
+        title: noShows.length
+          ? `${noShows.length} no-${plural(noShows.length, "show", "shows")} this week`
+          : "No no-shows this week",
+        detail: noShows[0]
+          ? `${noShows[0].title} · ${formatDay(noShows[0].startsAt ?? "2026-10-04T19:00:00+05:30")}`
+          : "Nothing to review.",
+        count: noShows.length,
+        action: "Review",
+        href: "/ops/sessions?tab=no-shows",
+        tone: noShows.length ? ("maroon" as const) : ("neutral" as const),
+      },
+      ...(relock
+        ? [
+            {
+              id: "relock",
+              title: "CV re-lock request",
+              detail: `${RIYA.name} asked to replace her locked CV`,
+              count: 1,
+              action: "Review",
+              href: `/ops/students/${RIYA.id}`,
+              tone: "neutral" as const,
+            },
+          ]
+        : []),
+      ...(pendingApps
+        ? [
+            {
+              id: "applications",
+              title: `${pendingApps} panelist ${plural(pendingApps, "application", "applications")} waiting`,
+              detail: "Review and approve to grow the roster.",
+              count: pendingApps,
+              action: "Review",
+              href: "/ops/panelists/applications",
+              tone: "neutral" as const,
+            },
+          ]
+        : []),
+    ];
+
+    const weekLo = "2026-10-05T00:00:00+05:30";
+    const weekHi = "2026-10-12T00:00:00+05:30";
+    const inWeek = bookings.filter(
+      (x) =>
+        (x.status === "upcoming" || x.status === "unassigned") &&
+        x.startsAt &&
+        x.startsAt >= weekLo &&
+        x.startsAt < weekHi,
+    );
 
     return HttpResponse.json({
       season: "Season 1",
       day0: { label: DAY0_LABEL, daysLeft: 35 },
-      totals: { students: students.length, paid, revenue },
-      seats: (["basic", "premium", "elite"] as const).map((plan) => ({
-        plan: plan[0]!.toUpperCase() + plan.slice(1),
-        taken: count(plan),
-        total: PLAN_SEATS[plan],
-      })),
+      totals: { students: students.length, paid, revenue: revenueTotal },
+      seats: [
+        { id: "finals", label: "Finals seats, season 1", taken: finals, total: SEATS.finals.total },
+        {
+          id: "summers",
+          label: "Summers seats, season 1",
+          taken: summers,
+          total: SEATS.summers.total,
+        },
+        {
+          id: "elite",
+          label: "Elite seats, case track capped",
+          taken: elite,
+          total: SEATS.elite.total,
+        },
+      ],
+      seatsNote: "Seats close fifteen days before the process opens.",
       funnel: [
-        { label: "Signed up", value: students.length },
-        { label: "Booked free session", value: Math.round(students.length * 0.82) },
-        { label: "Viewed plans", value: Math.round(students.length * 0.7) },
-        { label: "Paid", value: paid },
+        { label: "booked", value: booked },
+        { label: "attended", value: attended },
+        { label: "bought a plan", value: paid },
       ],
-      revenueByTier: (["basic", "premium", "elite"] as const).map((tier) => ({
-        tier: tier[0]!.toUpperCase() + tier.slice(1),
-        count: count(tier),
-        amount: sum(tier),
-      })),
-      needsAttention: [
-        {
-          id: "unassigned",
-          title: "Panels without a panelist",
-          count: unassigned,
-          href: "/ops/assignments",
-          tone: unassigned ? "maroon" : "neutral",
-        },
-        {
-          id: "no-shows",
-          title: "No-shows to review",
-          count: noShowsToReview(scenario).length,
-          href: "/ops/sessions?tab=no-shows",
-          tone: "maroon",
-        },
-        {
-          id: "applications",
-          title: "Panelist applications waiting",
-          count: pendingApps,
-          href: "/ops/panelists/applications",
-          tone: "neutral",
-        },
-        {
-          id: "relock",
-          title: "CV re-lock requests",
-          count: relock,
-          href: `/ops/students/${RIYA.id}`,
-          tone: "neutral",
-        },
-        {
-          id: "roster",
-          title: "Panelists needing attention",
-          count: roster,
-          href: "/ops/panelists?health=needs-attention",
-          tone: "maroon",
-        },
-      ],
-      thisWeek,
+      conversionPct: attended ? Math.round((paid / attended) * 100) : 0,
+      revenue: { lines: tiers, topUps, total: revenueTotal },
+      needsAttention,
+      thisWeek: {
+        sessionsScheduled: inWeek.length,
+        freeSessions: 12,
+        feedbackOverdue: w.panelists.reduce((n, p) => n + p.feedbackOverdue, 0),
+        panelistsActive: w.panelists.filter((p) => p.status === "active").length,
+        panelistsTotal: w.panelists.length,
+      },
     });
   }),
 
@@ -337,7 +423,7 @@ export const opsHandlers = [
       unassigned: unassigned.map((x) => ({
         booking: toBooking(scenario, x),
         candidates: w.panelists
-          .filter((p) => p.function === x.function && p.status === "active")
+          .filter((p) => p.function === panelFunctionFor(x.function) && p.status === "active")
           .map((p) => ({
             panelistId: p.id,
             name: p.name,
@@ -358,7 +444,7 @@ export const opsHandlers = [
           panelists: ps.length,
           booked: ps.reduce((n, p) => n + panelistLoad(scenario, p.id), 0),
           capacity: ps.reduce((n, p) => n + p.capacity, 0),
-          unassigned: unassigned.filter((x) => x.function === fn).length,
+          unassigned: unassigned.filter((x) => panelFunctionFor(x.function) === fn).length,
         };
       }),
     });

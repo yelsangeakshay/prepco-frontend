@@ -24,7 +24,7 @@ function AssignRow({ row }: { row: Row }) {
 
   return (
     <Card className="space-y-3" data-testid={`unassigned-${b.id}`}>
-      <div className="flex flex-wrap items-start justify-between gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-2 md:pr-72">
         <div>
           <p className="font-semibold">{b.studentName}</p>
           <p className="text-navy-400 text-sm">

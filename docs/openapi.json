@@ -387,11 +387,11 @@
                     "type": "string",
                     "enum": [
                       "Sales & Marketing",
-                      "Finance",
-                      "Operations",
-                      "Consulting",
                       "HR",
-                      "Product & Analytics"
+                      "Finance",
+                      "Business Analytics",
+                      "General Management",
+                      "Operations"
                     ]
                   },
                   "targetRole": {
@@ -610,7 +610,17 @@
         "tags": [
           "Plans"
         ],
-        "summary": "List plans",
+        "summary": "List plans and seat counts for a track (finals or summers)",
+        "parameters": [
+          {
+            "name": "track",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -638,20 +648,71 @@
                           "price": {
                             "type": "number"
                           },
+                          "listPrice": {
+                            "type": "number"
+                          },
+                          "badge": {
+                            "type": "string"
+                          },
+                          "suggested": {
+                            "type": "boolean"
+                          },
                           "tagline": {
                             "type": "string"
+                          },
+                          "coverage": {
+                            "type": "object",
+                            "properties": {
+                              "done": {
+                                "type": "number"
+                              },
+                              "total": {
+                                "type": "number"
+                              },
+                              "caption": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "done",
+                              "total",
+                              "caption"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "inherits": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           },
                           "features": {
                             "type": "array",
                             "items": {
-                              "type": "string"
+                              "type": "object",
+                              "properties": {
+                                "text": {
+                                  "type": "string"
+                                },
+                                "included": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "text",
+                                "included"
+                              ],
+                              "additionalProperties": false
                             }
                           },
-                          "mostChosen": {
-                            "type": "boolean"
+                          "note": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           },
-                          "elite": {
-                            "type": "boolean"
+                          "topUp": {
+                            "type": "number"
                           },
                           "seatsTotal": {
                             "type": "number"
@@ -664,10 +725,15 @@
                           "id",
                           "name",
                           "price",
+                          "listPrice",
+                          "badge",
+                          "suggested",
                           "tagline",
+                          "coverage",
+                          "inherits",
                           "features",
-                          "mostChosen",
-                          "elite",
+                          "note",
+                          "topUp",
                           "seatsTotal",
                           "seatsTaken"
                         ],
@@ -676,11 +742,40 @@
                     },
                     "cohortFull": {
                       "type": "boolean"
+                    },
+                    "track": {
+                      "type": "string",
+                      "enum": [
+                        "finals",
+                        "summers"
+                      ]
+                    },
+                    "seats": {
+                      "type": "object",
+                      "properties": {
+                        "label": {
+                          "type": "string"
+                        },
+                        "taken": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "taken",
+                        "total"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
                     "items",
-                    "cohortFull"
+                    "cohortFull",
+                    "track",
+                    "seats"
                   ],
                   "additionalProperties": false
                 }
@@ -695,7 +790,7 @@
         "tags": [
           "Plans"
         ],
-        "summary": "Pay for a plan",
+        "summary": "Pay for a plan (method: upi, card or netbanking)",
         "requestBody": {
           "required": true,
           "content": {
@@ -710,10 +805,20 @@
                       "premium",
                       "elite"
                     ]
+                  },
+                  "method": {
+                    "default": "upi",
+                    "type": "string",
+                    "enum": [
+                      "upi",
+                      "card",
+                      "netbanking"
+                    ]
                   }
                 },
                 "required": [
-                  "planId"
+                  "planId",
+                  "method"
                 ],
                 "additionalProperties": false
               }
@@ -742,6 +847,21 @@
                     "planName": {
                       "type": "string"
                     },
+                    "track": {
+                      "type": "string",
+                      "enum": [
+                        "finals",
+                        "summers"
+                      ]
+                    },
+                    "method": {
+                      "type": "string",
+                      "enum": [
+                        "upi",
+                        "card",
+                        "netbanking"
+                      ]
+                    },
                     "amount": {
                       "type": "number"
                     },
@@ -750,6 +870,12 @@
                       "enum": [
                         "paid",
                         "failed"
+                      ]
+                    },
+                    "failureTitle": {
+                      "type": [
+                        "string",
+                        "null"
                       ]
                     },
                     "failureReason": {
@@ -775,18 +901,28 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "email": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
                     "id",
                     "planId",
                     "planName",
+                    "track",
+                    "method",
                     "amount",
                     "status",
+                    "failureTitle",
                     "failureReason",
                     "seatHeldUntil",
                     "receiptNo",
-                    "paidAt"
+                    "paidAt",
+                    "email"
                   ],
                   "additionalProperties": false
                 }
@@ -854,6 +990,21 @@
                     "planName": {
                       "type": "string"
                     },
+                    "track": {
+                      "type": "string",
+                      "enum": [
+                        "finals",
+                        "summers"
+                      ]
+                    },
+                    "method": {
+                      "type": "string",
+                      "enum": [
+                        "upi",
+                        "card",
+                        "netbanking"
+                      ]
+                    },
                     "amount": {
                       "type": "number"
                     },
@@ -862,6 +1013,12 @@
                       "enum": [
                         "paid",
                         "failed"
+                      ]
+                    },
+                    "failureTitle": {
+                      "type": [
+                        "string",
+                        "null"
                       ]
                     },
                     "failureReason": {
@@ -887,18 +1044,28 @@
                         "string",
                         "null"
                       ]
+                    },
+                    "email": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
                     "id",
                     "planId",
                     "planName",
+                    "track",
+                    "method",
                     "amount",
                     "status",
+                    "failureTitle",
                     "failureReason",
                     "seatHeldUntil",
                     "receiptNo",
-                    "paidAt"
+                    "paidAt",
+                    "email"
                   ],
                   "additionalProperties": false
                 }
@@ -1259,12 +1426,24 @@
                         },
                         "score": {
                           "type": "number"
+                        },
+                        "impact": {
+                          "type": "number"
+                        },
+                        "clarity": {
+                          "type": "number"
+                        },
+                        "defensibility": {
+                          "type": "number"
                         }
                       },
                       "required": [
                         "version",
                         "locked",
-                        "score"
+                        "score",
+                        "impact",
+                        "clarity",
+                        "defensibility"
                       ],
                       "additionalProperties": false
                     },
@@ -1279,14 +1458,60 @@
                         },
                         "needWork": {
                           "type": "number"
+                        },
+                        "flagged": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
                         }
                       },
                       "required": [
                         "total",
                         "prepared",
-                        "needWork"
+                        "needWork",
+                        "flagged"
                       ],
                       "additionalProperties": false
+                    },
+                    "latestPanel": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "feedbackId": {
+                              "type": "string"
+                            },
+                            "label": {
+                              "type": "string"
+                            },
+                            "date": {
+                              "type": "string"
+                            },
+                            "quote": {
+                              "type": "string"
+                            },
+                            "panelistLine": {
+                              "type": "string"
+                            },
+                            "sentBack": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "feedbackId",
+                            "label",
+                            "date",
+                            "quote",
+                            "panelistLine",
+                            "sentBack"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     }
                   },
                   "required": [
@@ -1299,7 +1524,8 @@
                     "nextSession",
                     "tasks",
                     "cv",
-                    "answers"
+                    "answers",
+                    "latestPanel"
                   ],
                   "additionalProperties": false
                 }
@@ -3487,7 +3713,7 @@
         "tags": [
           "Billing"
         ],
-        "summary": "Upgrade price after top-up credit (Proposed)",
+        "summary": "Upgrade quote: next tier price minus current tier paid minus top-ups bought (Proposed)",
         "responses": {
           "200": {
             "description": "OK",
@@ -3505,11 +3731,43 @@
                     "listPrice": {
                       "type": "number"
                     },
+                    "difference": {
+                      "type": "number"
+                    },
+                    "topUps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "at": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "amount",
+                          "at"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
                     "topUpCredit": {
                       "type": "number"
                     },
                     "payable": {
                       "type": "number"
+                    },
+                    "unlocks": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "seatsLeft": {
                       "type": "number"
@@ -3519,8 +3777,11 @@
                     "from",
                     "to",
                     "listPrice",
+                    "difference",
+                    "topUps",
                     "topUpCredit",
                     "payable",
+                    "unlocks",
                     "seatsLeft"
                   ],
                   "additionalProperties": false
@@ -3775,11 +4036,11 @@
                     "type": "string",
                     "enum": [
                       "Sales & Marketing",
-                      "Finance",
-                      "Operations",
-                      "Consulting",
                       "HR",
-                      "Product & Analytics"
+                      "Finance",
+                      "Business Analytics",
+                      "General Management",
+                      "Operations"
                     ]
                   },
                   "role": {
@@ -4174,12 +4435,12 @@
                   "function": {
                     "type": "string",
                     "enum": [
-                      "Sales & Marketing",
-                      "Finance",
-                      "Operations",
-                      "Consulting",
-                      "HR",
-                      "Product & Analytics"
+                      "Consulting & Strategy",
+                      "Marketing & Brand",
+                      "Finance & Banking",
+                      "Operations & Supply Chain",
+                      "Product & Analytics",
+                      "HR & General Management"
                     ]
                   },
                   "company": {
@@ -4323,6 +4584,9 @@
                           "studentName": {
                             "type": "string"
                           },
+                          "plan": {
+                            "type": "string"
+                          },
                           "college": {
                             "type": "string"
                           },
@@ -4348,18 +4612,30 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "briefRead": {
+                            "type": "boolean"
+                          },
+                          "dueLabel": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
                           "sessionId",
                           "studentId",
                           "studentName",
+                          "plan",
                           "college",
                           "target",
                           "title",
                           "startsAt",
                           "status",
-                          "verdict"
+                          "verdict",
+                          "briefRead",
+                          "dueLabel"
                         ],
                         "additionalProperties": false
                       }
@@ -4378,6 +4654,9 @@
                           "studentName": {
                             "type": "string"
                           },
+                          "plan": {
+                            "type": "string"
+                          },
                           "college": {
                             "type": "string"
                           },
@@ -4403,18 +4682,30 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "briefRead": {
+                            "type": "boolean"
+                          },
+                          "dueLabel": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
                           "sessionId",
                           "studentId",
                           "studentName",
+                          "plan",
                           "college",
                           "target",
                           "title",
                           "startsAt",
                           "status",
-                          "verdict"
+                          "verdict",
+                          "briefRead",
+                          "dueLabel"
                         ],
                         "additionalProperties": false
                       }
@@ -4433,6 +4724,9 @@
                           "studentName": {
                             "type": "string"
                           },
+                          "plan": {
+                            "type": "string"
+                          },
                           "college": {
                             "type": "string"
                           },
@@ -4458,18 +4752,30 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "briefRead": {
+                            "type": "boolean"
+                          },
+                          "dueLabel": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
                           "sessionId",
                           "studentId",
                           "studentName",
+                          "plan",
                           "college",
                           "target",
                           "title",
                           "startsAt",
                           "status",
-                          "verdict"
+                          "verdict",
+                          "briefRead",
+                          "dueLabel"
                         ],
                         "additionalProperties": false
                       }
@@ -4538,6 +4844,9 @@
                           "studentName": {
                             "type": "string"
                           },
+                          "plan": {
+                            "type": "string"
+                          },
                           "college": {
                             "type": "string"
                           },
@@ -4563,18 +4872,30 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "briefRead": {
+                            "type": "boolean"
+                          },
+                          "dueLabel": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
                           "sessionId",
                           "studentId",
                           "studentName",
+                          "plan",
                           "college",
                           "target",
                           "title",
                           "startsAt",
                           "status",
-                          "verdict"
+                          "verdict",
+                          "briefRead",
+                          "dueLabel"
                         ],
                         "additionalProperties": false
                       }
@@ -4775,6 +5096,9 @@
                           "studentName": {
                             "type": "string"
                           },
+                          "plan": {
+                            "type": "string"
+                          },
                           "college": {
                             "type": "string"
                           },
@@ -4800,18 +5124,30 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "briefRead": {
+                            "type": "boolean"
+                          },
+                          "dueLabel": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
                           "sessionId",
                           "studentId",
                           "studentName",
+                          "plan",
                           "college",
                           "target",
                           "title",
                           "startsAt",
                           "status",
-                          "verdict"
+                          "verdict",
+                          "briefRead",
+                          "dueLabel"
                         ],
                         "additionalProperties": false
                       }
@@ -4830,6 +5166,9 @@
                           "studentName": {
                             "type": "string"
                           },
+                          "plan": {
+                            "type": "string"
+                          },
                           "college": {
                             "type": "string"
                           },
@@ -4855,18 +5194,30 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "briefRead": {
+                            "type": "boolean"
+                          },
+                          "dueLabel": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
                           "sessionId",
                           "studentId",
                           "studentName",
+                          "plan",
                           "college",
                           "target",
                           "title",
                           "startsAt",
                           "status",
-                          "verdict"
+                          "verdict",
+                          "briefRead",
+                          "dueLabel"
                         ],
                         "additionalProperties": false
                       }
@@ -5250,7 +5601,7 @@
         "tags": [
           "Ops"
         ],
-        "summary": "Cohort overview",
+        "summary": "Cohort overview: seats, funnel, revenue lines, needs attention, this week",
         "responses": {
           "200": {
             "description": "OK",
@@ -5303,7 +5654,10 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "plan": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "label": {
                             "type": "string"
                           },
                           "taken": {
@@ -5314,12 +5668,16 @@
                           }
                         },
                         "required": [
-                          "plan",
+                          "id",
+                          "label",
                           "taken",
                           "total"
                         ],
                         "additionalProperties": false
                       }
+                    },
+                    "seatsNote": {
+                      "type": "string"
                     },
                     "funnel": {
                       "type": "array",
@@ -5340,28 +5698,52 @@
                         "additionalProperties": false
                       }
                     },
-                    "revenueByTier": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "tier": {
-                            "type": "string"
-                          },
-                          "count": {
-                            "type": "number"
-                          },
-                          "amount": {
-                            "type": "number"
+                    "conversionPct": {
+                      "type": "number"
+                    },
+                    "revenue": {
+                      "type": "object",
+                      "properties": {
+                        "lines": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tier": {
+                                "type": "string"
+                              },
+                              "count": {
+                                "type": "number"
+                              },
+                              "unit": {
+                                "type": "number"
+                              },
+                              "amount": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "tier",
+                              "count",
+                              "unit",
+                              "amount"
+                            ],
+                            "additionalProperties": false
                           }
                         },
-                        "required": [
-                          "tier",
-                          "count",
-                          "amount"
-                        ],
-                        "additionalProperties": false
-                      }
+                        "topUps": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "lines",
+                        "topUps",
+                        "total"
+                      ],
+                      "additionalProperties": false
                     },
                     "needsAttention": {
                       "type": "array",
@@ -5374,8 +5756,14 @@
                           "title": {
                             "type": "string"
                           },
+                          "detail": {
+                            "type": "string"
+                          },
                           "count": {
                             "type": "number"
+                          },
+                          "action": {
+                            "type": "string"
                           },
                           "href": {
                             "type": "string"
@@ -5391,7 +5779,9 @@
                         "required": [
                           "id",
                           "title",
+                          "detail",
                           "count",
+                          "action",
                           "href",
                           "tone"
                         ],
@@ -5399,27 +5789,32 @@
                       }
                     },
                     "thisWeek": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "day": {
-                            "type": "string"
-                          },
-                          "panels": {
-                            "type": "number"
-                          },
-                          "unassigned": {
-                            "type": "number"
-                          }
+                      "type": "object",
+                      "properties": {
+                        "sessionsScheduled": {
+                          "type": "number"
                         },
-                        "required": [
-                          "day",
-                          "panels",
-                          "unassigned"
-                        ],
-                        "additionalProperties": false
-                      }
+                        "freeSessions": {
+                          "type": "number"
+                        },
+                        "feedbackOverdue": {
+                          "type": "number"
+                        },
+                        "panelistsActive": {
+                          "type": "number"
+                        },
+                        "panelistsTotal": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "sessionsScheduled",
+                        "freeSessions",
+                        "feedbackOverdue",
+                        "panelistsActive",
+                        "panelistsTotal"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
@@ -5427,8 +5822,10 @@
                     "day0",
                     "totals",
                     "seats",
+                    "seatsNote",
                     "funnel",
-                    "revenueByTier",
+                    "conversionPct",
+                    "revenue",
                     "needsAttention",
                     "thisWeek"
                   ],

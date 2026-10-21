@@ -3,11 +3,45 @@ import { http } from "../http";
 import { API_BASE_URL } from "@/lib/api/client";
 import { getDb } from "../db";
 import { getState } from "../state";
+import { PLAN_PRICE, SEATS } from "../world";
 import { apiError, latency, scenarioOf } from "../utils";
 
 const NOW = "2026-10-05T12:00:00+05:30";
-const ELITE_PRICE = 59999;
-const ELITE_SEATS_LEFT = 9;
+
+const UNLOCKS = {
+  premium: [
+    "P2 panel with an external specialist",
+    "Domain deep-dive with a practitioner",
+    "P3 pressure mock, one week out",
+    "Shortlist, JD & application strategy",
+  ],
+  elite: [
+    "Case competition track: 3 sessions",
+    "2 expert deck reviews",
+    "PPI conversion preparation",
+    "Lowest top-up rates all season",
+  ],
+} as const;
+
+/** e08: next tier price, minus what you paid for this tier, minus top-ups bought this season. */
+function quoteFor(st: ReturnType<typeof getState>, scenario: string | null | undefined) {
+  const toElite = st.plan.id === "premium";
+  const listPrice = toElite ? PLAN_PRICE.elite : PLAN_PRICE.premium;
+  const difference = listPrice - st.plan.paid;
+  const topUpCredit = st.topUps.reduce((sum, t) => sum + t.amount, 0);
+  const seats = toElite ? SEATS.elite : SEATS.finals;
+  return {
+    from: st.plan.name,
+    to: toElite ? "Elite" : "Premium",
+    listPrice,
+    difference,
+    topUps: st.topUps,
+    topUpCredit,
+    payable: Math.max(0, difference - topUpCredit),
+    unlocks: [...(toElite ? UNLOCKS.elite : UNLOCKS.premium)],
+    seatsLeft: scenario === "cohort-full" ? 0 : seats.total - seats.taken,
+  };
+}
 
 export const accountHandlers = [
   // Journey, quick switch, case track
@@ -58,9 +92,9 @@ export const accountHandlers = [
       "Sales & Marketing": 18,
       Finance: 9,
       Operations: 12,
-      Consulting: 10,
+      "Business Analytics": 8,
       HR: 14,
-      "Product & Analytics": 8,
+      "General Management": 10,
     };
     if (!(to in reusableByFn))
       return apiError(422, "unknown_function", "Pick a function from the list.");
@@ -115,19 +149,7 @@ export const accountHandlers = [
     const scenario = scenarioOf(request);
     const st = getState(scenario);
     if (st.plan.id === "elite") return apiError(409, "already_elite", "You are already on Elite.");
-    const unused = Math.max(0, st.credits.total - st.credits.used);
-    const credit =
-      st.plan.status === "ended" || st.credits.total === 0
-        ? 0
-        : Math.round((st.plan.paid * unused) / st.credits.total);
-    return HttpResponse.json({
-      from: st.plan.name,
-      to: "Elite",
-      listPrice: ELITE_PRICE,
-      topUpCredit: credit,
-      payable: ELITE_PRICE - credit,
-      seatsLeft: scenario === "cohort-full" ? 0 : ELITE_SEATS_LEFT,
-    });
+    return HttpResponse.json(quoteFor(st, scenario));
   }),
 
   http.post(`${API_BASE_URL}/billing/upgrade`, async ({ request }) => {
@@ -135,22 +157,18 @@ export const accountHandlers = [
     const scenario = scenarioOf(request);
     const st = getState(scenario);
     if (st.plan.id === "elite") return apiError(409, "already_elite", "You are already on Elite.");
-    if (scenario === "cohort-full") {
-      return apiError(409, "cohort_full", "Elite is full. Join the waitlist instead.");
+    const quote = quoteFor(st, scenario);
+    if (quote.seatsLeft === 0) {
+      return apiError(409, "cohort_full", `${quote.to} is full. Join the waitlist instead.`);
     }
-    const unused = Math.max(0, st.credits.total - st.credits.used);
-    const credit =
-      st.plan.status === "ended" || st.credits.total === 0
-        ? 0
-        : Math.round((st.plan.paid * unused) / st.credits.total);
-    const amount = ELITE_PRICE - credit;
+    const amount = quote.payable;
     st.upgradeAttempts += 1;
     if (scenario === "payment-failed" && st.upgradeAttempts === 1) {
       return HttpResponse.json({
         status: "failed",
         receiptNo: null,
         amount,
-        plan: "Elite",
+        plan: quote.to,
         message: "Your bank declined the payment. No money was taken.",
       });
     }
@@ -158,27 +176,31 @@ export const accountHandlers = [
     st.invoices.push({
       id: `inv-${st.invoices.length + 1}`,
       receiptNo,
-      description: "Upgrade to Elite",
+      description: `Upgrade to ${quote.to}`,
       amount,
       at: NOW,
     });
+    const toElite = quote.to === "Elite";
     st.plan = {
-      id: "elite",
-      name: "Elite",
-      paid: st.plan.paid + amount,
+      id: toElite ? "elite" : "premium",
+      name: quote.to,
+      paid: toElite ? PLAN_PRICE.elite : PLAN_PRICE.premium,
       status: "active",
       endedAt: null,
     };
+    st.topUps = [];
     st.notifications.unshift({
       id: `n-up-${st.invoices.length}`,
       kind: "billing",
-      title: "Welcome to Elite",
-      body: `Receipt ${receiptNo}. The case track is now open.`,
+      title: `Welcome to ${quote.to}`,
+      body: toElite
+        ? `Receipt ${receiptNo}. The case track is now open.`
+        : `Receipt ${receiptNo}. Your runway continues.`,
       at: NOW,
       read: false,
-      href: "/case-track",
+      href: toElite ? "/case-track" : "/home",
     });
-    return HttpResponse.json({ status: "paid", receiptNo, amount, plan: "Elite", message: null });
+    return HttpResponse.json({ status: "paid", receiptNo, amount, plan: quote.to, message: null });
   }),
 
   // Profile

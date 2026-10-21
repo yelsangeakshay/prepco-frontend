@@ -22,7 +22,7 @@ Built as drawn in the mockups; confirm or change before launch.
 
 ## Phase 3 notes
 
-- Plan names, prices and seat counts are sample values (Basic ₹14,999, Premium ₹36,999, Elite ₹59,999). Real pricing needs sign-off. The Plans page shows "Sample data" and "Proposed".
+- Plan prices and seat counts follow the mockups and are all Proposed, needing sign-off: Basic 5,999 (list 8,999), Premium 9,999 (list 17,999), Elite 13,999 (list 26,999); top-ups 1,799 / 1,299 / 999 for Basic / Premium / Elite; seats Finals 37 of 60, Summers 20 of 40, Elite 17 of 22. Real pricing needs sign-off. The Plans page shows "Sample data" and "Proposed".
 - E12 was not defined in the brief beyond "S3, E12". Built as "free session already used" (reachable with `?scenario=returning-student`).
 - E3 (late joiner) is built as a banner plus a runway cut to the last three sessions.
 - Reschedule is free until 24 h before the start; the first no-show is free. Both are shown with the Proposed badge or copy.
@@ -33,7 +33,7 @@ Built as drawn in the mockups; confirm or change before launch.
 
 - CV model: the locked version (V4) is read-only for panelists; students edit a working draft (V5) and send a re-lock request. Ops reviews it, Proposed within one working day (reviewing arrives in Phase 5).
 - Bullet tests (decision, number, trade-off) use a simple text heuristic in the mock. The real scorer is a backend decision.
-- Upgrade price: Elite list price minus credit for unused sessions, proportional to what was paid (Proposed).
+- Upgrade price rule (Proposed): next tier price minus the current tier paid minus top-ups bought this season. This replaces the earlier unused-session credit rule.
 - Not placed: full credit carried to next season (Proposed). Placed: company, role and CTC are self-reported.
 - Case track: Elite only; modules are sample content.
 - Quick Switch and the "Routes open to you" list on Journey are Proposed screens with sample content.
@@ -72,3 +72,25 @@ Built as drawn in the mockups; confirm or change before launch.
   brief: not built, tokens ready, light only.
 - **Mock latency** (200 to 600 ms) is switched off only by the Web Vitals test, through
   `window.__PREPCO_NO_LATENCY__`.
+
+## Mockup fidelity pass
+
+Owner decisions from design/mockups/review.png. Each has a proposed policy in the app; none is confirmed and all need sign-off.
+
+1. No-show: does a missed panel use up the session? Proposed: the first no-show is free, then it counts.
+2. Reschedule window: Proposed: free up to 24 hours before.
+3. Payment provider (Razorpay, Cashfree or Stripe India) and GST invoicing: undecided.
+4. Season-2 price for returning students: the site says it exists but not what it is.
+5. Late joiners: below how many weeks to Day 0 do you refuse to sell Premium?
+6. Waitlist: first come, or held for free-session attendees?
+7. Placed early (PPO): are unused sessions credited, transferable or lost?
+8. Colleges: SCMHRD only at launch, or per-college Day 0 dates from day one?
+9. Panelist pay: per panel or monthly, and is feedback turnaround part of it?
+10. Who runs free sessions: core team only, or senior panelists too?
+
+Deviations from the mockups, all Proposed:
+
+- The phone tab bar keeps a fifth More/Account tab for panelist and ops, which the mockups do not draw.
+- Feedback overdue is seeded as 0 in the mock world.
+- Student and panelist function taxonomies differ. The mapping in PANEL_FOR_TARGET (features/onboarding/schemas.ts) is an assumption.
+- The 1,000-student fixture is kept as a performance fixture, while the ops overview shows 57 paid students.

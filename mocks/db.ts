@@ -8,7 +8,7 @@ import { readSection, registerSection } from "./persist";
 const at = (day: string, hour: number) =>
   `2026-${day}T${String(hour).padStart(2, "0")}:00:00+05:30`;
 
-const PANELISTS = [`${ARJUN.name}`, "Neha Iyer", "Rahul Bose"];
+const PANELISTS = [`${ARJUN.name}`, "Vikram Sethi", "Rahul Bose"];
 
 function base(): Session[] {
   return [
@@ -25,7 +25,7 @@ function base(): Session[] {
     },
     {
       id: "s-1002",
-      title: "P1 first mock panel",
+      title: "P1: first mock panel",
       week: "Week -7",
       kind: "panel",
       startsAt: at("09-21", 19),
@@ -41,14 +41,14 @@ function base(): Session[] {
       kind: "deep-dive",
       startsAt: at("10-07", 19),
       status: "upcoming",
-      panelist: "Neha Iyer",
-      panelFunction: "Sales & Marketing",
+      panelist: "Vikram Sethi",
+      panelFunction: "Marketing & Brand",
       freeRescheduleUntil: at("10-06", 19),
       feedbackId: null,
     },
     {
       id: "s-1004",
-      title: "P2 external specialist panel",
+      title: "P2: external specialist panel",
       week: "Week -4",
       kind: "panel",
       startsAt: null,
@@ -70,7 +70,7 @@ function base(): Session[] {
     },
     {
       id: "s-1006",
-      title: "P3 pressure mock",
+      title: "P3: pressure mock",
       week: "Week -1",
       kind: "panel",
       startsAt: at("11-02", 19),

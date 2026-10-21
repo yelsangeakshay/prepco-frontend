@@ -1,13 +1,37 @@
 import { z } from "zod";
 
+/** Target roles a student picks (s02.png). */
 export const FUNCTIONS = [
   "Sales & Marketing",
-  "Finance",
-  "Operations",
-  "Consulting",
   "HR",
-  "Product & Analytics",
+  "Finance",
+  "Business Analytics",
+  "General Management",
+  "Operations",
 ] as const;
+
+/** The six functions panelists interview for (a06.png): 10, 11, 9, 7, 8 and 7 of the 52. */
+export const PANELIST_FUNCTIONS = [
+  "Consulting & Strategy",
+  "Marketing & Brand",
+  "Finance & Banking",
+  "Operations & Supply Chain",
+  "Product & Analytics",
+  "HR & General Management",
+] as const;
+
+/** Which panelist function interviews a student's target role. */
+export const PANEL_FOR_TARGET: Record<
+  (typeof FUNCTIONS)[number],
+  (typeof PANELIST_FUNCTIONS)[number]
+> = {
+  "Sales & Marketing": "Marketing & Brand",
+  HR: "HR & General Management",
+  Finance: "Finance & Banking",
+  "Business Analytics": "Product & Analytics",
+  "General Management": "Consulting & Strategy",
+  Operations: "Operations & Supply Chain",
+};
 
 export const step1Schema = z.object({
   college: z.string().trim().min(2, "Enter your college"),

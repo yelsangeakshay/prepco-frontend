@@ -8,7 +8,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
   return (
     <div className="flex min-h-dvh">
       <Sidebar role={role} />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         <TopBar role={role} />
         <main id="main" className="flex-1 pb-20 md:pb-0">
           {children}

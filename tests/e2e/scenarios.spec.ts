@@ -10,7 +10,7 @@ const cases: Record<string, (page: Page) => Promise<void>> = {
   "payment-failed": async (page) => {
     await gotoReady(page, "/checkout/premium?scenario=payment-failed");
     await page.getByRole("button", { name: /^Pay/ }).click();
-    await expect(alerts(page)).toContainText("Payment failed");
+    await expect(alerts(page)).toContainText("The UPI payment timed out");
   },
   "payment-success": async (page) => {
     await gotoReady(page, "/checkout/premium?scenario=payment-success");
@@ -99,6 +99,6 @@ for (const scenario of SCENARIOS) {
 test("an unknown scenario name is ignored", async ({ page, context }) => {
   await signInAs(context, "student");
   await gotoReady(page, "/home?scenario=does-not-exist");
-  await expect(page.getByRole("heading", { name: "Hello, Riya" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Good evening, Riya." })).toBeVisible();
   await expect(page.getByTestId("banner-late-joiner")).toHaveCount(0);
 });

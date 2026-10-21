@@ -44,7 +44,7 @@ export function BillingView() {
       )}
 
       <Card variant="feature">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3 md:pr-72">
           <div>
             <p className="text-navy-400 text-xs font-semibold tracking-wider uppercase">
               Current plan

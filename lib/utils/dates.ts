@@ -24,3 +24,13 @@ export function formatTime(input: Date | string): string {
 export function formatSession(input: Date | string): string {
   return `${formatDay(input)} · ${formatTime(input)} IST`;
 }
+
+const istDay = (d: Date) => {
+  const ist = new Date(d.getTime() + 5.5 * 3_600_000);
+  return Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate());
+};
+
+/** Whole IST calendar days from the pinned "today" to a date. 2 means "in 2 days". */
+export function daysUntil(input: Date | string, today: Date): number {
+  return Math.round((istDay(new Date(input)) - istDay(today)) / 86_400_000);
+}

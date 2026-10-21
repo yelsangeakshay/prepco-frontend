@@ -60,7 +60,7 @@ export function AnswersView() {
         )}
       </div>
 
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:pr-72">
         <div role="tablist" aria-label="Filter answers" className="flex flex-wrap gap-2">
           {TABS.map((t) => {
             const active = status === t.key;

@@ -32,6 +32,8 @@ export interface State {
   credits: Billing["credits"];
   invoices: Billing["invoices"];
   upgradeAttempts: number;
+  /** Top-up mocks bought this season; they count toward an upgrade. */
+  topUps: { label: string; amount: number; at: string }[];
   outcome: Outcome;
   target: { function: string; role: string };
   targetChange: { changedAt: string; from: string; answersToRework: number } | null;
@@ -128,7 +130,11 @@ const QUESTIONS: [string, string, string][] = [
     "Self",
     "I over-prepare numbers and under-prepare the story. I now write the headline first.",
   ],
-  ["Where do you see yourself in 5 years?", "Career", "Running a regional team and owning a P&L."],
+  [
+    "You already have experience. Why should we hire you as an MT?",
+    "Pitch",
+    "Running a regional team and owning a P&L.",
+  ],
   [
     "Why should we hire you over others?",
     "Pitch",
@@ -298,7 +304,7 @@ function buildNotifications(db: Db): Notification[] {
     id: "n-2",
     kind: "feedback",
     title: "Arjun Mehta sent your P1 feedback",
-    body: "Strong structure, thin on the pricing trade-off.",
+    body: "Strong on the numbers, weak on the why. Every answer should name the trade-off you owned.",
     at: at("09-22", 9),
     href: "/feedback/p-1001",
   });
@@ -403,8 +409,8 @@ function buildState(db: Db): State {
   const plan: State["plan"] = firstLogin
     ? { id: "free", name: "Free", paid: 0, status: "active", endedAt: null }
     : basicEnded
-      ? { id: "basic", name: "Basic", paid: 14999, status: "ended", endedAt: at("10-01", 23) }
-      : { id: "premium", name: "Premium", paid: 36999, status: "active", endedAt: null };
+      ? { id: "basic", name: "Basic", paid: 5999, status: "ended", endedAt: at("10-01", 23) }
+      : { id: "premium", name: "Premium", paid: 9999, status: "active", endedAt: null };
 
   const outcome: Outcome =
     s === "placed"
@@ -422,7 +428,7 @@ function buildState(db: Db): State {
             company: null,
             role: null,
             ctc: null,
-            creditCarried: 36999,
+            creditCarried: 9999,
             day0Label: "Mon 9 Nov",
           }
         : {
@@ -458,6 +464,7 @@ function buildState(db: Db): State {
           },
         ],
     upgradeAttempts: 0,
+    topUps: basicEnded ? [{ label: "Top-up mock", amount: 1799, at: at("09-30", 12) }] : [],
     outcome,
     target: changed
       ? { function: "Finance", role: "Analyst" }

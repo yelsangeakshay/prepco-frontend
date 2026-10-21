@@ -50,7 +50,7 @@ export function CvBuilderView() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 md:pr-72">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="font-display text-3xl font-bold">CV Builder</h1>
           {locked.version && <LockedVersionBadge version={locked.version} />}

@@ -6,6 +6,7 @@ import type { Runway, Session } from "@/features/runway/schemas";
 import { buildSlots, getDb, type Db } from "../db";
 import { DAY0_ISO, DAY0_MOVED_ISO, RIYA } from "../fixtures/personas";
 import { answerCounts, getState } from "../state";
+import { getWorld } from "../world";
 import { apiError, latency, paginate, scenarioOf } from "../utils";
 
 const MS_DAY = 86_400_000;
@@ -51,7 +52,7 @@ export function buildRunway(db: Db): Runway {
   steps.push({
     id: "day0",
     week: "Day 0",
-    title: "Placement day",
+    title: "You're in the room",
     when: formatDay(day0Iso),
     status: "day0",
     sessionId: null,
@@ -104,37 +105,66 @@ export function buildRunway(db: Db): Runway {
           { id: "t2", label: "Upload your CV", hint: "PDF or DOCX, up to 5 MB", done: false },
         ]
       : [
+          { id: "t1", label: "Book your deep-dive slot", hint: "Wed 7 Oct · 7:00 PM", done: true },
           {
-            id: "t1",
-            label: "Rehearse your 4 flagged answers",
-            hint: "HR Question Builder",
+            id: "t2",
+            label: 'Redraft "Why should we hire you as an MT?"',
+            hint: "Flagged at P1 · lead with the trade-off, then the number",
             done: false,
           },
           {
-            id: "t2",
-            label: "Read the Marketing & Brand panel feedback",
-            hint: "Panel feedback",
-            done: true,
+            id: "t3",
+            label: 'Draft "You mention 400+ outlets. What exactly did you analyse?"',
+            hint: "Not drafted · a panel will pull on this bullet",
+            done: false,
           },
           {
-            id: "t3",
-            label: "Pick a slot for your P2 panel",
-            hint: "Slots release every Monday",
+            id: "t4",
+            label: "Pick your P2 slot",
+            hint: "Priority booking open until Wed · Premium",
             done: false,
           },
         ],
     cv: firstLogin
-      ? { version: "V0", locked: false, score: 0 }
+      ? { version: "V0", locked: false, score: 0, impact: 0, clarity: 0, defensibility: 0 }
       : {
           version: st.cv.lockedVersion ?? "V0",
           locked: !!st.cv.lockedVersion,
           score: st.cv.lockedScores?.overall ?? 0,
+          impact: st.cv.lockedScores?.impact ?? 0,
+          clarity: st.cv.lockedScores?.clarity ?? 0,
+          defensibility: st.cv.lockedScores?.defensibility ?? 0,
         },
     answers: {
       total: counts.all,
       prepared: counts.rehearsed,
       needWork: counts.flagged,
+      flagged:
+        (
+          st.answers.find((a) => a.status === "flagged" && a.question.includes("MT")) ??
+          st.answers.find((a) => a.status === "flagged")
+        )?.question ?? null,
     },
+    latestPanel: latestPanel(db, scenario),
+  };
+}
+
+/** Newest feedback note that is visible in this scenario (s05.png). */
+function latestPanel(db: Db, scenario: Db["scenario"]) {
+  const w = getWorld(scenario);
+  const visible = w.feedbacks
+    .filter((f) => db.sessions.find((x) => x.id === f.sessionId)?.status === "completed")
+    .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0];
+  if (!visible) return null;
+  const d = new Date(new Date(visible.startsAt).getTime() + 5.5 * 3_600_000);
+  const date = `${d.getUTCDate()} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getUTCMonth()]}`;
+  return {
+    feedbackId: visible.panelId,
+    label: visible.sessionId === "s-1002" ? "P1" : "Panel",
+    date,
+    quote: visible.headline,
+    panelistLine: `${visible.function} panelist${visible.sentBackToBuilder ? " · 2 answers sent to your builder" : ""}`,
+    sentBack: visible.sentBackToBuilder ? 2 : 0,
   };
 }
 

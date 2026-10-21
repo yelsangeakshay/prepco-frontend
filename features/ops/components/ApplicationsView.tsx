@@ -21,7 +21,7 @@ function ApplicationCard({ a }: { a: ApplicationRow }) {
   const err = decide.error instanceof ApiError ? decide.error : null;
   return (
     <Card data-testid={`application-${a.id}`} className="space-y-2">
-      <div className="flex flex-wrap items-start justify-between gap-2">
+      <div className="flex flex-wrap items-start justify-between gap-2 md:pr-72">
         <div>
           <p className="font-semibold">{a.name}</p>
           <p className="text-navy-400 text-sm">

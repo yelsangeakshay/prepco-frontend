@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FUNCTIONS } from "@/features/onboarding/schemas";
+import { PANELIST_FUNCTIONS } from "@/features/onboarding/schemas";
 
 export const DIMENSIONS = ["Structure", "Defensibility", "Composure"] as const;
 export const VERDICTS = ["Ready", "Almost There", "Needs Work"] as const;
@@ -8,12 +8,17 @@ export const panelItemSchema = z.object({
   sessionId: z.string(),
   studentId: z.string(),
   studentName: z.string(),
+  /** "Premium · Finals" (p02). */
+  plan: z.string(),
   college: z.string(),
   target: z.string(),
   title: z.string(),
   startsAt: z.string(),
   status: z.enum(["upcoming", "awaiting-score", "scored"]),
   verdict: z.string().nullable(),
+  briefRead: z.boolean(),
+  /** For feedback still to write: "Due today", "Due tomorrow", or "Overdue". */
+  dueLabel: z.string().nullable(),
 });
 export type PanelItem = z.infer<typeof panelItemSchema>;
 
@@ -86,7 +91,7 @@ export type Availability = z.infer<typeof availabilitySchema>;
 export const applicationBodySchema = z.object({
   name: z.string().trim().min(2, "Enter your full name"),
   email: z.string().trim().email("Enter a valid email"),
-  function: z.enum(FUNCTIONS, { message: "Pick your function" }),
+  function: z.enum(PANELIST_FUNCTIONS, { message: "Pick your function" }),
   company: z.string().trim().min(2, "Enter your company"),
   role: z.string().trim().min(2, "Enter your current role"),
   years: z.coerce

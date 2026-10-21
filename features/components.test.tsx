@@ -126,7 +126,7 @@ describe("RunwayTimeline", () => {
         ]}
       />,
     );
-    await userEvent.click(screen.getByRole("button", { name: "Pick A Slot" }));
+    await userEvent.click(screen.getByRole("button", { name: "Pick a slot" }));
     expect(onPick).toHaveBeenCalledWith("2");
   });
 });

@@ -1,4 +1,5 @@
 import type { BrowserContext, Page } from "@playwright/test";
+import { NAV } from "../../lib/config/nav";
 
 const BASE = "http://localhost:3000";
 
@@ -26,14 +27,18 @@ export async function openFromNav(page: Page, label: string, isMobile: boolean) 
       .click();
     return;
   }
+  const item = Object.values(NAV)
+    .flatMap((c) => c.sections.flatMap((x) => x.items))
+    .find((i) => i.label === label);
+  const short = item?.mobileLabel ?? label.split(" ")[0]!;
   const direct = page
     .getByRole("navigation", { name: "Mobile" })
-    .getByRole("link", { name: label.split(" ")[0], exact: true });
+    .getByRole("link", { name: short, exact: true });
   if (await direct.count()) {
     await direct.click();
     return;
   }
-  await page.getByRole("button", { name: "More" }).click();
+  await page.getByRole("button", { name: /^(More|Account)$/ }).click();
   await page.getByRole("dialog").getByRole("link", { name: label }).click();
 }
 

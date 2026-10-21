@@ -111,9 +111,15 @@ describe("Extras, billing, profile, outcome, notifications", () => {
     expect(await code(getCaseTrack())).toBe("elite_only");
   });
 
-  it("upgrade: quote uses unused-session credit, pay unlocks case track and notifies", async () => {
+  it("upgrade: quote is next tier minus paid minus top-ups, pay unlocks case track and notifies", async () => {
     const quote = await getUpgradeQuote();
-    expect(quote).toMatchObject({ listPrice: 59999, topUpCredit: 24666, payable: 35333 });
+    expect(quote).toMatchObject({
+      to: "Elite",
+      listPrice: 13999,
+      difference: 4000,
+      topUpCredit: 0,
+      payable: 4000,
+    });
     const paid = await postUpgrade();
     expect(paid.status).toBe("paid");
     expect((await getBilling()).plan.id).toBe("elite");
@@ -131,10 +137,15 @@ describe("Extras, billing, profile, outcome, notifications", () => {
     expect(await code(postUpgrade())).toBe("cohort_full");
   });
 
-  it("basic-ended carries no top-up credit", async () => {
+  it("basic-ended: Premium upgrade is credited with the top-up mock", async () => {
     asScenario("basic-ended");
     expect((await getBilling()).plan.status).toBe("ended");
-    expect((await getUpgradeQuote()).topUpCredit).toBe(0);
+    expect(await getUpgradeQuote()).toMatchObject({
+      to: "Premium",
+      difference: 4000,
+      topUpCredit: 1799,
+      payable: 2201,
+    });
   });
 
   it("changing target flags answers and shows up in the runway", async () => {
@@ -150,7 +161,7 @@ describe("Extras, billing, profile, outcome, notifications", () => {
   it("outcome: pending, then placed or not placed", async () => {
     expect((await getOutcome()).state).toBe("pending");
     const n = await postOutcome({ state: "not-placed" });
-    expect(n.creditCarried).toBe(36999);
+    expect(n.creditCarried).toBe(9999);
     resetDb();
     const p = await postOutcome({ state: "placed", company: "Acme", role: "MT", ctc: 900000 });
     expect(p).toMatchObject({ state: "placed", company: "Acme", ctc: 900000 });

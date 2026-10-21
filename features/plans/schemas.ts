@@ -1,13 +1,34 @@
 import { z } from "zod";
 
+export const TRACKS = ["finals", "summers"] as const;
+export type Track = (typeof TRACKS)[number];
+
+export const PAY_METHODS = ["upi", "card", "netbanking"] as const;
+export type PayMethod = (typeof PAY_METHODS)[number];
+export const PAY_METHOD_LABEL: Record<PayMethod, string> = {
+  upi: "UPI",
+  card: "Card",
+  netbanking: "Net banking",
+};
+
 export const planSchema = z.object({
   id: z.enum(["basic", "premium", "elite"]),
   name: z.string(),
   price: z.number(),
+  /** Struck-through list price (s04.png). */
+  listPrice: z.number(),
+  /** Tag at the top right of the card, e.g. "33% off · Season 1", "Most chosen", "Best value". */
+  badge: z.string(),
+  /** "Suggested from your free session". */
+  suggested: z.boolean(),
   tagline: z.string(),
-  features: z.array(z.string()),
-  mostChosen: z.boolean(),
-  elite: z.boolean(),
+  coverage: z.object({ done: z.number(), total: z.number(), caption: z.string() }),
+  /** "Everything in Basic, plus". */
+  inherits: z.string().nullable(),
+  features: z.array(z.object({ text: z.string(), included: z.boolean() })),
+  note: z.string().nullable(),
+  /** "Top-up mock" price. */
+  topUp: z.number(),
   seatsTotal: z.number(),
   seatsTaken: z.number(),
 });
@@ -16,21 +37,33 @@ export type Plan = z.infer<typeof planSchema>;
 export const plansSchema = z.object({
   items: z.array(planSchema),
   cohortFull: z.boolean(),
+  track: z.enum(TRACKS),
+  seats: z.object({ label: z.string(), taken: z.number(), total: z.number() }),
 });
+export type Plans = z.infer<typeof plansSchema>;
 
-export const checkoutBodySchema = z.object({ planId: planSchema.shape.id });
+export const checkoutBodySchema = z.object({
+  planId: planSchema.shape.id,
+  method: z.enum(PAY_METHODS).default("upi"),
+});
+export type CheckoutBody = z.input<typeof checkoutBodySchema>;
 
 export const checkoutSchema = z.object({
   id: z.string(),
   planId: planSchema.shape.id,
   planName: z.string(),
+  track: z.enum(TRACKS),
+  method: z.enum(PAY_METHODS),
   amount: z.number(),
   status: z.enum(["paid", "failed"]),
+  /** "The UPI payment timed out". */
+  failureTitle: z.string().nullable(),
   failureReason: z.string().nullable(),
   /** ISO time until which the seat is held after a failed payment (Proposed: 15 min). */
   seatHeldUntil: z.string().nullable(),
   receiptNo: z.string().nullable(),
   paidAt: z.string().nullable(),
+  email: z.string().nullable(),
 });
 export type Checkout = z.infer<typeof checkoutSchema>;
 

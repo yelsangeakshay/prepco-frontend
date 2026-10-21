@@ -56,13 +56,13 @@ const score = {
 };
 
 describe("the world", () => {
-  it("1,000 students with the advertised plan mix; 52 panelists across six functions", async () => {
+  it("1,000 students with the mockup plan mix (57 paid); 52 panelists across six functions", async () => {
     const all = await getOpsStudents({ pageSize: 1 });
     expect(all.total).toBe(1000);
-    expect((await getOpsStudents({ plan: "elite", pageSize: 1 })).total).toBe(41);
-    expect((await getOpsStudents({ plan: "premium", pageSize: 1 })).total).toBe(312);
-    expect((await getOpsStudents({ plan: "basic", pageSize: 1 })).total).toBe(212);
-    expect((await getOpsStudents({ plan: "none", pageSize: 1 })).total).toBe(435);
+    expect((await getOpsStudents({ plan: "elite", pageSize: 1 })).total).toBe(17);
+    expect((await getOpsStudents({ plan: "premium", pageSize: 1 })).total).toBe(26);
+    expect((await getOpsStudents({ plan: "basic", pageSize: 1 })).total).toBe(14);
+    expect((await getOpsStudents({ plan: "none", pageSize: 1 })).total).toBe(943);
 
     const roster = await getOpsPanelists({ pageSize: 100 });
     expect(roster.total).toBe(52);
@@ -78,28 +78,36 @@ describe("the world", () => {
     expect((await getOpsStudents({ pageSize: 1000 })).items).toHaveLength(1000);
   });
 
-  it("cohort overview: seats match plans, seven panels unassigned, 5 applications waiting", async () => {
+  it("cohort overview matches a01: seats, funnel, revenue, three sessions unassigned, 3 applications", async () => {
     const c = await getOpsCohort();
-    expect(c.seats).toEqual([
-      { plan: "Basic", taken: 212, total: 300 },
-      { plan: "Premium", taken: 312, total: 400 },
-      { plan: "Elite", taken: 41, total: 50 },
+    expect(c.seats.map((x) => [x.id, x.taken, x.total])).toEqual([
+      ["finals", 37, 60],
+      ["summers", 20, 40],
+      ["elite", 17, 22],
     ]);
-    expect(c.totals.paid).toBe(565);
+    expect(c.totals).toEqual({ students: 1000, paid: 57, revenue: 623293 });
+    expect(c.funnel.map((f) => f.value)).toEqual([160, 131, 57]);
+    expect(c.conversionPct).toBe(44);
+    expect(c.revenue.topUps).toBe(41350);
+    expect(c.revenue.total).toBe(623293);
     const attn = Object.fromEntries(c.needsAttention.map((n) => [n.id, n.count]));
-    expect(attn.unassigned).toBe(7);
-    expect(attn.applications).toBe(5);
-    expect(c.funnel.at(-1)?.value).toBe(565);
-    expect(c.totals.revenue).toBeGreaterThan(15_000_000);
+    expect(attn.unassigned).toBe(3);
+    expect(attn.applications).toBe(3);
+    expect(attn["no-shows"]).toBe(1);
+    expect(c.thisWeek).toMatchObject({
+      sessionsScheduled: 46,
+      panelistsActive: 31,
+      panelistsTotal: 52,
+    });
   });
 });
 
 describe("Arjun", () => {
-  it("has twelve panels this season, two tonight, one to score, and Riya's P1 among them", async () => {
+  it("has twelve panels this season, three tonight, two to score, and Riya's P1 among them", async () => {
     const t = await getPanelistToday();
     expect(t.panelist.panelsThisSeason).toBe(12);
-    expect(t.today).toHaveLength(2);
-    expect(t.awaitingScore).toHaveLength(1);
+    expect(t.today).toHaveLength(3);
+    expect(t.awaitingScore).toHaveLength(2);
     const done = await getScoringList();
     expect(done.done.some((d) => d.studentName === "Riya Kulkarni")).toBe(true);
   });
@@ -123,8 +131,9 @@ describe("Arjun", () => {
 
   it("availability: booked slots cannot be switched off", async () => {
     const a = await getAvailability();
-    expect(Object.values(a.slots).filter(Boolean)).toHaveLength(9);
+    expect(Object.values(a.slots).filter(Boolean)).toHaveLength(10);
     expect(a.booked).toContain("Mon-18:00");
+    expect(a.booked).toContain("Mon-21:00");
     const slots = { ...a.slots, "Sat-19:00": true };
     expect((await putAvailability(slots)).slots["Sat-19:00"]).toBe(true);
     expect(await code(putAvailability({ ...slots, "Mon-18:00": false }))).toBe("slot_booked");
@@ -133,14 +142,14 @@ describe("Arjun", () => {
 
 describe("one panel, three roles", () => {
   it("Riya books P2 -> ops sees it unassigned -> assigns Arjun -> Arjun scores -> Riya gets feedback and flagged answers", async () => {
-    expect((await getOpsAssignments()).unassigned).toHaveLength(7);
+    expect((await getOpsAssignments()).unassigned).toHaveLength(3);
 
     await bookSession("s-1004", "s-1004-10-12-18");
     const queue = await getOpsAssignments();
-    expect(queue.unassigned).toHaveLength(8);
+    expect(queue.unassigned).toHaveLength(4);
     const mine = queue.unassigned.find((u) => u.booking.id === "s-1004")!;
     expect(mine.booking.studentName).toBe("Riya Kulkarni");
-    expect((await getOpsBookings({ tab: "unassigned", pageSize: 100 })).counts.unassigned).toBe(8);
+    expect((await getOpsBookings({ tab: "unassigned", pageSize: 100 })).counts.unassigned).toBe(4);
 
     // Before assignment Arjun does not see it.
     expect((await getPanelistToday()).upcoming.some((u) => u.sessionId === "s-1004")).toBe(false);
@@ -148,7 +157,7 @@ describe("one panel, three roles", () => {
     const arjun = mine.candidates.find((c) => c.name === "Arjun Mehta");
     expect(arjun?.free).toBe(true);
     await postAssignment({ sessionId: "s-1004", panelistId: arjun!.panelistId });
-    expect((await getOpsAssignments()).unassigned).toHaveLength(7);
+    expect((await getOpsAssignments()).unassigned).toHaveLength(3);
     expect((await getPanelistToday()).upcoming.some((u) => u.sessionId === "s-1004")).toBe(true);
     expect((await getNotifications()).items.some((n) => n.title.includes("is confirmed"))).toBe(
       true,
@@ -181,17 +190,17 @@ describe("one panel, three roles", () => {
 describe("ops actions", () => {
   it("excuse a no-show; approve and reject applications; roster follows", async () => {
     const ns = await getOpsBookings({ tab: "no-shows", pageSize: 100 });
-    expect(ns.counts.noShows).toBe(18);
+    expect(ns.counts.noShows).toBe(1);
     const id = ns.items.find((b) => !b.excused)!.id;
     await excuseBooking(id);
     expect(await code(excuseBooking("b-nope"))).toBe("not_a_no_show");
 
     const apps = await getOpsApplications("pending");
-    expect(apps.items).toHaveLength(5);
+    expect(apps.items).toHaveLength(3);
     await decideApplication(apps.items[0]!.id, "approve");
     await decideApplication(apps.items[1]!.id, "reject");
     expect(await code(decideApplication(apps.items[0]!.id, "approve"))).toBe("already_decided");
-    expect((await getOpsApplications()).counts).toEqual({ pending: 3, approved: 3, rejected: 2 });
+    expect((await getOpsApplications()).counts).toEqual({ pending: 1, approved: 3, rejected: 2 });
     expect((await getOpsPanelists({ pageSize: 100 })).total).toBe(53);
   });
 
@@ -212,15 +221,13 @@ describe("ops actions", () => {
     expect((await getOpsApplications("pending")).items[0]?.name).toBe("Test Person");
   });
 
-  it("roster health: overdue feedback and cancellations need attention; reminders clear overdue", async () => {
+  it("roster health: two panelists need attention for cancellations, none overdue; pausing is counted", async () => {
     const need = await getOpsPanelists({ health: "needs-attention", pageSize: 100 });
-    expect(need.total).toBeGreaterThanOrEqual(5);
-    const overdue = need.items.find((p) => p.feedbackOverdue > 0)!;
-    await panelistAction(overdue.id, "nudge");
-    const after = await getOpsPanelists({ health: "needs-attention", pageSize: 100 });
-    expect(after.items.find((p) => p.id === overdue.id)).toBeUndefined();
+    expect(need.items.map((p) => p.id).sort()).toEqual(["pn-008", "pn-014"]);
+    expect(need.items.every((p) => p.feedbackOverdue === 0)).toBe(true);
+    expect((await getOpsPanelists({ pageSize: 100 })).counts.paused).toBe(21);
     await panelistAction(need.items[0]!.id, "pause");
-    expect((await getOpsPanelists({ pageSize: 100 })).counts.paused).toBe(1);
+    expect((await getOpsPanelists({ pageSize: 100 })).counts.paused).toBe(22);
     expect(await code(panelistAction("pn-nope", "pause"))).toBe("panelist_not_found");
   });
 
@@ -239,8 +246,9 @@ describe("ops actions", () => {
 
   it("ledger totals reconcile", async () => {
     const l = await getOpsLedger({ pageSize: 25 });
-    expect(l.total).toBeGreaterThan(500);
+    expect(l.total).toBe(87);
     expect(l.totals.net).toBe(l.totals.payments + l.totals.refunds + l.totals.credits);
-    expect((await getOpsLedger({ type: "refund" })).items.every((e) => e.amount < 0)).toBe(true);
+    expect((await getOpsLedger({ type: "refund" })).total).toBe(0);
+    expect(l.totals.net).toBe(623293);
   });
 });

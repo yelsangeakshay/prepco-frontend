@@ -54,10 +54,10 @@ test.describe("Join and buy a plan", () => {
     // Plans (S4) and checkout
     await expect(page).toHaveURL(/\/plans$/);
     await page.getByRole("button", { name: "Choose Premium" }).click();
-    await expect(page).toHaveURL(/\/checkout\/premium$/);
-    await page.getByRole("button", { name: /^Pay/ }).click();
-    await expect(page.getByTestId("receipt")).toContainText("Payment received");
-    await page.getByRole("link", { name: "Go To Home" }).click();
+    await expect(page.getByRole("heading", { name: "Payment" })).toBeVisible();
+    await page.getByRole("button", { name: /^Pay ₹9,999/ }).click();
+    await expect(page.getByTestId("receipt")).toContainText("You're in, Riya.");
+    await page.getByRole("link", { name: "Book profiling call" }).click();
     await expect(page).toHaveURL(/\/home$/);
   });
 });
@@ -77,7 +77,10 @@ test.describe("First login, nothing booked", () => {
     await gotoReady(page, "/home");
     await expect(page.getByTestId("banner-first-login")).toContainText("Nothing is booked yet");
     await expect(page.getByRole("link", { name: "Book Free Session" })).toBeVisible();
-    await expect(page.getByRole("meter")).toHaveAttribute("aria-valuenow", "0");
+    await expect(page.getByRole("progressbar", { name: "Readiness for Day 0" })).toHaveAttribute(
+      "aria-valuenow",
+      "0",
+    );
   });
 });
 
@@ -129,9 +132,9 @@ test.describe("Payment fails", () => {
     await signInAsRiya(context, "payment-failed");
     await gotoReady(page, "/checkout/premium");
     await page.getByRole("button", { name: /^Pay/ }).click();
-    await expect(alerts(page)).toContainText("Payment failed");
-    await expect(page.getByText(/Seat held for \d+:\d{2}/)).toBeVisible();
-    await page.getByRole("button", { name: /^Retry Payment/ }).click();
+    await expect(alerts(page)).toContainText("The UPI payment timed out");
+    await expect(page.getByText(/Your seat is held for \d+:\d{2}/)).toBeVisible();
+    await page.getByRole("button", { name: "Try again with UPI" }).click();
     await expect(page.getByTestId("receipt")).toBeVisible();
   });
 });
@@ -204,14 +207,23 @@ test.describe("Session cancelled / moved / missed", () => {
 });
 
 test.describe("Home, sessions and feedback (Riya)", () => {
-  test("home shows runway, countdown and readiness", async ({ page, context }) => {
+  test("home shows runway, countdown and readiness", async ({ page, context, isMobile }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/home");
-    await expect(page.getByRole("heading", { name: "Hello, Riya" })).toBeVisible();
-    await expect(page.getByText("days to Day 0")).toBeVisible();
-    await expect(page.getByText("35", { exact: true })).toBeVisible();
-    await expect(page.getByRole("meter")).toHaveAttribute("aria-valuenow", "64");
-    await expect(page.getByText("4 need work")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Good evening, Riya." })).toBeVisible();
+    await expect(
+      page
+        .getByText(/days( to Day 0| · Mon 9 Nov)/)
+        .locator("visible=true")
+        .first(),
+    ).toBeVisible();
+    await expect(page.getByText("35", { exact: true }).locator("visible=true")).toBeVisible();
+    await expect(page.getByRole("progressbar", { name: "Readiness for Day 0" })).toHaveAttribute(
+      "aria-valuenow",
+      "64",
+    );
+    if (!isMobile)
+      await expect(page.getByText("4 need work").locator("visible=true").first()).toBeVisible();
   });
 
   test("feedback list opens detail", async ({ page, context }) => {
@@ -232,7 +244,7 @@ test.describe("Home, sessions and feedback (Riya)", () => {
   test("sessions list links to each session", async ({ page, context }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/sessions");
-    await expect(page.getByRole("link", { name: /P2 external specialist panel/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /P2: external specialist panel/ })).toBeVisible();
     await page.getByRole("link", { name: /Domain deep-dive/ }).click();
     await expect(page).toHaveURL(/\/sessions\/s-1003$/);
   });

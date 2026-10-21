@@ -4,6 +4,7 @@ import { API_BASE_URL } from "@/lib/api/client";
 import type { PanelItem } from "@/features/panelist/schemas";
 import type { FeedbackDetail } from "@/features/feedback/schemas";
 import { getDb } from "../db";
+import { saveSnapshot } from "../persist";
 import { ARJUN } from "../fixtures/personas";
 import { getState } from "../state";
 import { apiError, latency, scenarioOf } from "../utils";
@@ -35,13 +36,31 @@ function toItem(
     sessionId: x.id,
     studentId: x.studentId,
     studentName: x.studentName,
+    plan: s
+      ? `${s.plan === "none" ? "Free" : s.plan[0]!.toUpperCase() + s.plan.slice(1)} · ${s.track}`
+      : "",
     college: s?.college ?? "",
     target: s?.function ?? x.function,
     title: x.title,
     startsAt: x.startsAt ?? NOW,
     status: x.scored ? "scored" : x.status === "completed" ? "awaiting-score" : "upcoming",
     verdict: x.verdict,
+    briefRead: !!getWorld(scenario).briefsRead[x.id],
+    dueLabel: x.status === "completed" && !x.scored ? dueLabel(x.startsAt) : null,
   };
+}
+
+/** Feedback is due three days after the panel. */
+function dueLabel(startsAt: string | null) {
+  if (!startsAt) return null;
+  const days = Math.round(
+    (Date.parse(`${TODAY}T00:00:00Z`) - Date.parse(`${istDate(startsAt)}T00:00:00Z`)) / 86_400_000,
+  );
+  if (days > 3) return "Overdue";
+  if (days === 3) return "Due today";
+  if (days === 2) return "Due tomorrow";
+  if (days === 1) return "Due in 2 days";
+  return "Due in 2 days";
 }
 
 function mine(scenario: Scenario | null) {
@@ -160,6 +179,8 @@ export const panelistHandlers = [
     if (!x || x.panelistId !== ME) {
       return apiError(404, "brief_not_found", "We could not find a brief for that session.");
     }
+    getWorld(scenario).briefsRead[x.id] = true;
+    saveSnapshot();
     return HttpResponse.json(brief(scenario, x));
   }),
 
@@ -265,7 +286,12 @@ export const panelistHandlers = [
     const booked = allBookings(scenario)
       .filter((x) => x.panelistId === ME && x.status === "upcoming" && x.startsAt)
       .map((x) => slotKey(x.startsAt!));
-    return HttpResponse.json({ slots: w.availability[ME] ?? {}, booked: [...new Set(booked)] });
+    // A booked panel always counts as an open slot, so the grid never contradicts the calendar.
+    const slots = {
+      ...(w.availability[ME] ?? {}),
+      ...Object.fromEntries(booked.map((k) => [k, true])),
+    };
+    return HttpResponse.json({ slots, booked: [...new Set(booked)] });
   }),
 
   http.put(`${API_BASE_URL}/availability`, async ({ request }) => {

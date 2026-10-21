@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { LazyDataTable as DataTable } from "@/components/shared/LazyDataTable";
-import { FUNCTIONS } from "@/features/onboarding/schemas";
+import { PANELIST_FUNCTIONS } from "@/features/onboarding/schemas";
 import { ROUTES } from "@/lib/config/routes";
 import { cn } from "@/lib/utils/cn";
 import { notify } from "@/lib/utils/notify";
@@ -135,7 +135,7 @@ export function PanelistsView() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-4 p-4 md:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 md:pr-72">
         <div>
           <h1 className="font-display text-3xl font-bold">Panelists</h1>
           {counts && (
@@ -169,7 +169,7 @@ export function PanelistsView() {
           placeholder="All functions"
           value={fn}
           onChange={(e) => set({ function: e.target.value }, { resetPage: true })}
-          options={FUNCTIONS.map((f) => ({ value: f, label: f }))}
+          options={PANELIST_FUNCTIONS.map((f) => ({ value: f, label: f }))}
         />
         <Select
           label="Health"

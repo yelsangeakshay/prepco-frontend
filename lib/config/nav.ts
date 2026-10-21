@@ -31,6 +31,8 @@ export interface NavItem {
   badgeTone?: "gold" | "maroon";
   /** Pinned in the phone bottom bar; the rest go in the "More" sheet. */
   mobile?: boolean;
+  /** Short label for the phone bottom bar. */
+  mobileLabel?: string;
   /** Only match when pathname equals href exactly. */
   exact?: boolean;
 }
@@ -56,16 +58,28 @@ export const NAV: Record<Role, NavConfig> = {
         title: "Your runway",
         items: [
           { label: "Home", href: s.home, icon: Home, mobile: true },
-          { label: "Sessions & runway", href: s.sessions, icon: CalendarClock, mobile: true },
-          { label: "Panel feedback", href: s.feedback, icon: MessageSquareText, mobile: true },
+          {
+            label: "Sessions & runway",
+            href: s.sessions,
+            icon: CalendarClock,
+            mobile: true,
+            mobileLabel: "Sessions",
+          },
+          { label: "Panel feedback", href: s.feedback, icon: MessageSquareText },
           { label: "Journey & routes", href: s.journey, icon: Route },
         ],
       },
       {
         title: "Tools",
         items: [
-          { label: "CV Builder", href: s.cv, icon: FileText, mobile: true },
-          { label: "HR Question Builder", href: s.answers, icon: BookOpen, mobile: true },
+          { label: "CV Builder", href: s.cv, icon: FileText, mobile: true, mobileLabel: "CV" },
+          {
+            label: "HR Question Builder",
+            href: s.answers,
+            icon: BookOpen,
+            mobile: true,
+            mobileLabel: "Answers",
+          },
           { label: "Quick Switch", href: s.quickSwitch, icon: Shuffle },
           {
             label: "Case track",
@@ -91,9 +105,27 @@ export const NAV: Record<Role, NavConfig> = {
         title: "Panels",
         items: [
           { label: "Today", href: p.today, icon: CalendarDays, mobile: true },
-          { label: "Pre-panel briefs", href: p.briefs, icon: ClipboardList, mobile: true },
-          { label: "Scoring & feedback", href: p.scoring, icon: ClipboardCheck, mobile: true },
-          { label: "Availability", href: p.availability, icon: CalendarClock, mobile: true },
+          {
+            label: "Pre-panel briefs",
+            href: p.briefs,
+            icon: ClipboardList,
+            mobile: true,
+            mobileLabel: "Briefs",
+          },
+          {
+            label: "Scoring & feedback",
+            href: p.scoring,
+            icon: ClipboardCheck,
+            mobile: true,
+            mobileLabel: "Score",
+          },
+          {
+            label: "Availability",
+            href: p.availability,
+            icon: CalendarClock,
+            mobile: true,
+            mobileLabel: "Calendar",
+          },
         ],
       },
       {
@@ -123,7 +155,13 @@ export const NAV: Record<Role, NavConfig> = {
       {
         title: "Business",
         items: [
-          { label: "Plans & credits", href: o.ledger, icon: Wallet },
+          {
+            label: "Plans & credits",
+            href: o.ledger,
+            icon: Wallet,
+            mobile: true,
+            mobileLabel: "Ledger",
+          },
           { label: "Panelists", href: o.panelists, icon: UsersRound },
         ],
       },
@@ -131,12 +169,19 @@ export const NAV: Record<Role, NavConfig> = {
   },
 };
 
-/** Footer cards under the sidebar. */
-export const NAV_FOOTER = {
-  student: { plan: "Premium", doneLabel: "2 of 6 runway sessions done", done: 2, total: 6 },
-  panelist: { function: "Marketing & Brand", panelsThisSeason: 12 },
-  ops: { season: "Season 1", day0Label: "Day 0 · Mon 9 Nov" },
-} as const;
+/** Line under the wordmark, per role (from the mockups). */
+export const ROLE_TAGLINE: Record<Role, string> = {
+  student: "Inception to offer letter",
+  panelist: "Panelist",
+  ops: "Ops console",
+};
+
+/** Label of the last phone tab, which opens the rest of the navigation. */
+export const MORE_LABEL: Record<Role, string> = {
+  student: "Account",
+  panelist: "More",
+  ops: "More",
+};
 
 export const ROLE_PROFILE: Record<Role, { name: string; initials: string; subtitle: string }> = {
   student: { name: "Riya Kulkarni", initials: "RK", subtitle: "SCMHRD Pune · MBA 2025–27" },

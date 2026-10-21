@@ -80,8 +80,32 @@ export const runwaySchema = z.object({
   tasks: z.array(
     z.object({ id: z.string(), label: z.string(), hint: z.string().optional(), done: z.boolean() }),
   ),
-  cv: z.object({ version: z.string(), locked: z.boolean(), score: z.number() }),
-  answers: z.object({ total: z.number(), prepared: z.number(), needWork: z.number() }),
+  cv: z.object({
+    version: z.string(),
+    locked: z.boolean(),
+    score: z.number(),
+    impact: z.number(),
+    clarity: z.number(),
+    defensibility: z.number(),
+  }),
+  answers: z.object({
+    total: z.number(),
+    prepared: z.number(),
+    needWork: z.number(),
+    /** A flagged question to show on Home. */
+    flagged: z.string().nullable(),
+  }),
+  /** Newest panel feedback (s05.png "Latest panel"). */
+  latestPanel: z
+    .object({
+      feedbackId: z.string(),
+      label: z.string(),
+      date: z.string(),
+      quote: z.string(),
+      panelistLine: z.string(),
+      sentBack: z.number(),
+    })
+    .nullable(),
 });
 export type Runway = z.infer<typeof runwaySchema>;
 

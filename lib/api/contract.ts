@@ -169,12 +169,19 @@ export const OPERATIONS: Operation[] = [
     response: freeSessionSchema,
   },
 
-  { method: "get", path: "/plans", tag: "Plans", summary: "List plans", response: plansSchema },
+  {
+    method: "get",
+    path: "/plans",
+    tag: "Plans",
+    summary: "List plans and seat counts for a track (finals or summers)",
+    response: plansSchema,
+    query: ["track"],
+  },
   {
     method: "post",
     path: "/checkout",
     tag: "Plans",
-    summary: "Pay for a plan",
+    summary: "Pay for a plan (method: upi, card or netbanking)",
     request: checkoutBodySchema,
     response: checkoutSchema,
     errors: [
@@ -384,7 +391,8 @@ export const OPERATIONS: Operation[] = [
     method: "get",
     path: "/billing/upgrade-quote",
     tag: "Billing",
-    summary: "Upgrade price after top-up credit (Proposed)",
+    summary:
+      "Upgrade quote: next tier price minus current tier paid minus top-ups bought (Proposed)",
     response: upgradeQuoteSchema,
     errors: [[409, "already_elite"]],
   },
@@ -542,7 +550,7 @@ export const OPERATIONS: Operation[] = [
     method: "get",
     path: "/ops/cohort",
     tag: "Ops",
-    summary: "Cohort overview",
+    summary: "Cohort overview: seats, funnel, revenue lines, needs attention, this week",
     response: cohortSchema,
   },
   {

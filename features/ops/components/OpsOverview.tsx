@@ -1,105 +1,173 @@
 "use client";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ErrorCard } from "@/components/shared/ErrorCard";
-import { FunnelBars } from "@/components/shared/FunnelBars";
-import { PageSkeleton, Skeleton } from "@/components/shared/Skeletons";
-import { StatCard } from "@/components/shared/StatCard";
-import { SeatGauge } from "@/features/ops/roster/components/SeatGauge";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { ProgressBar } from "@/components/shared/ProgressBar";
+import { PageSkeleton } from "@/components/shared/Skeletons";
 import { formatINR } from "@/lib/utils/currency";
 import { useCohort } from "../hooks/useOps";
+import type { Cohort } from "../schemas";
 
-const RevenueChart = dynamic(() => import("./Charts").then((m) => m.RevenueChart), {
-  ssr: false,
-  loading: () => <Skeleton className="h-56 w-full" />,
-});
-const WeekChart = dynamic(() => import("./Charts").then((m) => m.WeekChart), {
-  ssr: false,
-  loading: () => <Skeleton className="h-48 w-full" />,
-});
+function SeatCard({ seat }: { seat: Cohort["seats"][number] }) {
+  const left = Math.max(0, seat.total - seat.taken);
+  return (
+    <Card variant="feature" className="p-5">
+      <p className="text-maroon-600 text-[13px] font-semibold tracking-[0.14em] uppercase">
+        {seat.label}
+      </p>
+      <p className="font-display mt-4 text-5xl leading-none font-bold tabular-nums">
+        {seat.taken}
+        <span className="text-navy-400 ml-1.5 text-2xl font-normal">/ {seat.total}</span>
+      </p>
+      <ProgressBar className="mt-4 h-2.5" value={seat.taken} max={seat.total} label={seat.label} />
+      <p className="text-navy-400 mt-3 text-sm">{left === 0 ? "Full" : `${left} left`}</p>
+    </Card>
+  );
+}
 
-/** A1 cohort overview. */
+/** "Free session → paid": three stacked gradient bars, each scaled to the first. */
+function Funnel({ data }: { data: Cohort }) {
+  const top = data.funnel[0]?.value || 1;
+  return (
+    <Card variant="feature">
+      <h2 className="font-display text-2xl font-bold">Free session → paid</h2>
+      <ul className="mt-5 space-y-2.5">
+        {data.funnel.map((f) => (
+          <li
+            key={f.label}
+            style={{ width: `${Math.max(18, (f.value / top) * 100)}%` }}
+            className="flex h-10 items-center rounded-lg bg-gradient-to-r from-[var(--maroon-600)] to-[var(--gold-500)] px-4 text-sm font-bold whitespace-nowrap text-white"
+          >
+            {f.value} {f.label}
+          </li>
+        ))}
+      </ul>
+      <p className="text-navy-400 mt-5 text-sm">
+        {data.conversionPct}% of attended sessions convert.
+      </p>
+    </Card>
+  );
+}
+
+function Revenue({ data }: { data: Cohort }) {
+  return (
+    <Card variant="feature">
+      <h2 className="font-display text-2xl font-bold">Revenue by tier</h2>
+      <ul className="mt-4 space-y-3 text-[15px]">
+        {data.revenue.lines.map((l) => (
+          <li key={l.tier} className="flex justify-between gap-4">
+            <span>
+              {l.tier} · {l.count} × {formatINR(l.unit)}
+            </span>
+            <span className="font-semibold tabular-nums">{formatINR(l.amount)}</span>
+          </li>
+        ))}
+        <li className="flex justify-between gap-4">
+          <span>Top-ups</span>
+          <span className="font-semibold tabular-nums">{formatINR(data.revenue.topUps)}</span>
+        </li>
+      </ul>
+      <div className="border-line mt-5 flex items-end justify-between gap-4 border-t pt-5">
+        <span className="font-semibold">Season to date</span>
+        <span data-testid="season-total" className="font-display text-4xl font-bold tabular-nums">
+          {formatINR(data.revenue.total)}
+        </span>
+      </div>
+    </Card>
+  );
+}
+
+function NeedsAttention({ data }: { data: Cohort }) {
+  return (
+    <Card variant="feature">
+      <h2 className="font-display text-2xl font-bold">Needs attention</h2>
+      <ul className="divide-line mt-3 divide-y">
+        {data.needsAttention.map((n) => (
+          <li
+            key={n.id}
+            data-testid={`attn-${n.id}`}
+            className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="min-w-0">
+              <p className="font-semibold">{n.title}</p>
+              <p className="text-navy-400 text-sm">{n.detail}</p>
+            </div>
+            <Button asChild variant="secondary" size="sm" className="self-start sm:self-center">
+              <Link href={n.href} data-testid={`attn-${n.id}-action`}>
+                {n.action}
+                <span className="sr-only"> for {n.title}</span>
+              </Link>
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+function ThisWeek({ data }: { data: Cohort }) {
+  const w = data.thisWeek;
+  const rows: [string, string][] = [
+    ["Sessions scheduled", String(w.sessionsScheduled)],
+    ["Free sessions", String(w.freeSessions)],
+    ["Feedback overdue", String(w.feedbackOverdue)],
+    ["Panelists active", `${w.panelistsActive} of ${w.panelistsTotal}`],
+  ];
+  return (
+    <Card variant="navy" className="relative overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-10 -left-10 size-56 rounded-full bg-[var(--maroon-600)]/30 blur-3xl"
+      />
+      <h2 className="text-gold-300 relative text-[13px] font-semibold tracking-[0.16em] uppercase">
+        This week
+      </h2>
+      <dl className="relative mt-4 space-y-3.5">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex justify-between gap-4 text-[15px]">
+            <dt className="text-white/70">{label}</dt>
+            <dd className="font-bold tabular-nums">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="relative mt-5 border-t border-white/15 pt-4 text-sm text-white/70">
+        Finals Day 0 in {data.day0.daysLeft} days.
+      </p>
+    </Card>
+  );
+}
+
+/** A1 cohort overview (a01.png). */
 export function OpsOverview() {
   const { data, isPending, isError, refetch } = useCohort();
   if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <div>
-        <h1 className="font-display text-3xl font-bold">Cohort overview</h1>
-        <p className="text-navy-400 text-sm">
-          {data.season} · Day 0 {data.day0.label} · {data.day0.daysLeft} days to go
-        </p>
-      </div>
+    <div className="mx-auto max-w-[1440px] space-y-6 p-4 md:p-8 xl:px-10">
+      <PageHeader eyebrow="Mon 5 Oct 2026" pill="Sample data" title="Cohort overview" />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Students" value={data.totals.students.toLocaleString("en-IN")} />
-        <StatCard label="Paid" value={data.totals.paid.toLocaleString("en-IN")} tone="green" />
-        <StatCard label="Revenue" value={formatINR(data.totals.revenue)} />
-        <StatCard label="Days to Day 0" value={data.day0.daysLeft} />
-      </div>
-
-      <section aria-labelledby="attn" className="space-y-3">
-        <h2 id="attn" className="font-display text-xl font-bold">
-          Needs attention
-        </h2>
-        <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {data.needsAttention.map((n) => (
-            <li key={n.id}>
-              <Link href={n.href} data-testid={`attn-${n.id}`}>
-                <Card className="hover:bg-cream-soft flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold">{n.title}</span>
-                  <Badge tone={n.count > 0 && n.tone === "maroon" ? "maroon" : "neutral"}>
-                    {n.count}
-                  </Badge>
-                </Card>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <section aria-label="Seats" className="grid gap-4 md:grid-cols-3">
+        {data.seats.map((s) => (
+          <SeatCard key={s.id} seat={s} />
+        ))}
       </section>
-
-      <section aria-labelledby="seats" className="space-y-3">
-        <h2 id="seats" className="font-display text-xl font-bold">
-          Seats
-        </h2>
-        <div className="grid gap-3 md:grid-cols-3">
-          {data.seats.map((s) => (
-            <SeatGauge key={s.plan} label={s.plan} taken={s.taken} total={s.total} />
-          ))}
-        </div>
-      </section>
+      <p className="text-navy-400 -mt-2 text-[15px]">{data.seatsNote}</p>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card variant="feature">
-          <h2 className="font-display mb-4 text-xl font-bold">Free to paid</h2>
-          <FunnelBars stages={data.funnel} />
-        </Card>
-        <Card variant="feature">
-          <h2 className="font-display mb-2 text-xl font-bold">Revenue by tier</h2>
-          <RevenueChart data={data.revenueByTier} />
-          <ul className="mt-3 space-y-1 text-sm">
-            {data.revenueByTier.map((r) => (
-              <li key={r.tier} className="flex justify-between">
-                <span>
-                  {r.tier} <span className="text-navy-400">· {r.count} students</span>
-                </span>
-                <span className="font-semibold tabular-nums">{formatINR(r.amount)}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <Funnel data={data} />
+        <Revenue data={data} />
       </div>
 
-      <Card variant="feature">
-        <h2 className="font-display mb-2 text-xl font-bold">This week</h2>
-        <WeekChart data={data.thisWeek} />
-        <p className="text-navy-400 mt-2 text-xs">Gold = panels still without a panelist.</p>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_420px]">
+        <NeedsAttention data={data} />
+        <div>
+          <ThisWeek data={data} />
+        </div>
+      </div>
     </div>
   );
 }
