@@ -48,12 +48,36 @@ export const briefSchema = z.object({
     target: z.string(),
     background: z.string(),
     readiness: z.number(),
+    /** "Premium · Finals". */
+    plan: z.string(),
   }),
   cvHighlights: z.array(z.string()),
-  answersToProbe: z.array(z.object({ question: z.string(), why: z.string() })),
+  /** The locked CV (p03): version, score and the work-experience bullets with their own scores. */
+  cv: z.object({
+    version: z.string(),
+    score: z.number(),
+    bullets: z.array(z.object({ text: z.string(), score: z.number() })),
+  }),
+  answersToProbe: z.array(
+    z.object({
+      question: z.string(),
+      why: z.string(),
+      /** Where the student's answer stands in the builder. */
+      status: z.enum(["flagged", "not-drafted"]),
+    }),
+  ),
   previousFeedback: z
-    .object({ panelist: z.string(), verdict: z.string(), headline: z.string() })
+    .object({
+      panelist: z.string(),
+      verdict: z.string(),
+      headline: z.string(),
+      startsAt: z.string(),
+    })
     .nullable(),
+  /** Notes from the profiling call (p03). Proposed copy. */
+  profilingNotes: z.object({ dateLabel: z.string(), text: z.string() }),
+  /** One line on what changed since the last panel (p03). */
+  sinceLastPanel: z.string(),
   suggestedQuestions: z.array(z.string()),
 });
 export type Brief = z.infer<typeof briefSchema>;
@@ -82,9 +106,46 @@ export const scoreResultSchema = z.object({
   sentBack: z.boolean(),
 });
 
+export const APPLICATION_SESSIONS = [
+  "P1 · first mock panel",
+  "P2 · specialist panel",
+  "P3 · pressure mock",
+  "Domain deep-dive",
+  "Case deck reviews",
+  "Group positioning",
+] as const;
+
+export const AVAILABILITY_STATUSES = [
+  "Upcoming",
+  "Tonight",
+  "Feedback due",
+  "Feedback sent",
+] as const;
+
 export const availabilitySchema = z.object({
   slots: z.record(z.string(), z.boolean()),
   booked: z.array(z.string()),
+  /** Each booked panel with its date, so the grid can show any week (p05). */
+  bookedPanels: z.array(
+    z.object({
+      key: z.string(),
+      startsAt: z.string(),
+      /** "P2", "P1", "Deep-dive". */
+      kind: z.string(),
+      /** "Aditya R." */
+      student: z.string(),
+    }),
+  ),
+  /** "Recent and upcoming" under the grid. */
+  panels: z.array(
+    z.object({
+      sessionId: z.string(),
+      startsAt: z.string(),
+      student: z.string(),
+      session: z.string(),
+      status: z.enum(AVAILABILITY_STATUSES),
+    }),
+  ),
 });
 export type Availability = z.infer<typeof availabilitySchema>;
 
@@ -98,12 +159,14 @@ export const applicationBodySchema = z.object({
     .number({ message: "Enter your years of experience" })
     .min(3, "We need at least 3 years")
     .max(40, "Enter 40 or less"),
-  linkedin: z.string().trim().url("Enter a full LinkedIn URL").or(z.literal("")),
-  hoursPerMonth: z.coerce
-    .number({ message: "Enter hours per month" })
-    .min(2, "At least 2 hours")
-    .max(40, "40 hours or less"),
-  why: z.string().trim().min(30, "Tell us a bit more (30 characters or more)"),
+  linkedin: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || /linkedin\.com\/in\//i.test(v), "Enter your LinkedIn profile link"),
+  /** The sessions they can run (p01). */
+  sessions: z.array(z.string()).min(1, "Pick at least one session"),
+  /** "Weekday evenings after 6 PM, Saturday mornings". */
+  freeWhen: z.string().trim().min(3, "Tell us when you are usually free"),
 });
 export type ApplicationBody = z.input<typeof applicationBodySchema>;
 export type ApplicationParsed = z.output<typeof applicationBodySchema>;

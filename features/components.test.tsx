@@ -40,25 +40,48 @@ describe("SlotPicker", () => {
 });
 
 describe("ScoringForm", () => {
-  it("blocks submit until valid, then submits values", async () => {
+  const props = {
+    questions: [{ text: "Walk me through your profile." }, { text: "Why Marketing?" }],
+    p1Readiness: 64,
+    eyebrow: "P2 · Live · Riya",
+    briefHref: "/brief",
+  };
+
+  it("blocks submit until a question is marked and a note is written, then submits", async () => {
     const onSubmit = vi.fn();
     const user = userEvent.setup();
-    render(<ScoringForm onSubmit={onSubmit} />);
+    render(<ScoringForm {...props} onSubmit={onSubmit} />);
 
-    await user.click(screen.getByRole("button", { name: "Send Feedback" }));
+    await user.click(screen.getByRole("button", { name: "Submit feedback" }));
     expect(onSubmit).not.toHaveBeenCalled();
-    expect(await screen.findByText("Pick a verdict")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("Mark at least one question");
 
-    for (const d of ["Structure", "Defensibility", "Composure"]) {
-      await user.click(screen.getByRole("radio", { name: `${d} 4 of 5` }));
-    }
-    await user.click(screen.getByRole("radio", { name: "Ready" }));
-    await user.type(screen.getByLabelText("Feedback note"), "Clear structure, defend the numbers.");
-    await user.click(screen.getByRole("switch", { name: "Send back to builder" }));
-    await user.click(screen.getByRole("button", { name: "Send Feedback" }));
+    await user.click(screen.getByRole("checkbox", { name: "Situation" }));
+    await user.click(screen.getByRole("radio", { name: "Strong" }));
+    await user.click(screen.getByRole("button", { name: "Submit feedback" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("at least 20 characters");
+
+    await user.type(
+      screen.getByLabelText("Note to the student"),
+      "Clear structure, defend the numbers.",
+    );
+    await user.click(screen.getByRole("switch", { name: "Send back to the student's builder" }));
+    await user.click(screen.getByRole("button", { name: "Submit feedback" }));
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit.mock.calls[0]?.[0]).toMatchObject({ verdict: "Ready", sendBack: true });
+    expect(onSubmit.mock.calls[0]?.[0]).toMatchObject({
+      verdict: "Almost There",
+      sendBack: true,
+      scores: { Defensibility: 5 },
+    });
+  });
+
+  it("moves between questions", async () => {
+    const user = userEvent.setup();
+    render(<ScoringForm {...props} onSubmit={() => {}} />);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Question 1 of 2");
+    await user.click(screen.getByRole("button", { name: /Next question/ }));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Question 2 of 2");
   });
 });
 

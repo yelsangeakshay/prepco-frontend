@@ -4,12 +4,12 @@ import { alerts, gotoReady, signInAs } from "./helpers";
 const SCORING_NOTE = "Clear structure. Prepare one defensible number for the pricing trade-off.";
 
 async function fillScore(page: Page, opts: { sendBack?: boolean } = {}) {
-  for (const d of ["Structure", "Defensibility", "Composure"]) {
-    await page.getByRole("radio", { name: `${d} 4 of 5` }).click();
+  await page.getByRole("checkbox", { name: "Situation" }).check();
+  await page.getByRole("radio", { name: "Strong" }).click();
+  await page.getByLabel("Note to the student").fill(SCORING_NOTE);
+  if (opts.sendBack) {
+    await page.getByRole("switch", { name: "Send back to the student's builder" }).click();
   }
-  await page.getByRole("radio", { name: "Almost There" }).click();
-  await page.getByLabel("Feedback note").fill(SCORING_NOTE);
-  if (opts.sendBack) await page.getByRole("switch", { name: "Send back to builder" }).click();
 }
 
 async function pickByText(
@@ -27,24 +27,22 @@ async function pickByText(
 test.describe("Become a panelist", () => {
   test("apply, then ops approves and the roster grows", async ({ page, context }) => {
     await gotoReady(page, "/panelist/apply");
-    await page.getByRole("button", { name: "Submit Application" }).click();
+    await page.getByRole("button", { name: "Submit application" }).click();
     await expect(page.getByText("Enter your full name")).toBeVisible();
     await expect(page.getByText("Enter a valid email")).toBeVisible();
 
     await page.getByLabel("Full name").fill("Meera Kapoor");
     await page.getByLabel("Work email").fill("meera.kapoor@example.com");
-    await page.getByLabel("Function you can assess").selectOption("Finance & Banking");
-    await page.getByLabel("Company").fill("Tailspin Finance");
+    await page.getByRole("radio", { name: "Finance & Banking" }).click();
+    await page.getByLabel("Company (kept private from students)").fill("Tailspin Finance");
     await page.getByLabel("Current role").fill("Associate Director");
-    await page.getByLabel("Years of experience").fill("2");
-    await page.getByLabel("Hours per month").fill("8");
-    await page
-      .getByLabel("Why do you want to join?")
-      .fill("I want to coach students on the finance questions I once got wrong.");
-    await page.getByRole("button", { name: "Submit Application" }).click();
+    await page.getByLabel("Years in the function").fill("2");
+    await page.getByRole("checkbox", { name: "P1 · first mock panel" }).check();
+    await page.getByLabel("When you're usually free").fill("Weekday evenings after 6 PM");
+    await page.getByRole("button", { name: "Submit application" }).click();
     await expect(page.getByText("We need at least 3 years")).toBeVisible();
-    await page.getByLabel("Years of experience").fill("9");
-    await page.getByRole("button", { name: "Submit Application" }).click();
+    await page.getByLabel("Years in the function").fill("9");
+    await page.getByRole("button", { name: "Submit application" }).click();
     await expect(page).toHaveURL(/\/panelist\/apply\/submitted$/);
     await expect(page.getByRole("heading", { name: "Application received" })).toBeVisible();
 
@@ -75,17 +73,17 @@ test.describe("Run a panel", () => {
     await expect(unread).toHaveCount(2);
 
     await unread.first().click();
-    await expect(page.getByRole("heading", { name: /^Brief:/ })).toBeVisible();
-    await expect(page.getByText("Suggested questions")).toBeVisible();
-    await page.getByRole("link", { name: "Start Scoring" }).click();
+    await expect(page.getByRole("heading", { name: /Locked CV/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pull on these" })).toBeVisible();
+    await page.getByRole("link", { name: "Start panel" }).click();
 
     await expect(page).toHaveURL(/\/panelist\/scoring\/b-\d+$/);
-    await page.getByRole("button", { name: "Send Feedback" }).click();
-    await expect(page.getByText("Score every dimension").first()).toBeVisible();
-    await expect(page.getByText("Pick a verdict")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Question 1 of \d+$/ })).toBeVisible();
+    await page.getByRole("button", { name: "Submit feedback" }).click();
+    await expect(page.getByText("Mark at least one question first.")).toBeVisible();
 
     await fillScore(page);
-    await page.getByRole("button", { name: "Send Feedback" }).click();
+    await page.getByRole("button", { name: "Submit feedback" }).click();
     await expect(page.getByTestId("score-sent")).toBeVisible();
     await page.getByRole("link", { name: "Back To Today" }).click();
     if (!isMobile) await expect(season("13")).toBeVisible();
@@ -96,11 +94,11 @@ test.describe("Run a panel", () => {
     await signInAs(context, "panelist");
     await gotoReady(page, "/panelist/scoring");
     await page.getByRole("link", { name: "Score Now" }).first().click();
-    await page.getByRole("radio", { name: "Structure 5 of 5" }).click();
-    await page.getByLabel("Feedback note").fill("A draft note that is long enough to keep.");
+    await page.getByRole("radio", { name: "Strong" }).click();
+    await page.getByLabel("Note to the student").fill("A draft note that is long enough to keep.");
     await page.reload();
     await expect(page.getByText("Restored your unsent draft.")).toBeVisible();
-    await expect(page.getByRole("radio", { name: "Structure 5 of 5" })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Strong" })).toBeChecked();
   });
 
   test("a brief that is not yours is not found", async ({ page, context }) => {
@@ -117,7 +115,7 @@ test.describe("Set availability", () => {
     await expect(page.getByTestId("open-count")).toHaveText("10");
     await expect(page.getByRole("button", { name: "Mon 18:00, booked" })).toBeDisabled();
 
-    const save = page.getByRole("button", { name: "Save Availability" });
+    const save = page.getByRole("button", { name: "Save availability" });
     await expect(save).toBeDisabled();
     await page.getByRole("button", { name: "Sat 19:00" }).click();
     await expect(page.getByTestId("open-count")).toHaveText("11");
@@ -269,10 +267,10 @@ test.describe("One panel, three roles", () => {
     await signInAs(context, "panelist");
     await gotoReady(page, "/panelist/today");
     await gotoReady(page, "/panelist/briefs/s-1004");
-    await expect(page.getByText("Probe these answers")).toBeVisible();
-    await page.getByRole("link", { name: "Start Scoring" }).click();
+    await expect(page.getByRole("heading", { name: "Pull on these" })).toBeVisible();
+    await page.getByRole("link", { name: "Start panel" }).click();
     await fillScore(page, { sendBack: true });
-    await page.getByRole("button", { name: "Send Feedback" }).click();
+    await page.getByRole("button", { name: "Submit feedback" }).click();
     await expect(page.getByTestId("score-sent")).toContainText("sent back");
 
     // 4. Riya: feedback, answer bank and notifications all reflect it.

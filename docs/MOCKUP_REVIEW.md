@@ -211,3 +211,30 @@ is `riya.kulkarni@scmhrd.edu` as drawn (the login mock still accepts `riya@scmhr
 - **Quick Switch** copy is as drawn. "Free, and on for as long as you're looking" and the job boards are mock content.
 - **`Day 0 in 35 days` pill, bell and avatar** come from the shell (batch 0) and differ slightly from the single
   avatar drawn on these boards.
+
+## Batch 3: panelist
+
+Compared with the running app (desktop 1440 px, phone 390 px for the brief): `p01` (apply), `p03` and `p03-mobile` (pre-panel brief), `p04` (live scoring), `p05` (availability). `p02` Today was done earlier.
+
+### What differed and what changed
+
+| Screen          | Was                                                                                    | Now                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1 apply        | Narrow centred card, a function select, company, hours per month and a "why" textarea  | Header bar with the wordmark and "Panelist sign in". Left: "Sit on the side of the table students never see.", the lead and the navy "Who we look for" card. Right: two-column form (name, work email, role, company kept private, years in the function, LinkedIn), function pills, six "Sessions you can run" checkboxes, "When you're usually free", the reply note and "Submit application". Hours per month and "why" are gone because the mockup does not draw them               |
+| P3 brief        | A single column of cards (header, CV highlights, probe list, suggested questions)      | Avatar header with "Download locked CV" and "Start panel". "Pull on these" (numbered, "From P1 + the CV"), "Locked CV · work experience" with a score chip per bullet and the "V4 · Locked · Score 84" pill; right column: P1 readiness bar and quote, profiling call notes, "Since P1" and the "Co-interviewing" card. Phone: back chevron, "P2 · 7:30 PM tonight", P1 readiness, Flagged / Not drafted pills, one CV bullet with "V4 · 84", profiling notes, full-width "Start panel" |
+| P4 live scoring | Brief beside a form with three 1 to 5 scores, a verdict, a note and a send-back switch | "Question N of M" with the LIVE pill, "Back to brief" and "Submit feedback". Question list (check marks when marked), the question card (Flagged at P1 pill, "What landed" Situation / Decision / Result, Strong / Okay / Needs work, "Note to the student", send-back switch, Previous and Next), and the right column with the readiness slider ("P1: 64%", "Your read after this panel") and "P1 note on this question". On a phone the list becomes a row of numbered buttons       |
+| P5 availability | One card with a weekly grid and a Save button                                          | "Week of 5 Oct" with Previous week, Next week and Save availability. Date headings, booked cells show the kind and the student ("Deep-dive Aditya R."), open cells are green, empty cells dashed, the BOOKED / OPEN / EMPTY legend, and the "Recent and upcoming" table (date, student, session, status pill)                                                                                                                                                                           |
+
+Supporting changes: the brief response gained the student plan, the locked CV with scored bullets, answer status, profiling notes and `sinceLastPanel`; the availability response gained `bookedPanels` and `panels`; the application body is now `sessions[]` and `freeWhen` (no `hoursPerMonth` or `why`; the ops queue shows the two new fields as its "why" line); the grid has a 9:00 PM row so a booked 9 PM panel is visible.
+
+### Left as it was, with reason
+
+- **How the per-question marks become the stored score is Proposed.** p04 draws per-question fields and a readiness slider but no Structure, Defensibility or Composure scores. The submit button turns them into the three stored scores (Structure from what landed, Defensibility from the verdicts, Composure and the overall verdict from the slider) so the student and ops screens keep working. The drawn "Fields below are a proposal" label stays.
+- **Send-back is per question in the mockup, one flag in the API.** Any question sent back sets the single flag; the mock still flags up to two answers.
+- **Download locked CV** shows a toast; there is no file in the mock. **Co-interviewing** is shown for P2 only and is Proposed.
+- **Phone "Start panel"** sits at the end of the page, not pinned: the bottom tab bar already uses the pinned space.
+- **Phone availability and scoring** have no mockup; they reuse the desktop layout (the grid scrolls inside its card).
+- **Briefs and scoring lists, the "Application received" page and the panelist profile** are not drawn, so they keep their earlier layout.
+- **Dates.** The mockups are dated Mon 12 Oct; the app clock is Mon 5 Oct, so the week and the "Tonight" rows read 5 Oct.
+- **LinkedIn** accepts any link that contains linkedin.com/in/, as the placeholder shows.
+- **Sample numbers** (the 100 and 60 bullet scores, the three probe questions) come from the existing fixtures, not the drawn 86, 89, 71, 64.

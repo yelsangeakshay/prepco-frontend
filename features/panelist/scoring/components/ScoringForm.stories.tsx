@@ -4,12 +4,22 @@ import { ScoringForm } from "./ScoringForm";
 const meta: Meta<typeof ScoringForm> = {
   title: "Panelist/ScoringForm",
   component: ScoringForm,
-  args: { onSubmit: () => {} },
-  render: (a) => (
-    <div className="max-w-xl p-6">
-      <ScoringForm {...a} />
-    </div>
-  ),
+  args: {
+    onSubmit: () => {},
+    eyebrow: "P2 · Live · Riya Kulkarni",
+    briefHref: "#",
+    p1Readiness: 64,
+    questions: [
+      { text: "Walk me through your profile." },
+      { text: "Why Sales & Marketing?" },
+      {
+        text: "You already have experience. Why should we hire you as an MT?",
+        tag: "Flagged at P1",
+        p1Note: "You name the experience but never say what changes for us.",
+      },
+      { text: "Your own question" },
+    ],
+  },
 };
 export default meta;
 type S = StoryObj<typeof ScoringForm>;
@@ -18,10 +28,15 @@ export const Empty: S = {};
 export const Filled: S = {
   args: {
     defaultValues: {
-      scores: { Structure: 4, Defensibility: 3, Composure: 5 },
-      verdict: "Almost There",
-      note: "Good structure. Prepare a defensible number for pricing.",
-      sendBack: true,
+      readiness: 72,
+      answers: [
+        {
+          landed: { Situation: true, Decision: true, Result: false },
+          verdict: "Okay",
+          note: "Much better than P1. Close with what you would own in 90 days.",
+          sendBack: true,
+        },
+      ],
     },
   },
 };
