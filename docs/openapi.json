@@ -5667,25 +5667,18 @@
                     "maximum": 40
                   },
                   "linkedin": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "format": "uri"
-                      },
-                      {
-                        "type": "string",
-                        "const": ""
-                      }
-                    ]
+                    "type": "string"
                   },
-                  "hoursPerMonth": {
-                    "type": "number",
-                    "minimum": 2,
-                    "maximum": 40
+                  "sessions": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
-                  "why": {
+                  "freeWhen": {
                     "type": "string",
-                    "minLength": 30
+                    "minLength": 3
                   }
                 },
                 "required": [
@@ -5696,8 +5689,8 @@
                   "role",
                   "years",
                   "linkedin",
-                  "hoursPerMonth",
-                  "why"
+                  "sessions",
+                  "freeWhen"
                 ],
                 "additionalProperties": false
               }
@@ -6178,6 +6171,9 @@
                         },
                         "readiness": {
                           "type": "number"
+                        },
+                        "plan": {
+                          "type": "string"
                         }
                       },
                       "required": [
@@ -6187,7 +6183,8 @@
                         "track",
                         "target",
                         "background",
-                        "readiness"
+                        "readiness",
+                        "plan"
                       ],
                       "additionalProperties": false
                     },
@@ -6196,6 +6193,42 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "cv": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "string"
+                        },
+                        "score": {
+                          "type": "number"
+                        },
+                        "bullets": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "text": {
+                                "type": "string"
+                              },
+                              "score": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "text",
+                              "score"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "score",
+                        "bullets"
+                      ],
+                      "additionalProperties": false
                     },
                     "answersToProbe": {
                       "type": "array",
@@ -6207,11 +6240,19 @@
                           },
                           "why": {
                             "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "flagged",
+                              "not-drafted"
+                            ]
                           }
                         },
                         "required": [
                           "question",
-                          "why"
+                          "why",
+                          "status"
                         ],
                         "additionalProperties": false
                       }
@@ -6229,12 +6270,16 @@
                             },
                             "headline": {
                               "type": "string"
+                            },
+                            "startsAt": {
+                              "type": "string"
                             }
                           },
                           "required": [
                             "panelist",
                             "verdict",
-                            "headline"
+                            "headline",
+                            "startsAt"
                           ],
                           "additionalProperties": false
                         },
@@ -6242,6 +6287,25 @@
                           "type": "null"
                         }
                       ]
+                    },
+                    "profilingNotes": {
+                      "type": "object",
+                      "properties": {
+                        "dateLabel": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "dateLabel",
+                        "text"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "sinceLastPanel": {
+                      "type": "string"
                     },
                     "suggestedQuestions": {
                       "type": "array",
@@ -6256,8 +6320,11 @@
                     "startsAt",
                     "student",
                     "cvHighlights",
+                    "cv",
                     "answersToProbe",
                     "previousFeedback",
+                    "profilingNotes",
+                    "sinceLastPanel",
                     "suggestedQuestions"
                   ],
                   "additionalProperties": false
@@ -6601,11 +6668,77 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "bookedPanels": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string"
+                          },
+                          "student": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "startsAt",
+                          "kind",
+                          "student"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "panels": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "student": {
+                            "type": "string"
+                          },
+                          "session": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "Upcoming",
+                              "Tonight",
+                              "Feedback due",
+                              "Feedback sent"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "startsAt",
+                          "student",
+                          "session",
+                          "status"
+                        ],
+                        "additionalProperties": false
+                      }
                     }
                   },
                   "required": [
                     "slots",
-                    "booked"
+                    "booked",
+                    "bookedPanels",
+                    "panels"
                   ],
                   "additionalProperties": false
                 }
@@ -6666,11 +6799,77 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "bookedPanels": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string"
+                          },
+                          "student": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "startsAt",
+                          "kind",
+                          "student"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "panels": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sessionId": {
+                            "type": "string"
+                          },
+                          "startsAt": {
+                            "type": "string"
+                          },
+                          "student": {
+                            "type": "string"
+                          },
+                          "session": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "Upcoming",
+                              "Tonight",
+                              "Feedback due",
+                              "Feedback sent"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "sessionId",
+                          "startsAt",
+                          "student",
+                          "session",
+                          "status"
+                        ],
+                        "additionalProperties": false
+                      }
                     }
                   },
                   "required": [
                     "slots",
-                    "booked"
+                    "booked",
+                    "bookedPanels",
+                    "panels"
                   ],
                   "additionalProperties": false
                 }

@@ -95,12 +95,41 @@ function brief(scenario: Scenario | null, x: BookingRec) {
     ? st.answers
         .filter((a) => a.status === "flagged")
         .slice(0, 3)
-        .map((a) => ({ question: a.question, why: a.critique ?? "Flagged for more work." }))
+        .map((a) => ({
+          question: a.question,
+          why: a.critique ?? "Flagged for more work.",
+          status: "flagged" as const,
+        }))
     : [
-        { question: "Tell me about a failure", why: "Draft has no number and no lesson." },
-        { question: "Why this function?", why: "Motivation reads generic." },
-        { question: "Tell me about a trade-off you made", why: "Cost of the choice is missing." },
+        {
+          question: "Tell me about a failure",
+          why: "Draft has no number and no lesson.",
+          status: "flagged" as const,
+        },
+        {
+          question: "Why this function?",
+          why: "Motivation reads generic.",
+          status: "flagged" as const,
+        },
+        {
+          question: "Tell me about a trade-off you made",
+          why: "Cost of the choice is missing.",
+          status: "not-drafted" as const,
+        },
       ];
+
+  // Bullet scores follow the three tests the builder uses: a decision, a number, a trade-off.
+  const cvBullets = isRiya
+    ? st.cv.sections
+        .flatMap((s) => s.bullets)
+        .slice(0, 4)
+        .map((b) => ({
+          text: b.text,
+          score: 40 + 20 * [b.hasDecision, b.hasNumber, b.hasTradeoff].filter(Boolean).length,
+        }))
+    : cvHighlights.map((text, i) => ({ text, score: Math.max(40, student.cvScore - i * 9) }));
+  const planName =
+    student.plan === "none" ? "Free" : student.plan[0]!.toUpperCase() + student.plan.slice(1);
 
   const prev = isRiya
     ? [...w.feedbacks].sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0]
@@ -118,17 +147,94 @@ function brief(scenario: Scenario | null, x: BookingRec) {
       target: student.function,
       background: student.background,
       readiness: student.readiness,
+      plan: `${planName} · ${student.track}`,
     },
     cvHighlights,
+    cv: {
+      version: "V4",
+      score: isRiya ? (st.cv.lockedScores?.overall ?? student.cvScore) : student.cvScore,
+      bullets: cvBullets,
+    },
     answersToProbe,
     previousFeedback: prev
-      ? { panelist: prev.panelist, verdict: prev.verdict, headline: prev.headline }
+      ? {
+          panelist: prev.panelist,
+          verdict: prev.verdict,
+          headline: prev.headline,
+          startsAt: prev.startsAt,
+        }
       : null,
+    profilingNotes: {
+      dateLabel: "14 Sep",
+      text: `${student.background}. Undersells decisions and defaults to "we". ${planName}, ${student.track} track.`,
+    },
+    sinceLastPanel: isRiya
+      ? `${st.answers.filter((a) => a.status === "flagged").length} answers flagged · ${st.answers.filter((a) => a.status === "not-drafted").length} still not drafted · CV unchanged since lock`
+      : "Nothing recorded since the last panel",
     suggestedQuestions: [
       `Why ${student.function} and not another function?`,
       "Walk me through the decision you are proudest of. What did it cost?",
       "What would you do differently in your first 90 days?",
     ],
+  };
+}
+
+/** "P2", "P1" or "Deep-dive" from a booking title. */
+const kindOf = (title: string) => (/^P\d/.test(title) ? title.slice(0, 2) : "Deep-dive");
+
+/** "Aditya R." */
+const shortName = (name: string) => {
+  const [first, ...rest] = name.split(" ");
+  return rest.length ? `${first} ${rest[rest.length - 1]![0]}.` : name;
+};
+
+function availabilityBody(scenario: Scenario | null) {
+  const w = getWorld(scenario);
+  const upcoming = allBookings(scenario).filter(
+    (x) => x.panelistId === ME && x.status === "upcoming" && x.startsAt,
+  );
+  const booked = upcoming.map((x) => slotKey(x.startsAt!));
+  // A booked panel always counts as an open slot, so the grid never contradicts the calendar.
+  const slots = {
+    ...(w.availability[ME] ?? {}),
+    ...Object.fromEntries(booked.map((k) => [k, true])),
+  };
+  const items = mine(scenario);
+  const nearest = items
+    .filter((i) => i.status === "upcoming")
+    .sort(byTime)
+    .slice(0, 4);
+  const toScore = items.filter((i) => i.status === "awaiting-score");
+  const sent = items
+    .filter((i) => i.status === "scored")
+    .sort((a, b) => byTime(b, a))
+    .slice(0, 2);
+  const panels = [...nearest, ...toScore, ...sent]
+    .sort((a, b) => byTime(b, a))
+    .map((i) => ({
+      sessionId: i.sessionId,
+      startsAt: i.startsAt,
+      student: i.studentName,
+      session: i.title,
+      status:
+        i.status === "scored"
+          ? ("Feedback sent" as const)
+          : i.status === "awaiting-score"
+            ? ("Feedback due" as const)
+            : istDate(i.startsAt) === TODAY
+              ? ("Tonight" as const)
+              : ("Upcoming" as const),
+    }));
+  return {
+    slots,
+    booked: [...new Set(booked)],
+    bookedPanels: upcoming.map((x) => ({
+      key: slotKey(x.startsAt!),
+      startsAt: x.startsAt!,
+      kind: kindOf(x.title),
+      student: shortName(x.studentName),
+    })),
+    panels,
   };
 }
 
@@ -283,17 +389,7 @@ export const panelistHandlers = [
 
   http.get(`${API_BASE_URL}/availability`, async ({ request }) => {
     await latency();
-    const scenario = scenarioOf(request);
-    const w = getWorld(scenario);
-    const booked = allBookings(scenario)
-      .filter((x) => x.panelistId === ME && x.status === "upcoming" && x.startsAt)
-      .map((x) => slotKey(x.startsAt!));
-    // A booked panel always counts as an open slot, so the grid never contradicts the calendar.
-    const slots = {
-      ...(w.availability[ME] ?? {}),
-      ...Object.fromEntries(booked.map((k) => [k, true])),
-    };
-    return HttpResponse.json({ slots, booked: [...new Set(booked)] });
+    return HttpResponse.json(availabilityBody(scenarioOf(request)));
   }),
 
   http.put(`${API_BASE_URL}/availability`, async ({ request }) => {
@@ -316,7 +412,7 @@ export const panelistHandlers = [
       }
     }
     w.availability[ME] = Object.fromEntries(Object.entries(body.slots).filter(([, v]) => v));
-    return HttpResponse.json({ slots: w.availability[ME], booked: [...booked] });
+    return HttpResponse.json(availabilityBody(scenario));
   }),
 
   http.post(`${API_BASE_URL}/panelist/applications`, async ({ request }) => {
@@ -329,7 +425,8 @@ export const panelistHandlers = [
       company: string;
       role: string;
       years: number;
-      why: string;
+      sessions: string[];
+      freeWhen: string;
     };
     if (w.applications.some((a) => a.email.toLowerCase() === b.email.toLowerCase())) {
       return apiError(409, "already_applied", "An application with this email already exists.");
@@ -343,7 +440,7 @@ export const panelistHandlers = [
       company: b.company,
       role: b.role,
       years: Number(b.years),
-      why: b.why,
+      why: `Can run: ${b.sessions.join(", ")}. Usually free: ${b.freeWhen}.`,
       submittedAt: NOW,
       status: "pending",
     });

@@ -63,3 +63,5 @@ The mockup PNGs are now in design/mockups/. Home, Panelist Today, Ops Overview, 
 Batch 1 (student early flow) is done: sign in and sign up, account recovery, onboarding steps 1 and 2, CV upload, the free session summary and the late joiner screen were compared with s01, s02, s03 (and phone), e01, e02 and e03 and brought in line. See docs/MOCKUP_REVIEW.md, section "Batch 1". The CV builder (s06) was not touched.
 
 Batch 2 (student sessions, tools and account) is done: sessions and runway, panel feedback, the answer bank, journey, case track, Quick Switch, plan and billing and profile were compared with s08 to s15 (and the phone files for s08, s09, s10 and s14) and brought in line. S7 (CV version history) is part of the CV builder and was not touched. See docs/MOCKUP_REVIEW.md, section "Batch 2".
+
+Batch 3 (panelist) is done: the apply form, the pre-panel brief (and phone), live scoring and availability were compared with p01, p03, p03-mobile, p04 and p05 and brought in line. See docs/MOCKUP_REVIEW.md, section "Batch 3".

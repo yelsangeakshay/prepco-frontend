@@ -212,9 +212,9 @@ describe("ops actions", () => {
       company: "Acme",
       role: "VP",
       years: 9,
-      hoursPerMonth: 6,
       linkedin: "",
-      why: "I want to help students prepare for finance panels well.",
+      sessions: ["P1 · first mock panel"],
+      freeWhen: "Weekday evenings after 6 PM",
     };
     expect((await postApplication(body)).status).toBe("received");
     expect(await code(postApplication(body))).toBe("already_applied");
