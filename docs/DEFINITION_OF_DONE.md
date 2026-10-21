@@ -6,7 +6,7 @@ not done and why. Nothing is ticked on trust.
 Checks that apply to every row:
 
 - **Mockup**: layout matched against the mockup PNG at 1280 px, and at 390 px where a phone mockup exists.
-  **Checked only for S4, E4, S5, E8, P2 and A1** (Mockup fidelity pass); open for all other screens. Layout elsewhere follows the
+  **Checked only for S1, E1, S2, E2, E3, S3, S4, E4, S5, E8, P2 and A1** (Mockup fidelity pass); open for all other screens. Layout elsewhere follows the
   brief's text and design tokens only. This is the one box that needs a human with the PNGs.
 - **Reachable**: opened through the sidebar, or through the previous journey step. `foundation.spec`
   crawls every nav link per role; journeys cover the in-page links.
@@ -22,12 +22,12 @@ Checks that apply to every row:
 
 | Code    | Screen                                                        | Route                                                          | Mockup        | Other boxes | Journey spec                                     |
 | ------- | ------------------------------------------------------------- | -------------------------------------------------------------- | ------------- | ----------- | ------------------------------------------------ |
-| S1      | Sign in, sign up                                              | `/sign-in`, `/sign-up`                                         | open          | yes         | Join and buy a plan; Locked out / wrong email    |
-| E1      | Forgot, reset, verify email                                   | `/forgot-password`, `/reset-password/[token]`, `/verify-email` | open          | yes         | Locked out / wrong email                         |
-| S2      | Onboarding 1 to 3                                             | `/onboarding/[step]`                                           | open          | yes         | Join and buy a plan                              |
-| E2      | CV upload                                                     | `/onboarding/cv-upload`                                        | open          | yes         | Join and buy a plan; `cv-upload-failed` scenario |
-| E3      | Late joiner                                                   | banner on `/home`, `/onboarding/[step]`                        | open          | yes         | Joined late                                      |
-| S3      | Free session                                                  | `/free-session`                                                | open          | yes         | Join and buy a plan                              |
+| S1      | Sign in, sign up                                              | `/sign-in`, `/sign-up`                                         | yes (checked) | yes         | Join and buy a plan; Locked out / wrong email    |
+| E1      | Forgot, reset, verify email                                   | `/forgot-password`, `/reset-password/[token]`, `/verify-email` | yes (checked) | yes         | Locked out / wrong email                         |
+| S2      | Onboarding 1 to 3                                             | `/onboarding/[step]`                                           | yes (checked) | yes         | Join and buy a plan                              |
+| E2      | CV upload                                                     | `/onboarding/cv-upload`                                        | yes (checked) | yes         | Join and buy a plan; `cv-upload-failed` scenario |
+| E3      | Late joiner                                                   | `/plans`, banner on `/home`, `/onboarding/[step]`              | yes (checked) | yes         | Joined late                                      |
+| S3      | Free session                                                  | `/free-session`                                                | yes (checked) | yes         | Join and buy a plan                              |
 | E12     | Free session already used (defined by me, see OPEN_DECISIONS) | `/free-session`                                                | open          | yes         | `returning-student` scenario                     |
 | S4      | Plans, checkout                                               | `/plans`, `/checkout/[plan]`                                   | yes (checked) | yes         | Join and buy a plan                              |
 | E4      | Payment failed, receipt                                       | `/checkout/[plan]`                                             | yes (checked) | yes         | Payment fails                                    |

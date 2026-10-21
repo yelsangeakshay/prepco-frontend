@@ -34,7 +34,12 @@ export function Wordmark({ tagline, tone = "dark", className }: Props) {
         </span>
       </span>
       {tagline && (
-        <span className="text-gold-500 mt-1 text-[10px] font-semibold tracking-[0.16em] uppercase">
+        <span
+          className={cn(
+            "mt-1 text-[10px] font-semibold tracking-[0.16em] uppercase",
+            dark ? "text-gold-500" : "text-[#7a5d17]",
+          )}
+        >
           {tagline}
         </span>
       )}

@@ -13,6 +13,7 @@ import { ROUTES } from "@/lib/config/routes";
 import { cn } from "@/lib/utils/cn";
 import { usePlans } from "../hooks/usePlans";
 import { TRACKS, type Plan, type Track } from "../schemas";
+import { LateJoinerView } from "./LateJoinerView";
 import { PlanCard } from "./PlanCard";
 
 const TRACK_LABEL: Record<Track, string> = { finals: "Finals", summers: "Summers" };
@@ -24,6 +25,8 @@ export function PlansView() {
   const [chosen, setChosen] = useState<Plan["id"]>("premium");
   const { data, isPending, isError, refetch } = usePlans(track);
   const selected = data?.items.find((p) => p.id === chosen);
+
+  if (data?.lateJoiner) return <LateJoinerView data={data.lateJoiner} />;
 
   return (
     <div className="mx-auto max-w-6xl p-4 md:p-8">

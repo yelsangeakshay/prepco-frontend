@@ -90,6 +90,11 @@ Owner decisions from design/mockups/review.png. Each has a proposed policy in th
 
 Deviations from the mockups, all Proposed:
 
+- Batch 1: the CV history consent box stays unticked by default and is required; the mockup draws it ticked.
+- Batch 1: the runway callout on onboarding step 2 words the under-8-weeks case itself; the mockup only draws the 9 weeks case.
+- Batch 1: the late joiner policy (what is dropped, the Basic + one top-up recommendation) is drawn as a Proposed policy and is not confirmed.
+- Batch 1: the "Reschedule" and "Add to calendar" buttons on the free session do not talk to Calendly yet.
+
 - The phone tab bar keeps a fifth More/Account tab for panelist and ops, which the mockups do not draw.
 - Feedback overdue is seeded as 0 in the mock world.
 - Student and panelist function taxonomies differ. The mapping in PANEL_FOR_TARGET (features/onboarding/schemas.ts) is an assumption.

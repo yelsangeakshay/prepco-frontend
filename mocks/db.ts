@@ -190,7 +190,7 @@ export function getDb(scenario: Scenario | null): Db {
       raceHit: false,
       checkouts: new Map(),
       waitlistCount: 41,
-      freeSessionBookedAt: scenario === "returning-student" ? at("09-02", 19) : null,
+      freeSessionBookedAt: scenario === "returning-student" ? "2026-09-08T18:30:00+05:30" : null,
       signedUpEmails: new Set(),
     };
     const snap = readSection<DbSnapshot>("db", scenario);

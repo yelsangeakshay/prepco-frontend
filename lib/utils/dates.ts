@@ -14,6 +14,17 @@ export function formatDay(input: Date | string): string {
   return `${p.weekday} ${p.day} ${p.month}`;
 }
 
+/** "Tue, 8 Sep 2026" */
+export function formatDayYear(input: Date | string): string {
+  const p = parts(new Date(input), {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  return `${p.weekday}, ${p.day} ${(p.month ?? "").replace(/^Sept$/, "Sep")} ${p.year}`;
+}
+
 /** "7:00 PM" */
 export function formatTime(input: Date | string): string {
   const p = parts(new Date(input), { hour: "numeric", minute: "2-digit", hour12: true });
