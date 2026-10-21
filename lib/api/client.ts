@@ -3,7 +3,8 @@ import { SCENARIO_HEADER } from "@/lib/config/scenarios";
 import { SCENARIO_COOKIE } from "@/lib/auth/roles";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api/v1";
-export const API_MOCKING = process.env.NEXT_PUBLIC_API_MOCKING === "on";
+/** Mock data is on unless NEXT_PUBLIC_API_MOCKING is "off", so a deploy needs no environment variable. */
+export const API_MOCKING = process.env.NEXT_PUBLIC_API_MOCKING !== "off";
 
 export class ApiError extends Error {
   constructor(
