@@ -256,6 +256,8 @@ export const panelistHandlers = [
           if (a.status === "rehearsed") {
             a.status = "flagged";
             a.critique = `${ARJUN.name} sent this back: rework it before your next panel.`;
+            a.noteTags = ["decision", "result"];
+            a.flaggedAt = "P2 · 12 Oct";
             n++;
           }
         }

@@ -224,13 +224,19 @@ test.describe("Home, sessions and feedback (Riya)", () => {
       await expect(page.getByText("4 need work").locator("visible=true").first()).toBeVisible();
   });
 
-  test("feedback list opens detail", async ({ page, context }) => {
+  test("feedback list opens detail", async ({ page, context, isMobile }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/feedback");
     await page.getByRole("link", { name: /Arjun Mehta/ }).click();
     await expect(page).toHaveURL(/\/feedback\/p-1001$/);
-    await expect(page.getByText("Almost There")).toBeVisible();
-    await expect(page.getByText("Defensibility")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Question by question" })).toBeVisible();
+    await expect(page.getByText("2 sent to your builder")).toBeVisible();
+    if (!isMobile) await expect(page.getByText("Fix before P2 · Mon 12 Oct")).toBeVisible();
+    await expect(page.getByRole("progressbar", { name: "Readiness for Day 0" })).toHaveAttribute(
+      "aria-valuenow",
+      "64",
+    );
+    await expect(page.getByText("Strong on the numbers, weak on the why.")).toBeVisible();
   });
 
   test("feedback is empty on first login runway", async ({ page, context }) => {
@@ -245,6 +251,22 @@ test.describe("Home, sessions and feedback (Riya)", () => {
     await expect(page.getByRole("link", { name: /P2: external specialist panel/ })).toBeVisible();
     await page.getByRole("link", { name: /Domain deep-dive/ }).click();
     await expect(page).toHaveURL(/\/sessions\/s-1003$/);
+  });
+
+  test("sessions runway: pick the P2 slot inline and confirm it", async ({ page, context }) => {
+    await signInAsRiya(context);
+    await gotoReady(page, "/sessions");
+    await expect(page.getByText("Day 0 in 35 days").locator("visible=true").first()).toBeVisible();
+    await expect(
+      page.getByRole("radiogroup", { name: "Available slots" }).getByRole("radio"),
+    ).toHaveCount(4);
+    // The second slot is drawn chosen; pick the first, then the drawn one again.
+    await page.getByRole("radio").first().click();
+    await expect(page.getByRole("button", { name: "Confirm Mon 12 Oct, 6:00 PM" })).toBeVisible();
+    await page.getByRole("radio").nth(1).click();
+    await page.getByRole("button", { name: "Confirm Mon 12 Oct, 7:30 PM" }).click();
+    await expect(page.getByText("Session booked")).toBeVisible();
+    await expect(page.getByRole("radiogroup", { name: "Available slots" })).toHaveCount(0);
   });
 });
 

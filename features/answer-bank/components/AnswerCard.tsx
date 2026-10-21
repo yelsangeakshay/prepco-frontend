@@ -1,42 +1,58 @@
-import { Card } from "@/components/ui/card";
-import { FlaggedBadge, NotDraftedBadge, RehearsedBadge } from "@/components/shared/Badges";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils/cn";
+import type { AnswerSummary } from "../schemas";
 
-export type AnswerStatus = "rehearsed" | "flagged" | "not-drafted";
+export type AnswerStatus = AnswerSummary["status"];
+
+const BADGE: Record<AnswerStatus, { label: string; tone: "green" | "maroonSoft" | "neutral" }> = {
+  rehearsed: { label: "Rehearsed", tone: "green" },
+  flagged: { label: "Flagged", tone: "maroonSoft" },
+  "not-drafted": { label: "Not drafted", tone: "neutral" },
+};
 
 interface Props {
   question: string;
   status: AnswerStatus;
-  snippet?: string;
-  critique?: string;
-  onOpen?: () => void;
+  /** The row that is open on the right (desktop) or highlighted (phone). */
+  selected?: boolean;
+  /** The panel note, shown on phones under a selected flagged row; desktop shows it in the editor. */
+  critique?: string | null;
+  noteTags?: AnswerSummary["noteTags"];
 }
 
-export function AnswerCard({ question, status, snippet, critique, onOpen }: Props) {
+/** One row of the answer list (s08.png): the question and its status. */
+export function AnswerCard({ question, status, selected, critique, noteTags = [] }: Props) {
+  const badge = BADGE[status];
   return (
-    <Card>
+    <div
+      className={cn(
+        "rounded-card min-h-14 border bg-white p-4 transition-colors",
+        selected ? "border-maroon-600 border-2" : "border-line hover:bg-cream-soft",
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-sm font-semibold">{question}</h3>
-        {status === "rehearsed" && <RehearsedBadge />}
-        {status === "flagged" && <FlaggedBadge />}
-        {status === "not-drafted" && <NotDraftedBadge />}
+        <span className={cn("text-base leading-snug", selected && "font-semibold")}>
+          {question}
+        </span>
+        <Badge tone={badge.tone} className="shrink-0">
+          {badge.label}
+        </Badge>
       </div>
-      {snippet ? (
-        <p className="text-navy-400 mt-2 line-clamp-2 text-sm">{snippet}</p>
-      ) : (
-        <p className="text-navy-400 mt-2 text-sm italic">No draft yet.</p>
+      {selected && status === "flagged" && critique && (
+        <div className="mt-2 lg:hidden">
+          <p className="text-maroon-600 text-sm">{critique}</p>
+          <ul aria-label="Parts the note is about" className="mt-2 flex flex-wrap gap-2">
+            {noteTags.map((t) => (
+              <li
+                key={t}
+                className="bg-cream-soft text-navy-900 rounded-full px-3 py-1 text-[11px] font-bold tracking-wider uppercase"
+              >
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-      {critique && status === "flagged" && (
-        <p className="bg-maroon-100 text-maroon-600 rounded-control mt-3 p-3 text-sm">{critique}</p>
-      )}
-      {onOpen && (
-        <button
-          type="button"
-          onClick={onOpen}
-          className="text-maroon-600 mt-3 min-h-11 text-sm font-semibold underline"
-        >
-          {status === "not-drafted" ? "Start Draft" : "Open Answer"}
-        </button>
-      )}
-    </Card>
+    </div>
   );
 }

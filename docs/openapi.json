@@ -405,7 +405,7 @@
                   },
                   "day0Date": {
                     "type": "string",
-                    "pattern": "^d{4}-d{2}-d{2}$"
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
                   },
                   "companies": {
                     "type": "string",
@@ -1523,6 +1523,12 @@
                             "week": {
                               "type": "string"
                             },
+                            "blurb": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
                             "kind": {
                               "type": "string",
                               "enum": [
@@ -1797,6 +1803,12 @@
                           "week": {
                             "type": "string"
                           },
+                          "blurb": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
                           "kind": {
                             "type": "string",
                             "enum": [
@@ -1931,6 +1943,12 @@
                     },
                     "week": {
                       "type": "string"
+                    },
+                    "blurb": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "kind": {
                       "type": "string",
@@ -2139,6 +2157,12 @@
                     "week": {
                       "type": "string"
                     },
+                    "blurb": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
                     "kind": {
                       "type": "string",
                       "enum": [
@@ -2284,6 +2308,12 @@
                     "week": {
                       "type": "string"
                     },
+                    "blurb": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
                     "kind": {
                       "type": "string",
                       "enum": [
@@ -2409,6 +2439,12 @@
                     },
                     "week": {
                       "type": "string"
+                    },
+                    "blurb": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "kind": {
                       "type": "string",
@@ -2657,6 +2693,92 @@
                     },
                     "sentBackToBuilder": {
                       "type": "boolean"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "badge": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "panelistBlurb": {
+                      "type": "string"
+                    },
+                    "readiness": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "readinessNote": {
+                      "type": "string"
+                    },
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "question": {
+                            "type": "string"
+                          },
+                          "rating": {
+                            "type": "string",
+                            "enum": [
+                              "strong",
+                              "okay",
+                              "flagged"
+                            ]
+                          },
+                          "comment": {
+                            "type": "string"
+                          },
+                          "short": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "situation",
+                                "decision",
+                                "result"
+                              ]
+                            }
+                          },
+                          "answerId": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "question",
+                          "rating",
+                          "comment",
+                          "tags",
+                          "answerId"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "fixBefore": {
+                      "type": "string"
+                    },
+                    "fixes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                   },
                   "required": [
@@ -3223,6 +3345,14 @@
             }
           },
           {
+            "name": "round",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "q",
             "in": "query",
             "required": false,
@@ -3269,6 +3399,13 @@
                           "category": {
                             "type": "string"
                           },
+                          "round": {
+                            "type": "string",
+                            "enum": [
+                              "fit",
+                              "cv"
+                            ]
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -3288,15 +3425,28 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "noteTags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "situation",
+                                "decision",
+                                "result"
+                              ]
+                            }
                           }
                         },
                         "required": [
                           "id",
                           "question",
                           "category",
+                          "round",
                           "status",
                           "snippet",
-                          "critique"
+                          "critique",
+                          "noteTags"
                         ],
                         "additionalProperties": false
                       }
@@ -3333,6 +3483,22 @@
                         "notDrafted"
                       ],
                       "additionalProperties": false
+                    },
+                    "rounds": {
+                      "type": "object",
+                      "properties": {
+                        "fit": {
+                          "type": "number"
+                        },
+                        "cv": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "fit",
+                        "cv"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
@@ -3340,7 +3506,8 @@
                     "total",
                     "page",
                     "pageSize",
-                    "counts"
+                    "counts",
+                    "rounds"
                   ],
                   "additionalProperties": false
                 }
@@ -3383,6 +3550,13 @@
                     "category": {
                       "type": "string"
                     },
+                    "round": {
+                      "type": "string",
+                      "enum": [
+                        "fit",
+                        "cv"
+                      ]
+                    },
                     "status": {
                       "type": "string",
                       "enum": [
@@ -3403,8 +3577,39 @@
                         "null"
                       ]
                     },
+                    "noteTags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "situation",
+                          "decision",
+                          "result"
+                        ]
+                      }
+                    },
                     "draft": {
                       "type": "string"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "situation": {
+                          "type": "string"
+                        },
+                        "decision": {
+                          "type": "string"
+                        },
+                        "result": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "situation",
+                        "decision",
+                        "result"
+                      ],
+                      "additionalProperties": false
                     },
                     "inlineCritique": {
                       "type": "array",
@@ -3424,17 +3629,49 @@
                         ],
                         "additionalProperties": false
                       }
+                    },
+                    "flaggedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "draftNo": {
+                      "type": "number"
+                    },
+                    "savedLabel": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "rehearseNext": {
+                      "type": "boolean"
+                    },
+                    "nextPanel": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
                     "id",
                     "question",
                     "category",
+                    "round",
                     "status",
                     "snippet",
                     "critique",
+                    "noteTags",
                     "draft",
-                    "inlineCritique"
+                    "parts",
+                    "inlineCritique",
+                    "flaggedAt",
+                    "draftNo",
+                    "savedLabel",
+                    "rehearseNext",
+                    "nextPanel"
                   ],
                   "additionalProperties": false
                 }
@@ -3478,6 +3715,21 @@
                   "draft": {
                     "type": "string"
                   },
+                  "parts": {
+                    "type": "object",
+                    "properties": {
+                      "situation": {
+                        "type": "string"
+                      },
+                      "decision": {
+                        "type": "string"
+                      },
+                      "result": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
                   "status": {
                     "type": "string",
                     "enum": [
@@ -3485,6 +3737,9 @@
                       "flagged",
                       "not-drafted"
                     ]
+                  },
+                  "rehearseNext": {
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -3509,6 +3764,13 @@
                     "category": {
                       "type": "string"
                     },
+                    "round": {
+                      "type": "string",
+                      "enum": [
+                        "fit",
+                        "cv"
+                      ]
+                    },
                     "status": {
                       "type": "string",
                       "enum": [
@@ -3529,8 +3791,39 @@
                         "null"
                       ]
                     },
+                    "noteTags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "situation",
+                          "decision",
+                          "result"
+                        ]
+                      }
+                    },
                     "draft": {
                       "type": "string"
+                    },
+                    "parts": {
+                      "type": "object",
+                      "properties": {
+                        "situation": {
+                          "type": "string"
+                        },
+                        "decision": {
+                          "type": "string"
+                        },
+                        "result": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "situation",
+                        "decision",
+                        "result"
+                      ],
+                      "additionalProperties": false
                     },
                     "inlineCritique": {
                       "type": "array",
@@ -3550,17 +3843,49 @@
                         ],
                         "additionalProperties": false
                       }
+                    },
+                    "flaggedAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "draftNo": {
+                      "type": "number"
+                    },
+                    "savedLabel": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "rehearseNext": {
+                      "type": "boolean"
+                    },
+                    "nextPanel": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   },
                   "required": [
                     "id",
                     "question",
                     "category",
+                    "round",
                     "status",
                     "snippet",
                     "critique",
+                    "noteTags",
                     "draft",
-                    "inlineCritique"
+                    "parts",
+                    "inlineCritique",
+                    "flaggedAt",
+                    "draftNo",
+                    "savedLabel",
+                    "rehearseNext",
+                    "nextPanel"
                   ],
                   "additionalProperties": false
                 }
@@ -3594,7 +3919,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "season": {
+                    "joinedAt": {
+                      "type": "string"
+                    },
+                    "stages": {
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -3602,21 +3930,37 @@
                           "id": {
                             "type": "string"
                           },
-                          "label": {
+                          "term": {
+                            "type": "string"
+                          },
+                          "title": {
                             "type": "string"
                           },
                           "detail": {
                             "type": "string"
                           },
-                          "done": {
-                            "type": "boolean"
+                          "state": {
+                            "type": "string",
+                            "enum": [
+                              "before",
+                              "now",
+                              "after"
+                            ]
+                          },
+                          "progress": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
                           "id",
-                          "label",
+                          "term",
+                          "title",
                           "detail",
-                          "done"
+                          "state",
+                          "progress"
                         ],
                         "additionalProperties": false
                       }
@@ -3629,10 +3973,16 @@
                           "id": {
                             "type": "string"
                           },
+                          "label": {
+                            "type": "string"
+                          },
                           "title": {
                             "type": "string"
                           },
                           "description": {
+                            "type": "string"
+                          },
+                          "path": {
                             "type": "string"
                           },
                           "fit": {
@@ -3641,20 +3991,54 @@
                               "primary",
                               "alternate"
                             ]
+                          },
+                          "badge": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "link": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "href": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "label",
+                                  "href"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
                           }
                         },
                         "required": [
                           "id",
+                          "label",
                           "title",
                           "description",
-                          "fit"
+                          "path",
+                          "fit",
+                          "badge",
+                          "link"
                         ],
                         "additionalProperties": false
                       }
                     }
                   },
                   "required": [
-                    "season",
+                    "joinedAt",
+                    "stages",
                     "routes"
                   ],
                   "additionalProperties": false
@@ -3737,12 +4121,12 @@
         }
       }
     },
-    "/case-track": {
+    "/quick-switch/digest": {
       "get": {
         "tags": [
           "Extras"
         ],
-        "summary": "Case modules (Elite only)",
+        "summary": "Quick Switch job-hunting agent: stats, today's digest and preferences",
         "responses": {
           "200": {
             "description": "OK",
@@ -3751,7 +4135,34 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "modules": {
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "matches": {
+                          "type": "number"
+                        },
+                        "highFit": {
+                          "type": "number"
+                        },
+                        "boards": {
+                          "type": "string"
+                        },
+                        "oldest": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "matches",
+                        "highFit",
+                        "boards",
+                        "oldest"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "items": {
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -3759,40 +4170,418 @@
                           "id": {
                             "type": "string"
                           },
+                          "fit": {
+                            "type": "number"
+                          },
                           "title": {
                             "type": "string"
                           },
-                          "minutes": {
-                            "type": "number"
+                          "meta": {
+                            "type": "string"
                           },
-                          "done": {
+                          "saved": {
                             "type": "boolean"
                           }
                         },
                         "required": [
                           "id",
+                          "fit",
                           "title",
-                          "minutes",
-                          "done"
+                          "meta",
+                          "saved"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "prefs": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "roles": {
+                          "type": "string"
+                        },
+                        "locations": {
+                          "type": "string"
+                        },
+                        "minFit": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "roles",
+                        "locations",
+                        "minFit",
+                        "email"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "stats",
+                    "date",
+                    "items",
+                    "prefs"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quick-switch/preferences": {
+      "put": {
+        "tags": [
+          "Extras"
+        ],
+        "summary": "Save the agent's preferences",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "roles": {
+                    "type": "string"
+                  },
+                  "locations": {
+                    "type": "string"
+                  },
+                  "minFit": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "enabled",
+                  "roles",
+                  "locations",
+                  "minFit",
+                  "email"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "roles": {
+                      "type": "string"
+                    },
+                    "locations": {
+                      "type": "string"
+                    },
+                    "minFit": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "email": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "roles",
+                    "locations",
+                    "minFit",
+                    "email"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quick-switch/saved/{id}": {
+      "post": {
+        "tags": [
+          "Extras"
+        ],
+        "summary": "Save or unsave a listing from the digest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "matches": {
+                          "type": "number"
+                        },
+                        "highFit": {
+                          "type": "number"
+                        },
+                        "boards": {
+                          "type": "string"
+                        },
+                        "oldest": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "matches",
+                        "highFit",
+                        "boards",
+                        "oldest"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "fit": {
+                            "type": "number"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "meta": {
+                            "type": "string"
+                          },
+                          "saved": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "fit",
+                          "title",
+                          "meta",
+                          "saved"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "prefs": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "roles": {
+                          "type": "string"
+                        },
+                        "locations": {
+                          "type": "string"
+                        },
+                        "minFit": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "roles",
+                        "locations",
+                        "minFit",
+                        "email"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "stats",
+                    "date",
+                    "items",
+                    "prefs"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/case-track": {
+      "get": {
+        "tags": [
+          "Extras"
+        ],
+        "summary": "Case track steps; a preview with upgrade prices below Elite",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unlocked": {
+                      "type": "boolean"
+                    },
+                    "plan": {
+                      "type": "string"
+                    },
+                    "upgrade": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "alone": {
+                              "type": "number"
+                            },
+                            "moreThanPlan": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "alone",
+                            "moreThanPlan"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "startWeek": {
+                      "type": "string"
+                    },
+                    "seats": {
+                      "type": "object",
+                      "properties": {
+                        "left": {
+                          "type": "number"
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "left",
+                        "total"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "summary": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "value"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "n": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "detail": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "type": "string",
+                            "enum": [
+                              "done",
+                              "upload",
+                              "book",
+                              "later",
+                              "on-placing"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "n",
+                          "title",
+                          "detail",
+                          "state"
                         ],
                         "additionalProperties": false
                       }
                     }
                   },
                   "required": [
-                    "modules"
+                    "unlocked",
+                    "plan",
+                    "upgrade",
+                    "startWeek",
+                    "seats",
+                    "summary",
+                    "steps"
                   ],
                   "additionalProperties": false
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "elite_only",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -3805,7 +4594,7 @@
         "tags": [
           "Billing"
         ],
-        "summary": "Plan, credits, receipts",
+        "summary": "Plan, what it includes, top-up rates, credits, invoices",
         "responses": {
           "200": {
             "description": "OK",
@@ -3894,6 +4683,13 @@
                           },
                           "at": {
                             "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "paid",
+                              "no-charge"
+                            ]
                           }
                         },
                         "required": [
@@ -3901,22 +4697,176 @@
                           "receiptNo",
                           "description",
                           "amount",
-                          "at"
+                          "at",
+                          "status"
                         ],
                         "additionalProperties": false
                       }
                     },
                     "canUpgrade": {
                       "type": "boolean"
+                    },
+                    "season": {
+                      "type": "string"
+                    },
+                    "tagline": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "paidAt": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "entitlements": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "type": "string",
+                            "enum": [
+                              "used",
+                              "booked",
+                              "unbooked",
+                              "scheduled",
+                              "active"
+                            ]
+                          },
+                          "when": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "state",
+                          "when"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "topUps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "detail": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "detail",
+                          "price"
+                        ],
+                        "additionalProperties": false
+                      }
                     }
                   },
                   "required": [
                     "plan",
                     "credits",
                     "invoices",
-                    "canUpgrade"
+                    "canUpgrade",
+                    "season",
+                    "tagline",
+                    "paidAt",
+                    "entitlements",
+                    "topUps"
                   ],
                   "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/top-ups": {
+      "post": {
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Buy a top-up at the plan rate; it counts toward an upgrade",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "label",
+                    "amount"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "top_up_unpriced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -4115,6 +5065,38 @@
                     "background": {
                       "type": "string"
                     },
+                    "workExperience": {
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string"
+                    },
+                    "day0": {
+                      "type": "string"
+                    },
+                    "panelSees": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "detail": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "detail"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
                     "target": {
                       "type": "object",
                       "properties": {
@@ -4166,6 +5148,10 @@
                     "batch",
                     "track",
                     "background",
+                    "workExperience",
+                    "phone",
+                    "day0",
+                    "panelSees",
                     "target",
                     "targetChange"
                   ],
@@ -4199,12 +5185,20 @@
                   "batch": {
                     "type": "string",
                     "minLength": 4
+                  },
+                  "workExperience": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
                   }
                 },
                 "required": [
                   "name",
                   "college",
-                  "batch"
+                  "batch",
+                  "workExperience",
+                  "phone"
                 ],
                 "additionalProperties": false
               }

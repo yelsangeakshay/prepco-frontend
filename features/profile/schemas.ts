@@ -8,6 +8,12 @@ export const profileViewSchema = z.object({
   batch: z.string(),
   track: z.string(),
   background: z.string(),
+  workExperience: z.string(),
+  phone: z.string(),
+  /** "Mon, 9 Nov 2026". */
+  day0: z.string(),
+  /** s15.png "What your panel can see". */
+  panelSees: z.array(z.object({ id: z.string(), label: z.string(), detail: z.string() })),
   target: z.object({ function: z.string(), role: z.string() }),
   targetChange: z
     .object({ changedAt: z.string(), from: z.string(), answersToRework: z.number() })
@@ -18,7 +24,9 @@ export type ProfileView = z.infer<typeof profileViewSchema>;
 export const updateProfileBodySchema = z.object({
   name: z.string().trim().min(2, "Enter your full name"),
   college: z.string().trim().min(2, "Enter your college"),
-  batch: z.string().trim().min(4, "Enter your batch, e.g. 2025–27"),
+  batch: z.string().trim().min(4, "Enter your batch, e.g. MBA 2025–27"),
+  workExperience: z.string().trim(),
+  phone: z.string().trim(),
 });
 export type UpdateProfileBody = z.infer<typeof updateProfileBodySchema>;
 

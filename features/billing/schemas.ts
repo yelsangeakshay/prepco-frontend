@@ -16,9 +16,35 @@ export const billingSchema = z.object({
       description: z.string(),
       amount: z.number(),
       at: z.string(),
+      /** The free session is listed with no charge and no download. */
+      status: z.enum(["paid", "no-charge"]),
     }),
   ),
   canUpgrade: z.boolean(),
+  /** s14.png: "Finals · Season 1". */
+  season: z.string(),
+  /** The plan's one-line promise, shown under the plan name. */
+  tagline: z.string().nullable(),
+  paidAt: z.string().nullable(),
+  /** What the plan includes, one row per runway session plus the standing perks. */
+  entitlements: z.array(
+    z.object({
+      id: z.string(),
+      label: z.string(),
+      state: z.enum(["used", "booked", "unbooked", "scheduled", "active"]),
+      /** "Wed 7 Oct" for booked and scheduled rows. */
+      when: z.string().nullable(),
+    }),
+  ),
+  /** Top-ups at the student's plan rate. A null price means the rate is not set yet. */
+  topUps: z.array(
+    z.object({
+      id: z.string(),
+      label: z.string(),
+      detail: z.string(),
+      price: z.number().nullable(),
+    }),
+  ),
 });
 export type Billing = z.infer<typeof billingSchema>;
 
@@ -39,6 +65,14 @@ export const upgradeQuoteSchema = z.object({
   seatsLeft: z.number(),
 });
 export type UpgradeQuote = z.infer<typeof upgradeQuoteSchema>;
+
+export const buyTopUpBodySchema = z.object({ id: z.string() });
+export const buyTopUpResultSchema = z.object({
+  ok: z.boolean(),
+  label: z.string(),
+  amount: z.number(),
+});
+export type BuyTopUpResult = z.infer<typeof buyTopUpResultSchema>;
 
 export const upgradeResultSchema = z.object({
   status: z.enum(["paid", "failed"]),

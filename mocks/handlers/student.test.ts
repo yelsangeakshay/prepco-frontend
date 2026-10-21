@@ -8,6 +8,7 @@ import {
   getFreeSession,
   getPlans,
   getRunway,
+  getSessionSlots,
   getSessions,
   postCheckout,
   signIn,
@@ -82,6 +83,19 @@ describe("runway", () => {
 });
 
 describe("booking", () => {
+  it("s09: the P2 session offers the four drawn slots and every session has a runway line", async () => {
+    const slots = (await getSessionSlots("s-1004")).items;
+    expect(slots.map((s) => s.label)).toEqual([
+      "Mon 12 Oct · 6:00 PM IST",
+      "Mon 12 Oct · 7:30 PM IST",
+      "Tue 13 Oct · 6:30 PM IST",
+      "Wed 14 Oct · 8:00 PM IST",
+    ]);
+    const list = await getSessions();
+    expect(list.items.every((s) => !!s.blurb)).toBe(true);
+    expect(list.items[1]?.blurb).toBe("External industry expert · your baseline");
+  });
+
   it("race slot loses once with slot_taken, then succeeds; taken slots always fail", async () => {
     expect(await code(bookSession("s-1004", "s-1004-race"))).toBe("slot_taken");
     const booked = await bookSession("s-1004", "s-1004-race");

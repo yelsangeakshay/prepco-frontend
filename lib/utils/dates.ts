@@ -11,7 +11,7 @@ function parts(date: Date, opts: Intl.DateTimeFormatOptions) {
 /** "Wed 7 Oct" */
 export function formatDay(input: Date | string): string {
   const p = parts(new Date(input), { weekday: "short", day: "numeric", month: "short" });
-  return `${p.weekday} ${p.day} ${p.month}`;
+  return `${p.weekday} ${p.day} ${(p.month ?? "").replace(/^Sept$/, "Sep")}`;
 }
 
 /** "Tue, 8 Sep 2026" */

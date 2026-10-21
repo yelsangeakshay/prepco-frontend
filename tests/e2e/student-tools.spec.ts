@@ -37,45 +37,75 @@ test.describe("Prepare for Day 0", () => {
     await expect(page.getByText("V5 draft")).toBeVisible();
     await expect(page.getByText("V4 · Locked")).toBeVisible();
 
-    // Answer bank: Flagged filter is in the URL
+    // Answer bank: the Flagged filter is in the URL. The fit round holds 3 of the 4 flagged answers.
     await gotoReady(page, "/answers");
-    await page.getByRole("tab", { name: /Flagged/ }).click();
+    await page.getByRole("tab", { name: "Flagged" }).click();
     await expect(page).toHaveURL(/status=flagged/);
-    await expect(page.getByRole("button", { name: "Open Answer" })).toHaveCount(4);
+    await expect(page.getByTestId("answer-row")).toHaveCount(3);
 
-    await page.getByRole("button", { name: "Open Answer" }).first().click();
-    await expect(page).toHaveURL(/\/answers\/a-\d+$/);
-    await expect(page.getByLabel("Inline critique")).toBeVisible();
+    // The MT answer carries the panel note and the three parts.
+    await gotoReady(page, "/answers/a-1009");
+    await expect(page.getByText("Panel note:")).toBeVisible();
+    await expect(page.getByLabel("Situation")).toHaveValue(/400\+ outlets in West Delhi/);
+    await expect(page.getByLabel("Result")).toHaveValue("");
     await page.getByRole("button", { name: "Mark Rehearsed" }).click();
     await expect(page.getByTestId("answer-status")).toContainText("Rehearsed");
 
     await page.getByRole("link", { name: "All answers" }).click();
-    await page.getByRole("tab", { name: /Flagged/ }).click();
-    await expect(page.getByRole("button", { name: "Open Answer" })).toHaveCount(3);
+    await page.getByRole("tab", { name: "Flagged" }).click();
+    await expect(page.getByTestId("answer-row")).toHaveCount(2);
+  });
+
+  test("write the three parts of an answer and send it for review", async ({ page, context }) => {
+    await signInAsRiya(context);
+    await gotoReady(page, "/answers/a-1015");
+    await expect(page.getByTestId("answer-status")).toContainText("Not drafted");
+    await expect(page.getByRole("button", { name: "Send for review" })).toBeDisabled();
+    await page
+      .getByLabel("Situation")
+      .fill("Our West Delhi outlets were split across 20 trade clusters.");
+    await page
+      .getByLabel("Decision")
+      .fill("I mapped white space before the next distributor review.");
+    await page.getByRole("button", { name: "Send for review" }).click();
+    await expect(page.getByText("Draft 1")).toBeVisible();
+    await expect(page.getByTestId("answer-status")).toContainText("Flagged");
+    await expect(page.getByRole("switch", { name: "Rehearse in my next panel" })).toBeVisible();
   });
 
   test("answer drafts survive a reload until saved", async ({ page, context }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/answers/a-1001");
-    const editor = page.getByRole("textbox", { name: "Answer draft" });
-    await editor.fill("A fresh opening that I have not saved yet.");
+    await page.getByLabel("Situation").fill("A fresh opening that I have not saved yet.");
     await page.reload();
     await expect(page.getByText("Restored your unsaved draft.")).toBeVisible();
     await page.getByRole("button", { name: "Discard" }).click();
     await expect(page.getByText("Restored your unsaved draft.")).toHaveCount(0);
   });
 
-  test("answers search is debounced into the URL, and empty results offer a reset", async ({
+  test("round tabs and filters live in the URL, and a row opens its answer", async ({
     page,
     context,
+    isMobile,
   }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/answers");
-    await page.getByLabel("Search questions").fill("zzz-no-match");
-    await expect(page).toHaveURL(/q=zzz-no-match/);
-    await expect(page.getByText("No answers match")).toBeVisible();
-    await page.getByRole("button", { name: "Clear Filters" }).click();
-    await expect(page.getByRole("button", { name: "Open Answer" }).first()).toBeVisible();
+    await expect(page.getByText("+ 7 more in Fit round")).toBeVisible();
+    await page.getByRole("tab", { name: /CV deep-dive/ }).click();
+    await expect(page).toHaveURL(/round=cv/);
+    await expect(page.getByTestId("answer-row")).toHaveCount(4);
+    await page.getByRole("tab", { name: /Fit round/ }).click();
+    await page.getByRole("tab", { name: "Not drafted" }).click();
+    await expect(page.getByTestId("answer-row")).toHaveCount(2);
+    await page.getByRole("tab", { name: "All" }).click();
+    await expect(page.getByTestId("answer-row")).toHaveCount(7);
+    await page.getByTestId("answer-row").nth(1).click();
+    if (isMobile) {
+      await expect(page).toHaveURL(/\/answers\/a-1003$/);
+    } else {
+      await expect(page).toHaveURL(/a=a-1003/);
+    }
+    await expect(page.getByRole("heading", { name: "Why MBA, and why now?" })).toBeVisible();
   });
 });
 
@@ -83,18 +113,32 @@ test.describe("Routes and extras", () => {
   test("journey, quick switch, locked case track", async ({ page, context }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/journey");
-    await expect(page.getByText("Management Trainee, Sales & Marketing")).toBeVisible();
-    await expect(page.getByText("Primary", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Four routes to an offer" })).toBeVisible();
+    await expect(page.getByText("You joined at Term 5–6")).toBeVisible();
+    await expect(page.getByText("Your route", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Final placements" }).first()).toBeVisible();
 
+    // Quick Switch: the agent, with the function comparison below it.
     await gotoReady(page, "/quick-switch");
+    await expect(page.getByText("Today's digest · 3 new matches")).toBeVisible();
+    await page.getByRole("button", { name: "Save Business Analyst: Consulting" }).click();
+    await expect(
+      page.getByRole("button", { name: "Saved Business Analyst: Consulting" }),
+    ).toBeVisible();
+    await page.getByLabel("Only send matches with fit above").fill("90");
+    await page.getByRole("button", { name: "Save preferences" }).click();
+    await expect(page.getByText("Today's digest · 2 new matches")).toBeVisible();
+
     await page.getByLabel("Compare with").selectOption("Finance");
     await expect(page.getByTestId("quick-switch-result")).toContainText(
       "9 of 18 answers carry over",
     );
 
     await gotoReady(page, "/case-track");
-    await expect(page.getByTestId("case-locked")).toBeVisible();
-    await page.getByRole("link", { name: "Upgrade To Elite" }).click();
+    await expect(page.getByTestId("case-locked")).toContainText("Preview · Included with Elite");
+    await expect(page.getByText("5 of 22 left")).toBeVisible();
+    await expect(page.getByText("Case track · runs in parallel from Week -12")).toBeVisible();
+    await page.getByRole("link", { name: /^Upgrade to Elite · ₹4,000/ }).click();
     await expect(page).toHaveURL(/\/billing\/upgrade$/);
   });
 });
@@ -107,8 +151,8 @@ test.describe("Upgrade mid-season", () => {
   }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/billing");
-    await expect(page.getByTestId("credits")).toHaveText("2 of 6 used");
-    await page.getByRole("link", { name: "Upgrade To Elite" }).click();
+    await expect(page.getByTestId("credits")).toHaveText("2 of 6 done");
+    await page.getByRole("link", { name: /^Upgrade (to Elite|· ₹4,000)/ }).click();
 
     await expect(page.getByTestId("payable")).toHaveText("₹4,000");
     await page.getByRole("button", { name: /^Upgrade for ₹4,000/ }).click();
@@ -119,7 +163,7 @@ test.describe("Upgrade mid-season", () => {
 
     await openFromNav(page, "Plan & billing", isMobile);
     await expect(page.locator("main").getByText("Elite", { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Upgrade To Elite" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /^Upgrade (to Elite|·)/ })).toHaveCount(0);
   });
 
   test("payment-failed upgrade can be retried", async ({ page, context }) => {
@@ -209,7 +253,7 @@ test.describe("Target role changes", () => {
     await expect(page.getByTestId("target-result")).toContainText("4 answers");
 
     await page.getByRole("link", { name: "Back To Profile" }).click();
-    await expect(page.getByTestId("target")).toHaveText("Finance");
+    await expect(page.getByTestId("target")).toHaveValue("Finance");
     await expect(page.getByTestId("target-changed")).toBeVisible();
   });
 
@@ -224,12 +268,14 @@ test.describe("Profile", () => {
   test("edit details with validation", async ({ page, context }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/profile");
-    await page.getByLabel("College").fill("");
-    await page.getByRole("button", { name: "Save Profile" }).click();
+    await page.getByLabel("College", { exact: true }).fill("");
+    await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByText("Enter your college")).toBeVisible();
-    await page.getByLabel("College").fill("SCMHRD Pune, Symbiosis");
-    await page.getByRole("button", { name: "Save Profile" }).click();
-    await expect(page.getByRole("button", { name: "Save Profile" })).toBeDisabled();
+    await page.getByLabel("College", { exact: true }).fill("SCMHRD Pune, Symbiosis");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByText("Profile saved")).toBeVisible();
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByText("No changes to save")).toBeVisible();
   });
 });
 
@@ -254,8 +300,8 @@ test.describe("On a phone, start to finish", () => {
 
     await openFromNav(page, "HR Question Builder", true);
     await expect(page).toHaveURL(/\/answers$/);
-    await page.getByRole("tab", { name: /Flagged/ }).click();
-    await expect(page.getByRole("button", { name: "Open Answer" })).toHaveCount(4);
+    await page.getByRole("tab", { name: "Flagged" }).click();
+    await expect(page.getByTestId("answer-row")).toHaveCount(3);
     expect(await noHScroll()).toBe(true);
 
     await openFromNav(page, "CV Builder", true);

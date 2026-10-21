@@ -8,11 +8,13 @@ interface Props {
   subtitle?: ReactNode;
   /** Small pill after the eyebrow, e.g. "Sample data". */
   pill?: ReactNode;
+  /** Extra classes for the pill, e.g. "hidden md:inline-block" to leave it off the phone layout. */
+  pillClassName?: string;
   className?: string;
 }
 
 /** Page heading used across the app (s05, p02, a01): eyebrow, Playfair title, optional lead. */
-export function PageHeader({ eyebrow, title, subtitle, pill, className }: Props) {
+export function PageHeader({ eyebrow, title, subtitle, pill, pillClassName, className }: Props) {
   return (
     <header className={cn("pr-0 md:pr-72", className)}>
       {(eyebrow || pill) && (
@@ -23,7 +25,12 @@ export function PageHeader({ eyebrow, title, subtitle, pill, className }: Props)
             </p>
           )}
           {pill && (
-            <span className="bg-cream-soft text-navy-900 rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase">
+            <span
+              className={cn(
+                "bg-cream-soft text-navy-900 rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase",
+                pillClassName,
+              )}
+            >
               {pill}
             </span>
           )}
