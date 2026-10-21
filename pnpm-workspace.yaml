@@ -1,0 +1,5 @@
+# pnpm 12 blocks dependency build scripts unless they are listed here.
+# esbuild and unrs-resolver download their native binaries in a postinstall step.
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
