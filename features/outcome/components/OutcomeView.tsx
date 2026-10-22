@@ -96,8 +96,8 @@ function NotPlaced({
             <Link href={ROUTES.student.billing}>See plan & billing</Link>
           </Button>
         ) : (
-          <Button disabled={saving} onClick={onSave}>
-            {saving ? "Saving…" : "Save my result"}
+          <Button loading={saving} onClick={onSave}>
+            Save my result
           </Button>
         )}
       </div>
@@ -135,7 +135,7 @@ export function OutcomeView() {
       <div
         role="group"
         aria-label="Outcome"
-        className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3"
+        className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-3"
       >
         {CHOICES.map((c) => (
           <button

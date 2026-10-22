@@ -190,7 +190,7 @@ export function LedgerView() {
         getRowId={(r) => r.id}
       />
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
         <Card variant="inset" className="p-6">
           <p className="text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase">
             Upgrade rule

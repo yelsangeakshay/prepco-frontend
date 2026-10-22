@@ -26,7 +26,7 @@ export function CheckoutView({ planId }: { planId: string }) {
         <Card>
           <p className="font-semibold">We could not find that plan.</p>
           <Button asChild className="mt-4">
-            <Link href={ROUTES.student.plans}>See Plans</Link>
+            <Link href={ROUTES.student.plans}>See plans</Link>
           </Button>
         </Card>
       )}

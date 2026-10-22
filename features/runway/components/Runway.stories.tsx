@@ -15,7 +15,7 @@ export const Hero: S = {
         title="Domain deep-dive"
         when="Wed 7 Oct · 7:00 PM IST"
         detail="Panel: Sales & Marketing"
-        ctaLabel="View Brief"
+        ctaLabel="View brief"
       />
     </div>
   ),

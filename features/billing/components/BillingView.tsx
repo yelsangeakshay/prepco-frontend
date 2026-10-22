@@ -64,7 +64,7 @@ export function BillingView() {
         </div>
       )}
 
-      <div className="grid items-stretch gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Card variant="feature" className="border-maroon-600 space-y-4 border-2 md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-3">
@@ -201,7 +201,7 @@ export function BillingView() {
         )}
       </div>
 
-      <div className="grid items-start gap-5 lg:grid-cols-2">
+      <div className="grid items-start gap-6 lg:grid-cols-2">
         <Card variant="feature" className="order-1 md:p-8">
           <h2 className="font-display hidden text-2xl font-bold md:block">
             Top-ups at your plan&apos;s rate
@@ -233,6 +233,7 @@ export function BillingView() {
                     variant="secondary"
                     aria-label={`Buy ${t.label}`}
                     disabled={buy.isPending}
+                    loading={buy.isPending && buy.variables === t.id}
                     onClick={() =>
                       t.price === null
                         ? notify("This top-up has no price yet")

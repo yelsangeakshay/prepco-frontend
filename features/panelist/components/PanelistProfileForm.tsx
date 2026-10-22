@@ -59,8 +59,8 @@ export default function PanelistProfileForm({ profile }: { profile: PanelistProf
           We could not save. Please try again.
         </p>
       )}
-      <Button type="submit" disabled={!isDirty || update.isPending}>
-        {update.isPending ? "Saving…" : "Save Profile"}
+      <Button type="submit" disabled={!isDirty} loading={update.isPending}>
+        Save profile
       </Button>
     </form>
   );

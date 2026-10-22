@@ -115,6 +115,11 @@ export function PanelistsView() {
                   size="sm"
                   variant="secondary"
                   disabled={action.isPending}
+                  loading={
+                    action.isPending &&
+                    action.variables?.id === p.id &&
+                    action.variables.action === "nudge"
+                  }
                   onClick={() =>
                     action.mutate(
                       { id: p.id, action: "nudge" },
@@ -129,6 +134,11 @@ export function PanelistsView() {
                 size="sm"
                 variant="ghost"
                 disabled={action.isPending}
+                loading={
+                  action.isPending &&
+                  action.variables?.id === p.id &&
+                  action.variables.action !== "nudge"
+                }
                 onClick={() =>
                   action.mutate({ id: p.id, action: p.status === "paused" ? "resume" : "pause" })
                 }
@@ -221,7 +231,7 @@ export function PanelistsView() {
         />
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className={cn(action.isError && "outline-maroon-600 outline")}>
           {action.isError && (
             <p role="alert" className="text-maroon-600 mb-2 text-sm">

@@ -47,7 +47,7 @@ export function NotificationList({ onNavigate }: { onNavigate?: () => void }) {
           disabled={data.unread === 0}
           onClick={() => mark.mutate({ all: true })}
         >
-          Mark All Read
+          Mark all read
         </Button>
       </div>
       <ul>

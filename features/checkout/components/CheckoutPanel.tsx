@@ -98,7 +98,7 @@ export function CheckoutPanel({ plan, track }: { plan: Plan; track: Track }) {
         <p className="font-display text-xl font-bold">{plan.name} is full</p>
         <p className="text-navy-400 mt-1 text-sm">Join the waitlist and keep the Season 1 price.</p>
         <Button asChild className="mt-4">
-          <Link href={ROUTES.student.waitlist}>Join Waitlist</Link>
+          <Link href={ROUTES.student.waitlist}>Join waitlist</Link>
         </Button>
       </Card>
     );
@@ -108,7 +108,7 @@ export function CheckoutPanel({ plan, track }: { plan: Plan; track: Track }) {
   const methodLabel = PAY_METHOD_LABEL[method];
 
   return (
-    <section aria-labelledby="checkout-h" className="grid gap-4 md:grid-cols-[1fr_340px]">
+    <section aria-labelledby="checkout-h" className="grid gap-6 md:grid-cols-[1fr_340px]">
       <Card variant="feature">
         <h2 id="checkout-h" className="font-display text-2xl font-bold">
           Payment

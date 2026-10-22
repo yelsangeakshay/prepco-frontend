@@ -166,8 +166,8 @@ export function ScoringForm({
           <Button asChild variant="secondary">
             <Link href={briefHref}>Back to brief</Link>
           </Button>
-          <Button onClick={submit} disabled={submitting}>
-            {submitting ? "Sending…" : "Submit feedback"}
+          <Button onClick={submit} loading={submitting}>
+            Submit feedback
           </Button>
         </div>
       </header>
@@ -182,7 +182,7 @@ export function ScoringForm({
         </p>
       )}
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)_minmax(0,290px)] lg:gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)_minmax(0,290px)] lg:gap-6">
         <Card variant="feature" className="h-fit p-3 md:p-4">
           <ol className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-1 lg:overflow-visible">
             {questions.map((item, i) => {

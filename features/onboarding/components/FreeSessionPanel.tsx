@@ -253,10 +253,10 @@ export function FreeSessionPanel() {
         <p className="text-navy-400 mt-1 text-sm">{formatSession(bookedAt!)}</p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Button asChild>
-            <Link href={ROUTES.student.plans}>See Plans</Link>
+            <Link href={ROUTES.student.plans}>See plans</Link>
           </Button>
           <Button asChild variant="secondary">
-            <Link href={ROUTES.student.home}>Go To Home</Link>
+            <Link href={ROUTES.student.home}>Go to home</Link>
           </Button>
         </div>
       </Card>,

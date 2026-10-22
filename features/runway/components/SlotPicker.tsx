@@ -107,10 +107,11 @@ export function SlotPicker({ slots, loading, slotTakenError, confirming, onConfi
       </div>
       <Button
         className="mt-4 w-full sm:w-auto"
-        disabled={!selected || confirming}
+        disabled={!selected}
+        loading={confirming}
         onClick={() => selected && onConfirm(selected)}
       >
-        {confirming ? "Booking…" : "Confirm Slot"}
+        Confirm slot
       </Button>
     </div>
   );

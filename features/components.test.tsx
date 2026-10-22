@@ -19,7 +19,7 @@ describe("SlotPicker", () => {
     const onConfirm = vi.fn();
     const user = userEvent.setup();
     render(<SlotPicker slots={slots} onConfirm={onConfirm} />);
-    expect(screen.getByRole("button", { name: "Confirm Slot" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Confirm slot" })).toBeDisabled();
 
     await user.tab();
     await user.keyboard("{ArrowDown}");

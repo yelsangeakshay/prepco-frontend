@@ -49,10 +49,10 @@ export function ChangeTargetView() {
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Button asChild>
-              <Link href={`${ROUTES.student.answers}?status=flagged`}>Rework Answers</Link>
+              <Link href={`${ROUTES.student.answers}?status=flagged`}>Rework answers</Link>
             </Button>
             <Button asChild variant="secondary">
-              <Link href={ROUTES.student.profile}>Back To Profile</Link>
+              <Link href={ROUTES.student.profile}>Back to profile</Link>
             </Button>
           </div>
         </Card>
@@ -161,10 +161,11 @@ export function ChangeTargetView() {
             Cancel
           </Button>
           <Button
-            disabled={!next || change.isPending}
+            disabled={!next}
+            loading={change.isPending}
             onClick={() => next && change.mutate({ function: next })}
           >
-            {change.isPending ? "Updating…" : `Confirm change to ${nextName ?? "target"}`}
+            {`Confirm change to ${nextName ?? "target"}`}
           </Button>
         </div>
       </div>

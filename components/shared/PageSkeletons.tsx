@@ -91,7 +91,7 @@ export function ListPageSkeleton({ stats = 0, rows = 5 }: { stats?: number; rows
     <Frame className="max-w-[1440px] p-4 md:p-8 xl:px-10">
       <Heading />
       {stats > 0 && (
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {Array.from({ length: stats }, (_, i) => (
             <Skeleton key={i} className="h-28" />
           ))}

@@ -116,7 +116,8 @@ function CancelledCard({ session }: { session: Session }) {
           )}
           <div className="flex flex-wrap gap-3">
             <Button
-              disabled={!selected || book.isPending}
+              disabled={!selected}
+              loading={book.isPending}
               onClick={() =>
                 selected &&
                 book
@@ -125,11 +126,7 @@ function CancelledCard({ session }: { session: Session }) {
                   .catch(() => slots.refetch())
               }
             >
-              {book.isPending
-                ? "Booking…"
-                : selected
-                  ? `Confirm ${confirmLabel(selected)}`
-                  : "Confirm"}
+              {selected ? `Confirm ${confirmLabel(selected)}` : "Confirm"}
             </Button>
             <Button
               variant="secondary"
@@ -184,7 +181,8 @@ function MoveCard({ session }: { session: Session }) {
       )}
       <Button
         variant="secondary"
-        disabled={!selected || move.isPending}
+        disabled={!selected}
+        loading={move.isPending}
         onClick={() =>
           selected &&
           move
@@ -193,7 +191,7 @@ function MoveCard({ session }: { session: Session }) {
             .catch(() => slots.refetch())
         }
       >
-        {move.isPending ? "Moving…" : "Move session"}
+        Move session
       </Button>
     </Card>
   );

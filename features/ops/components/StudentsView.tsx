@@ -306,7 +306,7 @@ export function StudentsView() {
         />
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <DataTable
           caption="Students"
           columns={columns}
