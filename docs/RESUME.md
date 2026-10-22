@@ -18,7 +18,7 @@ invented content. Anything the mockups do not define stays marked "Proposed".
 | Batch 2            | s08 to s15 (student; s07 CV versions skipped with the CV builder) | merged  |
 | Batch 3            | p01, p03, p04, p05 (panelist)                                     | done    |
 | Batch 4            | a02 to a06 (ops)                                                  | to do   |
-| Batch 5            | e05, e06, e07, e09 to e12 (edge cases)                            | to do   |
+| Batch 5            | e05, e06, e07, e09 to e12 (edge cases)                            | done    |
 | Skipped on purpose | s06 CV builder (the owner is doing it)                            | skipped |
 
 A live copy of this table is the "Mockup pass progress" artifact. Each finished batch appends a "Batch N" section

@@ -467,7 +467,7 @@ export const accountHandlers = [
   http.post(`${API_BASE_URL}/profile/change-target`, async ({ request }) => {
     await latency();
     const st = getState(scenarioOf(request));
-    const body = (await request.json()) as { function: string; role: string };
+    const body = (await request.json()) as { function: string; role?: string };
     const sameFunction = body.function === st.target.function;
     const toFlag = sameFunction ? 1 : 4;
     let flagged = 0;
@@ -486,7 +486,7 @@ export const accountHandlers = [
       from: `${st.target.function} (${st.target.role})`,
       answersToRework: flagged,
     };
-    st.target = { function: body.function, role: body.role };
+    st.target = { function: body.function, role: body.role ?? body.function };
     st.notifications.unshift({
       id: `n-tc-${Date.now()}`,
       kind: "runway",

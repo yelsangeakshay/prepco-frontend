@@ -162,6 +162,7 @@ export const plansHandlers = [
     return HttpResponse.json({
       items: buildPlans(track, full),
       cohortFull: full,
+      waitlistNext: getDb(scenarioOf(request)).waitlistCount + 1,
       lateJoiner: scenarioOf(request) === "late-joiner" ? LATE_JOINER : null,
       track,
       seats: {

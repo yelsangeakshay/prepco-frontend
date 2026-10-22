@@ -104,3 +104,6 @@ Deviations from the mockups, all Proposed:
 - Batch 2: what the plan includes for Basic and free accounts on the billing page is Proposed; only Premium and Elite are drawn.
 - Batch 2: the Quick Switch job-hunting agent, its fit score, the job boards and the digest listings are sample content. "Send for review" on an answer saves the draft only.
 - Batch 2: S7 (CV version history) was not touched; it belongs to the CV builder.
+- Batch 5: the second-season price is drawn as "[Season 2 price]" (decision 4) and stays that way; the plan list prices are the existing list prices.
+- Batch 5: "Unused sessions" after a placement shows "Decision needed" (decision 7). The waitlist queue position (#4), the "Also offer me Basic" and WhatsApp options, and the notification channel grid are mock UI only and Proposed; nothing is sent.
+- Batch 5: the change-target page no longer asks for a free-text role or a reason (the mockup has none); the API accepts both as optional.

@@ -126,7 +126,7 @@ export function buildRunway(db: Db): Runway {
           },
         ],
     cv: firstLogin
-      ? { version: "V0", locked: false, score: 0, impact: 0, clarity: 0, defensibility: 0 }
+      ? { version: "V1", locked: false, score: 46, impact: 0, clarity: 0, defensibility: 0 }
       : {
           version: st.cv.lockedVersion ?? "V0",
           locked: !!st.cv.lockedVersion,
@@ -146,6 +146,47 @@ export function buildRunway(db: Db): Runway {
         )?.question ?? null,
     },
     latestPanel: latestPanel(db, scenario),
+    secondSeason:
+      scenario === "returning-student"
+        ? {
+            carried: [
+              {
+                label: "Locked CV",
+                value: `${st.cv.lockedVersion ?? "V0"} · score ${st.cv.lockedScores?.overall ?? 0}`,
+              },
+              {
+                label: "Answer bank",
+                value: `${counts.all} answers · ${counts.rehearsed} rehearsed`,
+              },
+              { label: "Panel feedback", value: "P1, P2, P3 + 2 deck reviews" },
+              { label: "Profiling notes", value: "Term 1 onwards" },
+              { label: "Summer internship", value: "PPO not converted" },
+            ],
+            plans: [
+              {
+                id: "basic",
+                name: "Basic",
+                blurb: "Profiling refresh, P1",
+                listPrice: 8999,
+                suggested: false,
+              },
+              {
+                id: "premium",
+                name: "Premium",
+                blurb: "Full runway to the pressure mock",
+                listPrice: 17999,
+                suggested: true,
+              },
+              {
+                id: "elite",
+                name: "Elite",
+                blurb: "Premium + case track",
+                listPrice: 26999,
+                suggested: false,
+              },
+            ],
+          }
+        : null,
   };
 }
 

@@ -3,7 +3,7 @@ import { NAV } from "../../lib/config/nav";
 import { SCREENS } from "../../lib/config/screens";
 import { ROLE_HOME, type Role } from "../../lib/auth/roles";
 
-const BASE = "http://localhost:3000";
+const BASE = `http://localhost:${process.env.PORT ?? "3000"}`;
 
 async function signInAs(context: BrowserContext, role: Role) {
   await context.addCookies([{ name: "prepco_role", value: role, url: BASE }]);

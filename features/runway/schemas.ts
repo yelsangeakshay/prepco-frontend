@@ -97,6 +97,22 @@ export const runwaySchema = z.object({
     /** A flagged question to show on Home. */
     flagged: z.string().nullable(),
   }),
+  /** Second season for a returning student (e11.png). Null otherwise. */
+  secondSeason: z
+    .object({
+      carried: z.array(z.object({ label: z.string(), value: z.string() })),
+      plans: z.array(
+        z.object({
+          id: z.enum(["basic", "premium", "elite"]),
+          name: z.string(),
+          blurb: z.string(),
+          listPrice: z.number(),
+          suggested: z.boolean(),
+        }),
+      ),
+    })
+    .nullable()
+    .optional(),
   /** Newest panel feedback (s05.png "Latest panel"). */
   latestPanel: z
     .object({

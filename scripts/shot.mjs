@@ -1,3 +1,4 @@
+const BASE = `http://localhost:${process.env.PORT ?? "3000"}`;
 // Screenshot a route as a role, for comparing against design/mockups.
 // Usage: node scripts/shot.mjs <role> <path> <out.png> [width] [height]
 import { chromium } from "@playwright/test";
@@ -9,13 +10,18 @@ const context = await browser.newContext({
   deviceScaleFactor: 1,
 });
 if (role !== "public") {
-  await context.addCookies([{ name: "prepco_role", value: role, url: "http://localhost:3000" }]);
+  await context.addCookies([{ name: "prepco_role", value: role, url: BASE }]);
+}
+// Extra cookies for states the middleware gates, e.g. SHOT_COOKIES="prepco_onboarded=1".
+for (const pair of (process.env.SHOT_COOKIES ?? "").split(",").filter(Boolean)) {
+  const [name, value] = pair.split("=");
+  await context.addCookies([{ name, value, url: BASE }]);
 }
 const page = await context.newPage();
 await page.addInitScript(() => {
   window.__PREPCO_NO_LATENCY__ = true;
 });
-await page.goto(`http://localhost:3000${path}`, { waitUntil: "networkidle" });
+await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
 await page
   .locator("main h1")
   .first()

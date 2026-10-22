@@ -1,10 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const PORT = process.env.PORT ?? "3000";
+const BASE_URL = `http://localhost:${PORT}`;
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
   reporter: "list",
-  use: { baseURL: "http://localhost:3000", trace: "on-first-retry" },
+  use: { baseURL: BASE_URL, trace: "on-first-retry" },
   projects: [
     {
       name: "desktop",
@@ -19,8 +22,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm build && pnpm start",
-    url: "http://localhost:3000",
+    command: `pnpm build && pnpm exec next start -p ${PORT}`,
+    url: BASE_URL,
     reuseExistingServer: true,
     timeout: 300_000,
     env: { NEXT_PUBLIC_API_MOCKING: "on" },

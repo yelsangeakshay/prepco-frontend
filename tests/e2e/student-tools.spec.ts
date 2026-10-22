@@ -162,7 +162,7 @@ test.describe("Upgrade mid-season", () => {
     await expect(page.getByTestId("case-modules")).toBeVisible();
 
     await openFromNav(page, "Plan & billing", isMobile);
-    await expect(page.locator("main").getByText("Elite", { exact: true }).first()).toBeVisible();
+    await expect(page.locator("main")).toContainText("Paid ₹13,999");
     await expect(page.getByRole("link", { name: /^Upgrade (to Elite|·)/ })).toHaveCount(0);
   });
 
@@ -231,13 +231,13 @@ test.describe("After Day 0", () => {
   test("report an outcome yourself", async ({ page, context }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/outcome");
-    await page.getByRole("button", { name: "I Got Placed" }).click();
-    await page.getByRole("button", { name: "Save Outcome" }).click();
+    await page.getByRole("button", { name: /Placed on Day 0/ }).click();
+    await page.getByRole("button", { name: "Save my result" }).click();
     await expect(page.getByText("Enter the company")).toBeVisible();
-    await page.getByLabel("Company").fill("Acme Foods");
-    await page.getByLabel("Role").fill("Sales MT");
+    await page.getByLabel("Company (private)").fill("Acme Foods");
+    await page.getByLabel("Role", { exact: true }).fill("Sales MT");
     await page.getByLabel("Annual CTC (₹)").fill("1050000");
-    await page.getByRole("button", { name: "Save Outcome" }).click();
+    await page.getByRole("button", { name: "Save my result" }).click();
     await expect(page.getByTestId("outcome-placed")).toContainText("₹10,50,000");
   });
 });
@@ -246,10 +246,8 @@ test.describe("Target role changes", () => {
   test("change to Finance flags answers", async ({ page, context }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/profile/change-target");
-    await page.getByLabel("New target function").selectOption("Finance");
-    await page.getByLabel("New target role").fill("Analyst");
-    await page.getByLabel("Why are you changing?").fill("I enjoy numbers more than selling");
-    await page.getByRole("button", { name: "Change Target" }).click();
+    await page.getByRole("button", { name: "Finance", exact: true }).click();
+    await page.getByRole("button", { name: "Confirm change to Finance" }).click();
     await expect(page.getByTestId("target-result")).toContainText("4 answers");
 
     await page.getByRole("link", { name: "Back To Profile" }).click();
@@ -323,6 +321,6 @@ test.describe("Not placed, credit carried over", () => {
     await expect(page.getByRole("heading", { name: "Plan & billing" })).toBeVisible();
     await gotoReady(page, "/outcome");
     await expect(page.getByTestId("outcome-not-placed")).toContainText("₹9,999");
-    await expect(page.getByTestId("outcome-not-placed")).toContainText("in full");
+    await expect(page.getByTestId("outcome-not-placed")).toContainText("full credit");
   });
 });
