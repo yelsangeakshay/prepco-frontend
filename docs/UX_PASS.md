@@ -166,7 +166,7 @@ compared with the baseline, and standard verification passes.
 
 Same as `docs/RESUME.md`: `pnpm exec tsc --noEmit`, `pnpm exec eslint`, `pnpm exec vitest run`,
 `pnpm check:bundle` (under 170 KiB per route), Playwright against the production server for the affected specs plus
-`a11y.spec.ts` and `responsive.spec.ts`, and `pnpm test:stories` at the end of each phase.
+`a11y.spec.ts` and `responsive.spec.ts`.
 
 ## Working method
 

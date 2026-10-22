@@ -46,8 +46,6 @@ Example: `/sessions/s-1003?scenario=panelist-cancelled`. Sign in as the student 
 pnpm lint && pnpm typecheck && pnpm test     # unit tests (Vitest)
 pnpm build && pnpm check:bundle              # production build, then the 170 KiB first-load budget
 pnpm test:e2e                                 # Playwright: journeys, scenarios, responsive, a11y, vitals
-pnpm test:stories                             # builds Storybook and smoke-tests every story
-pnpm storybook                                # component and view stories, port 6006
 ```
 
 Playwright runs against a production build (`pnpm build && pnpm start`). Projects: `desktop` (1280),
@@ -118,8 +116,7 @@ components/     ui (primitives), shell (sidebar, bottom bar, bell), shared (card
 features/       one folder per feature: components, hooks, schemas
 lib/            api (client, endpoints, contract, openapi), auth, config (nav, routes, scenarios), utils
 mocks/          handlers, shared world (world.ts), persistence, scenarios
-stories/        Storybook stories for every screen and state
-tests/          e2e (Playwright), storybook (story smoke test), journeys.test.ts
+tests/          e2e (Playwright), journeys.test.ts
 docs/           PROGRESS, OPEN_DECISIONS, API_CONTRACT, openapi.json, DEFINITION_OF_DONE
 ```
 

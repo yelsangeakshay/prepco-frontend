@@ -40,7 +40,7 @@ already matched some numbers and are left as they are.
 4. Update unit tests, e2e specs, stories and docs in the same change.
 5. Verify: `pnpm exec tsc --noEmit`, `pnpm exec eslint`, `pnpm exec vitest run`, `pnpm check:bundle` (under 170 KiB per
    route), then Playwright against the production server: the specs that cover the screens plus `a11y.spec.ts` and
-   `responsive.spec.ts`; `pnpm test:stories` once at the end. Web-vitals LCP on phone is flaky, ignore it unless the
+   `responsive.spec.ts`. Web-vitals LCP on phone is flaky, ignore it unless the
    change caused it.
 
 ## Running batches in parallel
