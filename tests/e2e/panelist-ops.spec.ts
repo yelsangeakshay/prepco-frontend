@@ -12,18 +12,6 @@ async function fillScore(page: Page, opts: { sendBack?: boolean } = {}) {
   }
 }
 
-async function pickByText(
-  page: Page,
-  selectScope: ReturnType<Page["locator"]>,
-  startsWith: string,
-) {
-  const select = selectScope.getByRole("combobox");
-  const opts = await select.locator("option").allTextContents();
-  const i = opts.findIndex((t) => t.startsWith(startsWith));
-  expect(i, `option starting with ${startsWith}`).toBeGreaterThan(0);
-  await select.selectOption({ index: i });
-}
-
 test.describe("Become a panelist", () => {
   test("apply, then ops approves and the roster grows", async ({ page, context }) => {
     await gotoReady(page, "/panelist/apply");
@@ -151,13 +139,11 @@ test.describe("Weekly ops loop", () => {
       ).toBeVisible();
     }
 
-    const first = page.locator("[data-testid^=unassigned-b-]").first();
-    const select = first.getByRole("combobox");
-    const options = await select.locator("option").allTextContents();
-    const freeIdx = options.findIndex((t) => t.endsWith("· free"));
-    expect(freeIdx).toBeGreaterThan(0);
-    await select.selectOption({ index: freeIdx });
-    await first.getByRole("button", { name: "Assign" }).click();
+    const free = page
+      .locator("[data-testid^=candidate-]")
+      .filter({ hasText: "open at that time" })
+      .first();
+    await free.getByRole("button", { name: /^Assign/ }).click();
     await expect(page.getByTestId("unassigned-count")).toContainText("2 panels");
 
     await gotoReady(page, "/ops/sessions?tab=no-shows");
@@ -203,14 +189,14 @@ test.describe("Students at scale", () => {
   }) => {
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/students?pageSize=1000");
-    await expect(page.getByText("1,000 match")).toBeVisible();
+    await expect(page.getByText("1,000 students")).toBeVisible();
     const rendered = await page.locator("tbody tr").count();
     expect(rendered).toBeLessThan(60);
 
     await gotoReady(page, "/ops/students");
-    await page.getByLabel("Plan").selectOption("elite");
+    await page.getByRole("tab", { name: "Elite" }).click();
     await expect(page).toHaveURL(/plan=elite/);
-    await expect(page.getByText("17 match")).toBeVisible();
+    await expect(page.getByText("17 students")).toBeVisible();
 
     await page.getByRole("button", { name: "Readiness" }).click();
     await expect(page).toHaveURL(/sort=readiness%3Aasc/);
@@ -219,10 +205,18 @@ test.describe("Students at scale", () => {
     await expect(page.getByText("No students match").first()).toBeVisible();
   });
 
-  test("student detail", async ({ page, context }) => {
+  test("student detail", async ({ page, context, isMobile }) => {
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/students?q=Riya");
     await page.getByRole("cell", { name: /Riya Kulkarni/ }).click();
+    if (!isMobile) {
+      // On a wide screen the row opens the side card first.
+      const panel = page.getByTestId("student-panel");
+      await expect(page).toHaveURL(/student=st-riya/);
+      await expect(panel.getByText("Runway")).toBeVisible();
+      await expect(panel.getByText("Arjun Mehta")).toBeVisible();
+      await panel.getByRole("link", { name: "Full profile" }).click();
+    }
     await expect(page).toHaveURL(/\/ops\/students\/st-riya$/);
     await expect(page.getByRole("heading", { name: "Riya Kulkarni" })).toBeVisible();
     await expect(page.getByText("P1: first mock panel")).toBeVisible();
@@ -233,7 +227,7 @@ test.describe("Students at scale", () => {
   test("ledger totals and filter", async ({ page, context }) => {
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/ledger");
-    await expect(page.getByText("Payments").first()).toBeVisible();
+    await expect(page.getByText("Plan revenue")).toBeVisible();
     await page.getByLabel("Type").selectOption("top-up");
     await expect(page).toHaveURL(/type=top-up/);
     await expect(page.getByText("Top-up mock").first()).toBeVisible();
@@ -255,12 +249,12 @@ test.describe("One panel, three roles", () => {
     // 2. Ops sees it unassigned and assigns Arjun.
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/sessions?tab=unassigned");
-    await expect(page.getByRole("cell", { name: "Riya Kulkarni" })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "Riya Kulkarni", exact: true })).toBeVisible();
     await gotoReady(page, "/ops/assignments");
     await expect(page.getByTestId("unassigned-count")).toContainText("4 panels");
-    const row = page.getByTestId("unassigned-s-1004");
-    await pickByText(page, row, "Arjun Mehta");
-    await row.getByRole("button", { name: "Assign" }).click();
+    await page.getByTestId("unassigned-s-1004").click();
+    const arjun = page.locator("[data-testid^=candidate-]").filter({ hasText: "Arjun Mehta" });
+    await arjun.getByRole("button", { name: /^Assign/ }).click();
     await expect(page.getByTestId("unassigned-count")).toContainText("3 panels");
 
     // 3. Arjun sees it on Today, reads the brief, scores with send-back.

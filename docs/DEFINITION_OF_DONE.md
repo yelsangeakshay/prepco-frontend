@@ -6,8 +6,14 @@ not done and why. Nothing is ticked on trust.
 Checks that apply to every row:
 
 - **Mockup**: layout matched against the mockup PNG at 1280 px, and at 390 px where a phone mockup exists.
+  <<<<<<< HEAD
   **Checked only for S1, E1, S2, E2, E3, S3, S4, E4, S5, S8 to S15 (not S7), E5, E6, E7, E9, E10, E11, E8, P2 and A1** (Mockup fidelity pass); open for all other screens. Layout elsewhere follows the
-  brief's text and design tokens only. This is the one box that needs a human with the PNGs.
+  \=======
+  **Checked only for S1, E1, S2, E2, E3, S3, S4, E4, S5, S8 to S15 (not S7), E8, P1 to P5 and A1 to A6** (Mockup fidelity pass); open for all other screens. Layout elsewhere follows the
+
+> > > > > > > mockup-batch-4
+> > > > > > > brief's text and design tokens only. This is the one box that needs a human with the PNGs.
+
 - **Reachable**: opened through the sidebar, or through the previous journey step. `foundation.spec`
   crawls every nav link per role; journeys cover the in-page links.
 - **States**: loading, empty, error and success each have a Storybook story (`stories/*.stories.tsx`),
@@ -55,11 +61,11 @@ Checks that apply to every row:
 | P5      | Availability                                                  | `/panelist/availability`                                       | yes (checked)                       | yes         | Set availability                                 |
 | -       | Panelist profile (not mocked)                                 | `/panelist/profile`                                            | not mocked                          | yes         | none                                             |
 | A1      | Cohort overview                                               | `/ops`                                                         | yes (checked)                       | yes         | Weekly ops loop                                  |
-| A2      | Students, student detail                                      | `/ops/students`, `/ops/students/[id]`                          | open                                | yes         | Weekly ops loop                                  |
-| A3      | Panel assignment                                              | `/ops/assignments`                                             | open                                | yes         | Weekly ops loop; One panel, three roles          |
-| A4      | Sessions and bookings                                         | `/ops/sessions`                                                | open                                | yes         | Weekly ops loop                                  |
-| A5      | Plans and credits                                             | `/ops/ledger`                                                  | open                                | yes         | Weekly ops loop                                  |
-| A6      | Panelists, applications                                       | `/ops/panelists`, `/ops/panelists/applications`                | open                                | yes         | Keep the panel healthy; Become a panelist        |
+| A2      | Students, student detail                                      | `/ops/students`, `/ops/students/[id]`                          | yes (checked)                       | yes         | Weekly ops loop                                  |
+| A3      | Panel assignment                                              | `/ops/assignments`                                             | yes (checked)                       | yes         | Weekly ops loop; One panel, three roles          |
+| A4      | Sessions and bookings                                         | `/ops/sessions`                                                | yes (checked)                       | yes         | Weekly ops loop                                  |
+| A5      | Plans and credits                                             | `/ops/ledger`                                                  | yes (checked)                       | yes         | Weekly ops loop                                  |
+| A6      | Panelists, applications                                       | `/ops/panelists`, `/ops/panelists/applications`                | yes (checked)                       | yes         | Keep the panel healthy; Become a panelist        |
 | -       | Not found, error, maintenance                                 | `not-found`, `error`, `/maintenance`                           | open                                | yes         | foundation                                       |
 
 ## Known gaps

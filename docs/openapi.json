@@ -7455,6 +7455,15 @@
                           },
                           "joinedAt": {
                             "type": "string"
+                          },
+                          "stage": {
+                            "type": "string"
+                          },
+                          "panelistName": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
                           }
                         },
                         "required": [
@@ -7469,7 +7478,9 @@
                           "panelsDone",
                           "noShows",
                           "status",
-                          "joinedAt"
+                          "joinedAt",
+                          "stage",
+                          "panelistName"
                         ],
                         "additionalProperties": false
                       }
@@ -7482,13 +7493,26 @@
                     },
                     "pageSize": {
                       "type": "number"
+                    },
+                    "counts": {
+                      "type": "object",
+                      "properties": {
+                        "attention": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "attention"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
                     "items",
                     "total",
                     "page",
-                    "pageSize"
+                    "pageSize",
+                    "counts"
                   ],
                   "additionalProperties": false
                 }
@@ -7941,6 +7965,9 @@
                                 "specialty": {
                                   "type": "string"
                                 },
+                                "function": {
+                                  "type": "string"
+                                },
                                 "load": {
                                   "type": "number"
                                 },
@@ -7955,6 +7982,7 @@
                                 "panelistId",
                                 "name",
                                 "specialty",
+                                "function",
                                 "load",
                                 "capacity",
                                 "free"
@@ -8539,13 +8567,29 @@
                         },
                         "net": {
                           "type": "number"
+                        },
+                        "planRevenue": {
+                          "type": "number"
+                        },
+                        "plans": {
+                          "type": "number"
+                        },
+                        "topUps": {
+                          "type": "number"
+                        },
+                        "upgradeCredit": {
+                          "type": "number"
                         }
                       },
                       "required": [
                         "payments",
                         "refunds",
                         "credits",
-                        "net"
+                        "net",
+                        "planRevenue",
+                        "plans",
+                        "topUps",
+                        "upgradeCredit"
                       ],
                       "additionalProperties": false
                     }
@@ -8649,6 +8693,12 @@
                           "company": {
                             "type": "string"
                           },
+                          "role": {
+                            "type": "string"
+                          },
+                          "turnaroundHours": {
+                            "type": "number"
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -8689,6 +8739,8 @@
                           "function",
                           "specialty",
                           "company",
+                          "role",
+                          "turnaroundHours",
                           "status",
                           "panelsThisSeason",
                           "load",
@@ -8721,12 +8773,22 @@
                         },
                         "paused": {
                           "type": "number"
+                        },
+                        "byFunction": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "number"
+                          }
                         }
                       },
                       "required": [
                         "all",
                         "needsAttention",
-                        "paused"
+                        "paused",
+                        "byFunction"
                       ],
                       "additionalProperties": false
                     }

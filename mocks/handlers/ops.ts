@@ -45,6 +45,17 @@ function sortItems<T>(
   });
 }
 
+/** Session kind filter pills on the bookings screen (a04.png). */
+const KIND_PATTERN: Record<string, RegExp> = {
+  free: /free session/i,
+  profiling: /profil/i,
+  p1: /^P1/,
+  "deep-dive": /deep-dive/i,
+  p2: /^P2/,
+  p3: /^P3/,
+  case: /case/i,
+};
+
 function panelistName(scenario: Scenario | null, id: string | null) {
   if (!id) return null;
   return getWorld(scenario).panelists.find((p) => p.id === id)?.name ?? null;
@@ -275,11 +286,15 @@ export const opsHandlers = [
     const fn = url.searchParams.get("function");
     const status = url.searchParams.get("status");
 
-    let list = allStudents(scenario).map((s) => ({ ...s, status: studentStatus(s) }));
+    const track = url.searchParams.get("track");
+
+    const all = allStudents(scenario).map((s) => ({ ...s, status: studentStatus(s) }));
+    let list = all;
     if (q) list = list.filter((s) => `${s.name} ${s.email} ${s.college}`.toLowerCase().includes(q));
     if (plan) list = list.filter((s) => s.plan === plan);
     if (fn) list = list.filter((s) => s.function === fn);
     if (status) list = list.filter((s) => s.status === status);
+    if (track) list = list.filter((s) => s.track === track);
     list = sortItems(list, url.searchParams.get("sort"), {
       name: (s) => s.name,
       readiness: (s) => s.readiness,
@@ -287,6 +302,29 @@ export const opsHandlers = [
       plan: (s) => s.plan,
       panelsDone: (s) => s.panelsDone,
     });
+
+    // Runway stage and panelist come from each student's own bookings (a02.png).
+    const byStudent = new Map<string, BookingRec[]>();
+    for (const x of allBookings(scenario)) {
+      if (x.status === "cancelled") continue;
+      const arr = byStudent.get(x.studentId);
+      if (arr) arr.push(x);
+      else byStudent.set(x.studentId, [x]);
+    }
+    const stageOf = (id: string) => {
+      const mine = (byStudent.get(id) ?? []).filter((x) => x.startsAt);
+      const next = mine
+        .filter((x) => x.status === "upcoming" || x.status === "unassigned")
+        .sort((a, b) => a.startsAt!.localeCompare(b.startsAt!))[0];
+      if (next) return `${next.title.split(":")[0]} · ${formatDay(next.startsAt!)}`;
+      const done = mine.filter((x) => x.status === "completed").length;
+      return done ? `${done} ${done === 1 ? "panel" : "panels"} done` : "Not started";
+    };
+    const panelistOf = (id: string) => {
+      const mine = (byStudent.get(id) ?? []).filter((x) => x.panelistId);
+      const last = mine.sort((a, b) => (b.startsAt ?? "").localeCompare(a.startsAt ?? ""))[0];
+      return panelistName(scenario, last?.panelistId ?? null);
+    };
     const rows = list.map((s) => ({
       id: s.id,
       name: s.name,
@@ -300,8 +338,13 @@ export const opsHandlers = [
       noShows: s.noShows,
       status: s.status,
       joinedAt: s.joinedAt,
+      stage: stageOf(s.id),
+      panelistName: panelistOf(s.id),
     }));
-    return HttpResponse.json(paginate(rows, url));
+    return HttpResponse.json({
+      ...paginate(rows, url),
+      counts: { attention: all.filter((s) => s.status === "at-risk").length },
+    });
   }),
 
   http.get(`${API_BASE_URL}/ops/students/:id`, async ({ request, params }) => {
@@ -428,6 +471,7 @@ export const opsHandlers = [
             panelistId: p.id,
             name: p.name,
             specialty: p.specialty,
+            function: p.function,
             load: panelistLoad(scenario, p.id),
             capacity: p.capacity,
             free: free(p, x.startsAt),
@@ -503,6 +547,8 @@ export const opsHandlers = [
     let list = all;
     if (tab === "unassigned") list = all.filter((x) => x.status === "unassigned");
     if (tab === "no-shows") list = all.filter((x) => x.status === "no-show");
+    const kind = KIND_PATTERN[url.searchParams.get("kind") ?? ""];
+    if (kind) list = list.filter((x) => kind.test(x.title));
     if (q) list = list.filter((x) => `${x.studentName} ${x.title}`.toLowerCase().includes(q));
     list = sortItems(list, url.searchParams.get("sort") ?? "startsAt:desc", {
       startsAt: (x) => x.startsAt ?? "",
@@ -556,6 +602,11 @@ export const opsHandlers = [
     let list = all;
     if (type) list = list.filter((e) => e.type === type);
     if (q) list = list.filter((e) => `${e.studentName} ${e.description}`.toLowerCase().includes(q));
+    const upgradable = new Set(
+      allStudents(scenario)
+        .filter((x) => x.plan === "basic" || x.plan === "premium")
+        .map((x) => x.id),
+    );
     const t = (types: string[]) =>
       all.filter((e) => types.includes(e.type)).reduce((n, e) => n + e.amount, 0);
     return HttpResponse.json({
@@ -576,6 +627,13 @@ export const opsHandlers = [
         refunds: t(["refund"]),
         credits: t(["credit"]),
         net: all.reduce((n, e) => n + e.amount, 0),
+        planRevenue: all.filter((e) => e.type === "payment").reduce((n, e) => n + e.amount, 0),
+        plans: all.filter((e) => e.type === "payment").length,
+        topUps: t(["top-up"]),
+        // Top-ups only help students who can still move up a tier (Proposed).
+        upgradeCredit: all
+          .filter((e) => e.type === "top-up" && upgradable.has(e.studentId))
+          .reduce((n, e) => n + e.amount, 0),
       },
     });
   }),
@@ -597,6 +655,10 @@ export const opsHandlers = [
         function: p.function,
         specialty: p.specialty,
         company: p.company,
+        role: p.role,
+        // Proposed metric: a steady 16 to 31 hours per panelist, longer while feedback is overdue.
+        turnaroundHours:
+          16 + ([...p.id].reduce((n, ch) => n + ch.charCodeAt(0), 0) % 16) + p.feedbackOverdue * 6,
         status: p.status,
         panelsThisSeason: p.panelsThisSeason,
         load,
@@ -624,6 +686,12 @@ export const opsHandlers = [
         all: all.length,
         needsAttention: all.filter((p) => p.health === "needs-attention").length,
         paused: all.filter((p) => p.status === "paused").length,
+        byFunction: Object.fromEntries(
+          [...new Set(all.map((p) => p.function))].map((f) => [
+            f,
+            all.filter((p) => p.function === f).length,
+          ]),
+        ),
       },
     });
   }),

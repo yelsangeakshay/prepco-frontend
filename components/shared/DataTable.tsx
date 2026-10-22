@@ -37,6 +37,8 @@ interface Props<T> {
   emptyBody?: string;
   getRowId?: (row: T) => string;
   onRowClick?: (row: T) => void;
+  /** Extra classes for one row, e.g. to mark the selected one. */
+  rowClassName?: (row: T) => string | undefined;
   caption: string;
 }
 
@@ -56,6 +58,7 @@ export function DataTable<T>({
   emptyBody,
   getRowId,
   onRowClick,
+  rowClassName,
   caption,
 }: Props<T>) {
   const table = useReactTable({
@@ -113,7 +116,7 @@ export function DataTable<T>({
       >
         <table className="w-full text-left text-sm">
           <caption className="sr-only">{caption}</caption>
-          <thead className="bg-cream-soft sticky top-0 z-10">
+          <thead className="sticky top-0 z-10 bg-white">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((h) => {
@@ -163,6 +166,7 @@ export function DataTable<T>({
                   className={cn(
                     "border-line border-t",
                     onRowClick && "hover:bg-cream cursor-pointer",
+                    rowClassName?.(row.original),
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (

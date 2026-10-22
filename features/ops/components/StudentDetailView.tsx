@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ErrorCard } from "@/components/shared/ErrorCard";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { PageSkeleton } from "@/components/shared/Skeletons";
 import { LedgerRow } from "@/features/ops/ledger/components/LedgerRow";
 import { ApiError } from "@/lib/api/client";
@@ -37,16 +38,15 @@ export function StudentDetailView({ id }: { id: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4 p-4 md:p-8">
+    <div className="mx-auto max-w-7xl space-y-5 p-4 md:p-8">
       <Link href={ROUTES.ops.students} className="text-maroon-600 text-sm font-semibold underline">
         All students
       </Link>
-      <div>
-        <h1 className="font-display text-3xl font-bold">{data.name}</h1>
-        <p className="text-navy-400 text-sm">
-          {data.email} · {data.college} · {data.track} track
-        </p>
-      </div>
+      <PageHeader
+        eyebrow={`${data.track} track · ${data.college}`}
+        title={data.name}
+        subtitle={data.email}
+      />
 
       {data.relockRequest && (
         <Card variant="inset" data-testid="relock-request" className="space-y-3">
