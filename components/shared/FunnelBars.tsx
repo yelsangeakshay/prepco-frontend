@@ -17,9 +17,7 @@ export function FunnelBars({ stages }: { stages: FunnelStage[] }) {
             <div className="mb-1 flex items-baseline justify-between text-sm">
               <span className="font-medium">{s.label}</span>
               <span className="tabular-nums">
-                <strong className="font-display text-base">
-                  {s.value.toLocaleString("en-IN")}
-                </strong>
+                <strong className="font-num text-base">{s.value.toLocaleString("en-IN")}</strong>
                 {prev ? (
                   <span className="text-navy-400 ml-2 text-xs">
                     {Math.round((s.value / prev) * 100)}%

@@ -7,7 +7,7 @@ import { Avatar } from "@/components/shell/Avatar";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { PageSkeleton } from "@/components/shared/Skeletons";
+import { ListPageSkeleton } from "@/components/shared/PageSkeletons";
 import { cn } from "@/lib/utils/cn";
 import { ROUTES } from "@/lib/config/routes";
 import { formatTime } from "@/lib/utils/dates";
@@ -207,7 +207,7 @@ function FeedbackDue({ items }: { items: PanelItem[] }) {
 /** P2 today (p02.png, p02-mobile.png). */
 export function TodayView() {
   const { data, isPending, isError, refetch } = usePanelistToday();
-  if (isPending) return <PageSkeleton />;
+  if (isPending) return <ListPageSkeleton stats={3} />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   const { panelist, today, awaitingScore } = data;
@@ -289,12 +289,7 @@ function Stat({
   return (
     <Card variant="feature" className="p-5">
       <p className="text-navy-400 text-sm">{label}</p>
-      <p
-        className={cn(
-          "font-display mt-3 text-4xl font-bold",
-          tone === "maroon" && "text-maroon-600",
-        )}
-      >
+      <p className={cn("font-num mt-3 text-4xl font-bold", tone === "maroon" && "text-maroon-600")}>
         {value}
       </p>
       {hint && <p className="text-navy-400 mt-1 text-sm">{hint}</p>}

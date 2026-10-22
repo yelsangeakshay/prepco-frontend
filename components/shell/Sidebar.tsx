@@ -112,7 +112,7 @@ export function Sidebar({ role }: { role: Role }) {
       <nav aria-label="Primary" className="flex flex-1 flex-col gap-6">
         {config.sections.map((section) => (
           <div key={section.title}>
-            <p className="px-3 pb-2 text-[11px] font-semibold tracking-[0.16em] text-white/55 uppercase max-xl:sr-only">
+            <p className="px-3 pb-2 text-xs font-semibold tracking-[0.16em] text-white/55 uppercase max-xl:sr-only">
               {section.title}
             </p>
             <ul className="flex flex-col gap-1">
@@ -151,7 +151,7 @@ export function Sidebar({ role }: { role: Role }) {
                       {badge && (
                         <span
                           className={cn(
-                            "ml-auto text-[11px] font-bold max-xl:hidden",
+                            "ml-auto text-xs font-bold max-xl:hidden",
                             item.badgeTone === "gold"
                               ? "bg-gold-500 text-navy-900 rounded-full px-2.5 py-0.5 tracking-wide uppercase"
                               : "bg-maroon-600 flex size-6 items-center justify-center rounded-full text-white",

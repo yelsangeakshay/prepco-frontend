@@ -14,15 +14,16 @@ import { formatINR } from "@/lib/utils/currency";
 import { notify } from "@/lib/utils/notify";
 import { useCaseTrack } from "../hooks/useJourney";
 import type { CaseTrack } from "../schemas";
+import { statusTone, type StatusTone } from "@/lib/status";
 
 const STATE_PILL: Record<
   Exclude<CaseTrack["steps"][number]["state"], "upload">,
-  { label: string; tone: "green" | "neutral" | "goldSoft" }
+  { label: string; tone: StatusTone }
 > = {
-  done: { label: "Done", tone: "green" },
-  book: { label: "Book", tone: "neutral" },
-  later: { label: "Later", tone: "neutral" },
-  "on-placing": { label: "Unlocks on placing", tone: "goldSoft" },
+  done: { label: "Done", tone: statusTone("done") },
+  book: { label: "Book", tone: statusTone("book") },
+  later: { label: "Later", tone: statusTone("later") },
+  "on-placing": { label: "Unlocks on placing", tone: statusTone("on-placing") },
 };
 
 const eyebrow = "text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase";

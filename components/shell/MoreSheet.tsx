@@ -49,7 +49,7 @@ export default function MoreSheet({
                     <Icon className="size-5" aria-hidden />
                     {item.label}
                     {item.badge && (
-                      <span className="bg-gold-500 text-navy-900 ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                      <span className="bg-gold-500 text-navy-900 ml-auto rounded-full px-2 py-0.5 text-xs font-semibold">
                         {item.badge}
                       </span>
                     )}

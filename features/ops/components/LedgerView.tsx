@@ -15,15 +15,20 @@ import { useDebounced } from "@/lib/utils/useDebounced";
 import { useUrlState } from "@/lib/utils/useUrlState";
 import { useOpsLedger } from "../hooks/useOps";
 import type { LedgerEntry } from "../schemas";
+import { statusTone } from "@/lib/status";
 
 const PLAN_ITEM = /^(Basic|Premium|Elite) plan/;
-const PLAN_TONE = { Basic: "neutral", Premium: "maroon", Elite: "gold" } as const;
+const PLAN_TONE = {
+  Basic: statusTone("basic"),
+  Premium: statusTone("premium"),
+  Elite: statusTone("elite"),
+} as const;
 
 const STATUS = {
-  payment: { label: "Paid", tone: "green" },
-  "top-up": { label: "Paid", tone: "green" },
-  refund: { label: "Refunded", tone: "maroonSoft" },
-  credit: { label: "Credit", tone: "goldSoft" },
+  payment: { label: "Paid", tone: statusTone("paid") },
+  "top-up": { label: "Paid", tone: statusTone("paid") },
+  refund: { label: "Refunded", tone: statusTone("refunded") },
+  credit: { label: "Credit", tone: statusTone("credit") },
 } as const;
 
 const columns: ColumnDef<LedgerEntry, unknown>[] = [
@@ -90,7 +95,7 @@ function Figure({ label, value, hint }: { label: string; value: string; hint: st
   return (
     <Card variant="feature" className="p-5">
       <p className="text-navy-400 text-sm">{label}</p>
-      <p className="font-display mt-1 text-3xl leading-tight font-bold tabular-nums">{value}</p>
+      <p className="font-num mt-1 text-3xl leading-tight font-bold tabular-nums">{value}</p>
       <p className="text-navy-400 mt-1 text-sm">{hint}</p>
     </Card>
   );

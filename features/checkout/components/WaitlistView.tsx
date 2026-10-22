@@ -174,7 +174,7 @@ export function WaitlistView() {
             <p className="text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase">
               After you join
             </p>
-            <p className="font-display mt-3 text-6xl font-bold">
+            <p className="font-num mt-3 text-6xl font-bold">
               <span className="text-navy-400 font-normal">#</span>
               {plans.data?.waitlistNext ?? ""}
             </p>

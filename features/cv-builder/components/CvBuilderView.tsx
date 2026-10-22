@@ -104,7 +104,7 @@ export function CvBuilderView() {
             <p className="text-navy-400 text-xs font-semibold tracking-wider uppercase">
               {draft.version} score
             </p>
-            <p data-testid="overall-score" className="font-display mt-1 text-5xl font-bold">
+            <p data-testid="overall-score" className="font-num mt-1 text-5xl font-bold">
               {draft.scores.overall}
             </p>
             {locked.scores && (

@@ -48,8 +48,8 @@ export function ReadinessMeter({ value, size = 120, label = "Readiness" }: Props
         />
       </svg>
       <div className="absolute text-center">
-        <p className="font-display text-3xl leading-none font-bold">{pct}%</p>
-        <p className="text-navy-400 mt-1 text-[11px]">{label}</p>
+        <p className="font-num text-3xl leading-none font-bold">{pct}%</p>
+        <p className="text-navy-400 mt-1 text-xs">{label}</p>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ import { formatDay, formatSession } from "@/lib/utils/dates";
 import { notify } from "@/lib/utils/notify";
 import { useFeedbackDetail, useFeedbackList } from "../hooks/useFeedback";
 import type { FeedbackQuestion } from "../schemas";
+import { statusTone, type StatusTone } from "@/lib/status";
 
 /** S10 list. */
 export function FeedbackList() {
@@ -64,13 +65,10 @@ export function FeedbackList() {
   );
 }
 
-const RATING: Record<
-  FeedbackQuestion["rating"],
-  { label: string; tone: "green" | "maroonSoft" | "goldSoft" }
-> = {
-  strong: { label: "Strong", tone: "green" },
-  flagged: { label: "Flagged", tone: "maroonSoft" },
-  okay: { label: "Okay", tone: "goldSoft" },
+const RATING: Record<FeedbackQuestion["rating"], { label: string; tone: StatusTone }> = {
+  strong: { label: "Strong", tone: statusTone("strong") },
+  flagged: { label: "Flagged", tone: statusTone("flagged") },
+  okay: { label: "Okay", tone: statusTone("okay") },
 };
 
 const initials = (name: string) =>
@@ -156,7 +154,7 @@ export function FeedbackDetailView({ panelId }: { panelId: string }) {
           <Card variant="feature">
             <div className="flex items-baseline justify-between">
               <p className="font-semibold">Ready for Day 0</p>
-              <p className="font-display text-4xl font-bold">{data.readiness}%</p>
+              <p className="font-num text-4xl font-bold">{data.readiness}%</p>
             </div>
             <ProgressBar className="mt-2" value={data.readiness} label="Readiness for Day 0" />
             {data.readinessNote && (
@@ -199,7 +197,7 @@ export function FeedbackDetailView({ panelId }: { panelId: string }) {
                         {q.tags.map((t) => (
                           <li
                             key={t}
-                            className="bg-cream-soft text-navy-900 rounded-full px-3 py-1 text-[11px] font-bold tracking-wider uppercase"
+                            className="bg-cream-soft text-navy-900 rounded-full px-3 py-1 text-xs font-bold tracking-wider uppercase"
                           >
                             {t}
                           </li>

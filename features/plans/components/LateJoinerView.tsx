@@ -24,7 +24,7 @@ export function LateJoinerView({ data }: { data: LateJoiner }) {
           </p>
         </header>
         <div className="rounded-feature border-line mt-14 hidden w-40 shrink-0 border bg-white p-5 text-center md:block">
-          <p className="font-display text-5xl leading-none font-bold">{data.daysLeft}</p>
+          <p className="font-num text-5xl leading-none font-bold">{data.daysLeft}</p>
           <p className="text-navy-400 mt-1 text-sm">days to Day 0</p>
         </div>
       </div>

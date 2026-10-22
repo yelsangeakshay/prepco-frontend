@@ -67,7 +67,7 @@ function FunctionCompare() {
           <p className="text-navy-400 text-xs font-semibold tracking-wider uppercase">
             {q.data.from} to {q.data.to}
           </p>
-          <p className="font-display mt-1 text-4xl font-bold">
+          <p className="font-num mt-1 text-4xl font-bold">
             {q.data.reusableAnswers}
             <span className="text-navy-400 text-xl font-normal">
               {" "}
@@ -202,7 +202,7 @@ export function QuickSwitchView() {
             <dt className="text-navy-400 text-sm">{s.label}</dt>
             <dd
               className={cn(
-                "font-display mt-1 text-4xl font-bold",
+                "font-num mt-1 text-4xl font-bold",
                 s.tone === "green" && "text-green-600",
               )}
             >
@@ -239,7 +239,7 @@ export function QuickSwitchView() {
                       className="font-display flex size-16 shrink-0 flex-col items-center justify-center rounded-full bg-green-100 text-green-600"
                     >
                       <span className="text-2xl leading-none font-bold">{l.fit}</span>
-                      <span className="font-sans text-[10px] font-bold tracking-wider">FIT</span>
+                      <span className="font-sans text-xs font-bold tracking-wider">FIT</span>
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold">{l.title}</p>

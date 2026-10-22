@@ -17,12 +17,13 @@ import {
 } from "../availability/components/AvailabilityGrid";
 import { useAvailability, useSaveAvailability } from "../hooks/usePanelist";
 import type { Availability } from "../schemas";
+import { statusTone } from "@/lib/status";
 
 const STATUS_TONE = {
-  Upcoming: "neutral",
-  Tonight: "maroonSoft",
-  "Feedback due": "maroonSoft",
-  "Feedback sent": "green",
+  Upcoming: statusTone("Upcoming"),
+  Tonight: statusTone("Tonight"),
+  "Feedback due": statusTone("Feedback due"),
+  "Feedback sent": statusTone("Feedback sent"),
 } as const;
 
 /** Monday of today's week as a UTC date. */

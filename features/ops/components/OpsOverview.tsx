@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { ProgressBar } from "@/components/shared/ProgressBar";
-import { PageSkeleton } from "@/components/shared/Skeletons";
+import { OpsOverviewSkeleton } from "@/components/shared/PageSkeletons";
 import { formatINR } from "@/lib/utils/currency";
 import { useCohort } from "../hooks/useOps";
 import type { Cohort } from "../schemas";
@@ -18,7 +18,7 @@ function SeatCard({ seat }: { seat: Cohort["seats"][number] }) {
       <p className="text-maroon-600 text-[13px] font-semibold tracking-[0.14em] uppercase">
         {seat.label}
       </p>
-      <p className="font-display mt-4 text-5xl leading-none font-bold tabular-nums">
+      <p className="font-num mt-4 text-5xl leading-none font-bold tabular-nums">
         {seat.taken}
         <span className="text-navy-400 ml-1.5 text-2xl font-normal">/ {seat.total}</span>
       </p>
@@ -72,7 +72,7 @@ function Revenue({ data }: { data: Cohort }) {
       </ul>
       <div className="border-line mt-5 flex items-end justify-between gap-4 border-t pt-5">
         <span className="font-semibold">Season to date</span>
-        <span data-testid="season-total" className="font-display text-4xl font-bold tabular-nums">
+        <span data-testid="season-total" className="font-num text-4xl font-bold tabular-nums">
           {formatINR(data.revenue.total)}
         </span>
       </div>
@@ -143,7 +143,7 @@ function ThisWeek({ data }: { data: Cohort }) {
 /** A1 cohort overview (a01.png). */
 export function OpsOverview() {
   const { data, isPending, isError, refetch } = useCohort();
-  if (isPending) return <PageSkeleton />;
+  if (isPending) return <OpsOverviewSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   return (

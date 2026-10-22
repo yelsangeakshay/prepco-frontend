@@ -12,13 +12,14 @@ import { ApiError } from "@/lib/api/client";
 import { ROUTES } from "@/lib/config/routes";
 import { formatDay, formatSession } from "@/lib/utils/dates";
 import { useOpsStudent, useRelockDecision } from "../hooks/useOps";
+import { statusTone } from "@/lib/status";
 
 const STATUS_TONE = {
-  upcoming: "navy",
-  completed: "green",
-  "no-show": "maroonSoft",
-  cancelled: "neutral",
-  unassigned: "maroon",
+  upcoming: statusTone("upcoming"),
+  completed: statusTone("completed"),
+  "no-show": statusTone("no-show"),
+  cancelled: statusTone("cancelled"),
+  unassigned: statusTone("unassigned"),
 } as const;
 
 /** A2 detail. */
@@ -85,18 +86,18 @@ export function StudentDetailView({ id }: { id: string }) {
         </Card>
         <Card>
           <p className="text-navy-400 text-xs font-semibold uppercase">Readiness</p>
-          <p className="font-display text-2xl font-bold">{data.readiness}%</p>
+          <p className="font-num text-2xl font-bold">{data.readiness}%</p>
         </Card>
         <Card>
           <p className="text-navy-400 text-xs font-semibold uppercase">CV</p>
-          <p className="font-display text-2xl font-bold">
+          <p className="font-num text-2xl font-bold">
             {data.cv.score}
             <span className="text-navy-400 text-sm font-normal"> {data.cv.version ?? "none"}</span>
           </p>
         </Card>
         <Card>
           <p className="text-navy-400 text-xs font-semibold uppercase">Answers</p>
-          <p className="font-display text-2xl font-bold">
+          <p className="font-num text-2xl font-bold">
             {data.answers.prepared}/{data.answers.total}
             <span className="text-maroon-600 text-sm font-normal">
               {" "}

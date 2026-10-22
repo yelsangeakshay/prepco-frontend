@@ -15,7 +15,7 @@ export function SeatGauge({ label, taken, total }: Props) {
         <p className="text-sm font-semibold">{label}</p>
         <p className="text-navy-400 text-xs">{left === 0 ? "Full" : `${left} seats left`}</p>
       </div>
-      <p className="font-display mt-1 text-2xl font-bold tabular-nums">
+      <p className="font-num mt-1 text-2xl font-bold tabular-nums">
         {taken}
         <span className="text-navy-400 text-base font-normal"> / {total}</span>
       </p>

@@ -23,8 +23,14 @@ import { formatSort, parseSort } from "@/lib/utils/tableState";
 import { useUrlState } from "@/lib/utils/useUrlState";
 import { useOpsStudent, useOpsStudents } from "../hooks/useOps";
 import type { StudentRow } from "../schemas";
+import { statusTone } from "@/lib/status";
 
-const PLAN_TONE = { none: "neutral", basic: "neutral", premium: "maroon", elite: "gold" } as const;
+const PLAN_TONE = {
+  none: statusTone("none"),
+  basic: statusTone("basic"),
+  premium: statusTone("premium"),
+  elite: statusTone("elite"),
+} as const;
 
 /** "Arjun Mehta" becomes "A. Mehta". */
 function shortName(name: string) {

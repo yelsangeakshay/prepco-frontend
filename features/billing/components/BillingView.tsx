@@ -18,18 +18,19 @@ import { formatDay, formatDayYear } from "@/lib/utils/dates";
 import { notify } from "@/lib/utils/notify";
 import { useBilling, useBuyTopUp, useUpgradeQuote } from "../hooks/useBilling";
 import type { Billing } from "../schemas";
+import { statusTone, type StatusTone } from "@/lib/status";
 
 const eyebrow = "text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase";
 
 const ROW_PILL: Record<
   Billing["entitlements"][number]["state"],
-  { label: string; tone: "green" | "goldSoft" | "neutral" }
+  { label: string; tone: StatusTone }
 > = {
-  used: { label: "Used", tone: "green" },
-  booked: { label: "", tone: "goldSoft" },
-  scheduled: { label: "", tone: "neutral" },
-  unbooked: { label: "Not booked", tone: "neutral" },
-  active: { label: "Active", tone: "green" },
+  used: { label: "Used", tone: statusTone("used") },
+  booked: { label: "", tone: statusTone("booked") },
+  scheduled: { label: "", tone: statusTone("scheduled") },
+  unbooked: { label: "Not booked", tone: statusTone("unbooked") },
+  active: { label: "Active", tone: statusTone("active") },
 };
 
 /** S14 plan and billing (s14.png). */
@@ -72,7 +73,7 @@ export function BillingView() {
                 <span className="md:hidden"> · Finals</span>
               </p>
               {!free && (
-                <Badge tone="neutral" className="hidden text-[11px] md:inline-flex">
+                <Badge tone="neutral" className="hidden text-xs md:inline-flex">
                   {data.season}
                 </Badge>
               )}
@@ -89,7 +90,7 @@ export function BillingView() {
 
           {plan.paid > 0 && (
             <div className="md:hidden">
-              <p className="font-display text-4xl font-bold">{formatINR(plan.paid)}</p>
+              <p className="font-num text-4xl font-bold">{formatINR(plan.paid)}</p>
               {data.paidAt && (
                 <p className="text-navy-400 mt-1">
                   Paid {formatDayYear(data.paidAt).split(", ")[1]} · Season 1
@@ -181,7 +182,7 @@ export function BillingView() {
               </div>
               <div className="flex items-baseline justify-between pt-2">
                 <dt className="font-semibold">You pay</dt>
-                <dd className="font-display text-4xl font-bold" data-testid="billing-payable">
+                <dd className="font-num text-4xl font-bold" data-testid="billing-payable">
                   {formatINR(q.payable)}
                 </dd>
               </div>
@@ -289,7 +290,7 @@ export function BillingView() {
           <ul className="mt-3">
             <li
               aria-hidden
-              className="text-navy-400 hidden grid-cols-[1.1fr_2.2fr_1fr_1fr_0.8fr] gap-3 px-1 pb-2 text-[11px] font-bold tracking-[0.14em] uppercase md:grid"
+              className="text-navy-400 hidden grid-cols-[1.1fr_2.2fr_1fr_1fr_0.8fr] gap-3 px-1 pb-2 text-xs font-bold tracking-[0.14em] uppercase md:grid"
             >
               <span>Date</span>
               <span>Item</span>
