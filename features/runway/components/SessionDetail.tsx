@@ -114,7 +114,7 @@ export function SessionDetail({ id }: { id: string }) {
 
         {s.status === "completed" && s.feedbackId && (
           <Button asChild className="mt-4">
-            <Link href={ROUTES.student.feedbackPanel(s.feedbackId)}>Read Panel Feedback</Link>
+            <Link href={ROUTES.student.feedbackPanel(s.feedbackId)}>Read panel feedback</Link>
           </Button>
         )}
 
@@ -125,7 +125,7 @@ export function SessionDetail({ id }: { id: string }) {
                 Reschedule
               </Button>
               <Button variant="ghost" onClick={() => setConfirmCancel(true)}>
-                Cancel Session
+                Cancel session
               </Button>
             </div>
             {s.freeRescheduleUntil && (
@@ -146,7 +146,7 @@ export function SessionDetail({ id }: { id: string }) {
             <p className="text-navy-400">Your credit is kept and you can rebook.</p>
             <div className="mt-3 flex gap-2">
               <Button
-                disabled={cancel.isPending}
+                loading={cancel.isPending}
                 onClick={() =>
                   cancel.mutate(undefined, {
                     onSuccess: () => {
@@ -156,10 +156,10 @@ export function SessionDetail({ id }: { id: string }) {
                   })
                 }
               >
-                {cancel.isPending ? "Cancelling…" : "Yes, Cancel"}
+                Yes, cancel
               </Button>
               <Button variant="secondary" onClick={() => setConfirmCancel(false)}>
-                Keep Session
+                Keep session
               </Button>
             </div>
           </div>
@@ -180,7 +180,7 @@ export function SessionDetail({ id }: { id: string }) {
           />
           {picking && (
             <Button variant="ghost" className="mt-2" onClick={() => setPicking(false)}>
-              Never Mind
+              Never mind
             </Button>
           )}
         </Card>

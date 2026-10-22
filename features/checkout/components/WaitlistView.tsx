@@ -34,7 +34,7 @@ export function WaitlistView() {
 
   return (
     <div className="mx-auto max-w-6xl p-4 md:p-8">
-      <div className="grid grid-cols-[minmax(0,1fr)] items-end gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-end gap-6 lg:grid-cols-[minmax(0,1fr)_auto]">
         <PageHeader
           className="md:pr-0"
           title="Finals seats for Season 1 are full."
@@ -88,7 +88,7 @@ export function WaitlistView() {
                 Season 1 price is kept.
               </p>
               <Button asChild variant="secondary" className="mt-5">
-                <Link href={ROUTES.student.home}>Go To Home</Link>
+                <Link href={ROUTES.student.home}>Go to home</Link>
               </Button>
             </div>
           ) : (
@@ -158,8 +158,8 @@ export function WaitlistView() {
                   Something went wrong. Please try again.
                 </p>
               )}
-              <Button type="submit" disabled={join.isPending} className="w-full md:w-auto">
-                {join.isPending ? "Joining…" : "Join waitlist"}
+              <Button type="submit" loading={join.isPending} className="w-full md:w-auto">
+                Join waitlist
               </Button>
               <p className="text-navy-400 text-sm">
                 No payment now. When a seat opens you get 24 hours to take it before it goes to the

@@ -85,7 +85,7 @@ export function PlansView() {
         <ErrorCard onRetry={() => refetch()} />
       ) : (
         <div
-          className="mt-6 grid gap-4 md:grid-cols-3"
+          className="mt-6 grid gap-6 md:grid-cols-3"
           {...(isPending ? { role: "status", "aria-label": "Loading plans" } : {})}
         >
           {isPending && Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-96" />)}

@@ -7,7 +7,7 @@ test.describe("Join and buy a plan", () => {
     await page.getByLabel("Full name").fill("Test Student");
     await page.getByLabel("Email").fill("test.student@example.com");
     await page.getByLabel("Password").fill("password123");
-    await page.getByRole("button", { name: "Create Account" }).click();
+    await page.getByRole("button", { name: "Create account" }).click();
 
     // Step 1: About you
     await expect(page).toHaveURL(/\/onboarding\/1$/);
@@ -44,7 +44,7 @@ test.describe("Join and buy a plan", () => {
     // Free session (S3)
     await expect(page).toHaveURL(/\/free-session$/);
     await page.getByRole("radio").first().click();
-    await page.getByRole("button", { name: "Confirm Slot" }).click();
+    await page.getByRole("button", { name: "Confirm slot" }).click();
     await expect(page.getByText("You are booked")).toBeVisible();
     await page.getByRole("link", { name: "See Plans" }).click();
 
@@ -88,13 +88,13 @@ test.describe("Locked out / wrong email", () => {
     await gotoReady(page, "/sign-in");
     await page.getByLabel("Email").fill("wrong@example.com");
     await page.getByLabel("Password").fill("whatever1");
-    await page.getByRole("button", { name: "Sign In" }).click();
+    await page.getByRole("button", { name: "Sign in" }).click();
     await expect(alerts(page)).toContainText("could not find an account");
     await expect(page.getByRole("link", { name: "Sign up instead" })).toBeVisible();
 
     await page.getByLabel("Email").fill("riya@scmhrd.edu");
     await page.getByLabel("Password").fill("wrong");
-    await page.getByRole("button", { name: "Sign In" }).click();
+    await page.getByRole("button", { name: "Sign in" }).click();
     await expect(alerts(page)).toContainText("password is not right");
     await alerts(page).getByRole("link", { name: "Reset your password" }).click();
     await expect(page).toHaveURL(/\/forgot-password$/);
@@ -125,7 +125,7 @@ test.describe("Locked out / wrong email", () => {
     await gotoReady(page, "/sign-in");
     await page.getByLabel("Email").fill("someone@gmail.com");
     await page.getByLabel("Password").fill("password123");
-    await page.getByRole("button", { name: "Sign In" }).click();
+    await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/verify-email\?email=/);
     await expect(page.getByRole("heading", { name: "Verify your email" })).toBeVisible();
   });
@@ -180,11 +180,11 @@ test.describe("Session cancelled / moved / missed", () => {
 
     // The "race" slot loses the first time (never optimistic).
     await page.getByRole("radio", { name: /Fri 9 Oct · 7:00 PM/ }).click();
-    await page.getByRole("button", { name: "Confirm Slot" }).click();
+    await page.getByRole("button", { name: "Confirm slot" }).click();
     await expect(page.getByText("That slot was just taken")).toBeVisible();
 
     await page.getByRole("radio").first().click();
-    await page.getByRole("button", { name: "Confirm Slot" }).click();
+    await page.getByRole("button", { name: "Confirm slot" }).click();
     await expect(page.getByText("Booked", { exact: true })).toBeVisible();
   });
 
@@ -282,7 +282,7 @@ test.describe("Phone: sign-up to dashboard", () => {
     await page.getByLabel("Full name").fill("Phone Student");
     await page.getByLabel("Email").fill("phone.student@example.com");
     await page.getByLabel("Password").fill("password123");
-    await page.getByRole("button", { name: "Create Account" }).click();
+    await page.getByRole("button", { name: "Create account" }).click();
     await expect(page).toHaveURL(/\/onboarding\/1$/);
     const noHScroll = await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,

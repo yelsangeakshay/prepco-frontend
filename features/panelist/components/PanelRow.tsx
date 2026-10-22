@@ -36,7 +36,7 @@ export function PanelRow({ item, compact }: { item: PanelItem; compact?: boolean
         {item.status === "upcoming" && (
           <>
             <Button asChild size="sm" variant="secondary">
-              <Link href={ROUTES.panelist.brief(item.sessionId)}>View Brief</Link>
+              <Link href={ROUTES.panelist.brief(item.sessionId)}>View brief</Link>
             </Button>
             <Button asChild size="sm">
               <Link href={ROUTES.panelist.scoringSession(item.sessionId)}>Start scoring</Link>

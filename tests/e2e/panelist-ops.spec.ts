@@ -108,6 +108,8 @@ test.describe("Set availability", () => {
     await page.getByRole("button", { name: "Sat 19:00" }).click();
     await expect(page.getByTestId("open-count")).toHaveText("11");
     await save.click();
+    // The button disables at once; wait for the save itself before reloading.
+    await expect(page.getByText("Availability saved")).toBeVisible();
     await expect(save).toBeDisabled();
 
     await page.reload();
@@ -243,7 +245,7 @@ test.describe("One panel, three roles", () => {
     await signInAs(context, "student");
     await gotoReady(page, "/sessions/s-1004");
     await page.getByRole("radio", { name: /Mon 12 Oct · 6:00 PM/ }).click();
-    await page.getByRole("button", { name: "Confirm Slot" }).click();
+    await page.getByRole("button", { name: "Confirm slot" }).click();
     await expect(page.getByText("Booked", { exact: true })).toBeVisible();
 
     // 2. Ops sees it unassigned and assigns Arjun.
@@ -296,7 +298,7 @@ test.describe("CV re-lock reviewed by ops", () => {
     await gotoReady(page, "/ops");
     await page.getByTestId("attn-relock-action").click();
     await expect(page.getByTestId("relock-request")).toContainText("Sharpened bullets");
-    await page.getByRole("button", { name: "Approve Re-lock" }).click();
+    await page.getByRole("button", { name: "Approve re-lock" }).click();
     await expect(page.getByTestId("relock-request")).toHaveCount(0);
 
     await signInAs(context, "student");

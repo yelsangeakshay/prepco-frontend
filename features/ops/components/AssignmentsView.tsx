@@ -65,6 +65,11 @@ function CandidateRow({
           <Button
             variant={best ? "primary" : "secondary"}
             disabled={assign.isPending}
+            loading={
+              assign.isPending &&
+              assign.variables?.sessionId === b.id &&
+              assign.variables.panelistId === c.panelistId
+            }
             onClick={() =>
               assign.mutate(
                 { sessionId: b.id, panelistId: c.panelistId },
@@ -72,7 +77,7 @@ function CandidateRow({
               )
             }
           >
-            {assign.isPending ? "Assigning…" : "Assign"}
+            Assign
             <span className="sr-only">
               {" "}
               {c.name} to {b.studentName}
@@ -143,7 +148,7 @@ export function AssignmentsView() {
         {data.unassigned.length} panels without a panelist
       </p>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
         <section aria-labelledby="queue-h" className="space-y-3">
           <h2
             id="queue-h"

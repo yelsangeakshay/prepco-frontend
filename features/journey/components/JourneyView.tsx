@@ -96,7 +96,7 @@ export function JourneyView() {
         <h2 id="routes" className="font-display text-2xl font-bold">
           Four routes to an offer
         </h2>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {j.routes.map((r) => (
             <li key={r.id} className="flex">
               <Card

@@ -27,7 +27,7 @@ export function ErrorCard({
           onClick={onRetry}
           className="bg-maroon-600 hover:bg-maroon-700 rounded-control mt-4 min-h-11 px-5 text-sm font-semibold text-white"
         >
-          Try Again
+          Try again
         </button>
       )}
     </div>

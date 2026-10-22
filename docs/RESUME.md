@@ -11,21 +11,15 @@ invented content. Anything the mockups do not define stays marked "Proposed".
 
 ## Status
 
-| Batch        | Screens (mockup slugs)                                            | State  |
-| ------------ | ----------------------------------------------------------------- | ------ |
-| Done earlier | s04 plans, s05 home, e04 checkout, e08 upgrade, p02, a01          | merged |
-| Batch 1      | s01, s02, s03, e01, e02, e03                                      | merged |
-| Batch 2      | s08 to s15 (student; s07 CV versions skipped with the CV builder) | merged |
-| Batch 3      | p01, p03, p04, p05 (panelist)                                     | done   |
-| <<<<<<< HEAD |
-| Batch 4      | a02 to a06 (ops)                                                  | to do  |
-| Batch 5      | e05, e06, e07, e09 to e12 (edge cases)                            | done   |
-| =======      |
-| Batch 4      | a02 to a06 (ops)                                                  | done   |
-| Batch 5      | e05, e06, e07, e09 to e12 (edge cases)                            | to do  |
-
-> > > > > > > mockup-batch-4
-> > > > > > > | Skipped on purpose | s06 CV builder (the owner is doing it) | skipped |
+| Batch              | Screens (mockup slugs)                                            | State   |
+| ------------------ | ----------------------------------------------------------------- | ------- |
+| Done earlier       | s04 plans, s05 home, e04 checkout, e08 upgrade, p02, a01          | merged  |
+| Batch 1            | s01, s02, s03, e01, e02, e03                                      | merged  |
+| Batch 2            | s08 to s15 (student; s07 CV versions skipped with the CV builder) | merged  |
+| Batch 3            | p01, p03, p04, p05 (panelist)                                     | merged  |
+| Batch 4            | a02 to a06 (ops)                                                  | merged  |
+| Batch 5            | e05, e06, e07, e09 to e12 (edge cases)                            | merged  |
+| Skipped on purpose | s06 CV builder (the owner is doing it)                            | skipped |
 
 A live copy of this table is the "Mockup pass progress" artifact. Each finished batch appends a "Batch N" section
 to `docs/MOCKUP_REVIEW.md` and ticks the Mockup column in `docs/DEFINITION_OF_DONE.md`.

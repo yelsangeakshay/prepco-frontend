@@ -166,6 +166,7 @@ export function BookingsView() {
                 size="sm"
                 variant="secondary"
                 disabled={excuse.isPending}
+                loading={excuse.isPending && excuse.variables === b.id}
                 onClick={(e) => {
                   e.stopPropagation();
                   excuse.mutate(b.id, { onSuccess: () => notify(`Excused ${b.studentName}`) });

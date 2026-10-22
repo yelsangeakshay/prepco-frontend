@@ -94,7 +94,8 @@ function InlineSlots({ session, priority }: { session: Session; priority: boolea
         )}
         <Button
           className="w-full md:w-auto"
-          disabled={!selected || book.isPending}
+          disabled={!selected}
+          loading={book.isPending}
           onClick={() =>
             selected &&
             // mutateAsync, because this row unmounts once the session is booked and a
@@ -105,7 +106,7 @@ function InlineSlots({ session, priority }: { session: Session; priority: boolea
               .catch(() => slots.refetch())
           }
         >
-          {book.isPending ? "Booking…" : selected ? `Confirm ${confirmLabel(selected)}` : "Confirm"}
+          {selected ? `Confirm ${confirmLabel(selected)}` : "Confirm"}
         </Button>
       </div>
     </div>

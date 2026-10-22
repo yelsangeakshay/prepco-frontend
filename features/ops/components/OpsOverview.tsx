@@ -150,7 +150,7 @@ export function OpsOverview() {
     <div className="mx-auto max-w-[1440px] space-y-6 p-4 md:p-8 xl:px-10">
       <PageHeader eyebrow="Mon 5 Oct 2026" pill="Sample data" title="Cohort overview" />
 
-      <section aria-label="Seats" className="grid gap-4 md:grid-cols-3">
+      <section aria-label="Seats" className="grid gap-6 md:grid-cols-3">
         {data.seats.map((s) => (
           <SeatCard key={s.id} seat={s} />
         ))}

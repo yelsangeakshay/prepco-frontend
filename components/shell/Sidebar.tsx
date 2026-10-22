@@ -97,7 +97,7 @@ export function Sidebar({ role }: { role: Role }) {
       aria-label="Sidebar"
       className="bg-navy-900 sticky top-0 hidden h-dvh w-[72px] shrink-0 flex-col gap-7 overflow-y-auto px-3 py-6 md:flex xl:w-[249px] xl:px-4"
     >
-      <Link href={ROLE_HOME[role]} className="px-2 max-xl:flex max-xl:justify-center max-xl:px-0">
+      <Link href={ROLE_HOME[role]} className="px-1 max-xl:flex max-xl:justify-center max-xl:px-0">
         <span className="xl:hidden">
           <span className="text-gold-300 text-[22px] font-semibold" aria-hidden>
             [

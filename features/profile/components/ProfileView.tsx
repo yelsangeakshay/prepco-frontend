@@ -73,7 +73,7 @@ export function ProfileView() {
         </div>
       )}
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Card variant="feature" className="md:p-8">
           <ProfileDetailsFormLazy profile={data} />
         </Card>

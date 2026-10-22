@@ -197,10 +197,11 @@ function Editor({ answer, as: Heading }: { answer: AnswerDetail; as: "h1" | "h2"
         )}
         <Button
           variant="secondary"
-          disabled={!dirty || patch.isPending}
+          disabled={!dirty}
+          loading={patch.isPending}
           onClick={() => save("Draft saved")}
         >
-          {patch.isPending ? "Saving…" : "Save draft"}
+          Save draft
         </Button>
         <Button
           disabled={empty || patch.isPending}

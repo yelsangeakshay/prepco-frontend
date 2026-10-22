@@ -226,7 +226,7 @@ export function TodayView() {
         }
       />
 
-      <section aria-label="Your numbers" className="hidden gap-4 md:grid md:grid-cols-4">
+      <section aria-label="Your numbers" className="hidden gap-6 md:grid md:grid-cols-4">
         <Stat label="Panels today" value={String(n)} />
         <Stat label="Feedback due" value={String(awaitingScore.length)} tone="maroon" />
         <Stat label="This season" value={String(panelist.panelsThisSeason)} />

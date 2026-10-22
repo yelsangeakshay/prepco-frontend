@@ -11,12 +11,13 @@ match the mockups pixel for pixel.
 
 ## Status
 
-| Phase   | Scope                                                            | Depends on | State |
-| ------- | ---------------------------------------------------------------- | ---------- | ----- |
-| Phase 0 | Decision: usability vs mockup fidelity for badges, titles, Home  | none       | done  |
-| Phase 1 | Loading feedback: spinner, button loading, nav bar, auth flows   | none       | done  |
-| Phase 2 | Tokens: type scale, tabular numbers, badge tones, page skeletons | none       | done  |
-| Phase 3 | Layout: page names, filters, lists, spacing (Home layout kept)   | Phase 0, 2 | done  |
+| Phase   | Scope                                                             | Depends on | State |
+| ------- | ----------------------------------------------------------------- | ---------- | ----- |
+| Phase 0 | Decision: usability vs mockup fidelity for badges, titles, Home   | none       | done  |
+| Phase 1 | Loading feedback: spinner, button loading, nav bar, auth flows    | none       | done  |
+| Phase 2 | Tokens: type scale, tabular numbers, badge tones, page skeletons  | none       | done  |
+| Phase 3 | Layout: page names, filters, lists, spacing (Home layout kept)    | Phase 0, 2 | done  |
+| Phase 4 | Loading buttons everywhere, RESUME.md fix, badge and label polish | Phase 1-3  | done  |
 
 States: to do, in progress, done, blocked, open (waiting on a decision).
 
@@ -234,3 +235,23 @@ therefore out of scope. Rationale and the deviations are listed in `docs/OPEN_DE
 - 3.8: Google button has the four-colour G, "Forgot?" is label weight, and the duplicate "New here?" card is gone on
   desktop (the Create account tab covers it).
 - Phone web-vitals LCP fails on some routes on every run, with or without these changes; `main` fails 3 of 6.
+
+## Phase 4 notes (done)
+
+- 4.1 Loading buttons: about 20 buttons that swapped their label to "Saving…", "Booking…" and the like now use the
+  Button `loading` prop with a fixed label (answer draft, upgrade, waitlist, Quick Switch, availability, profile save,
+  scoring submit, change target, session book, move and cancel, slot confirm, outcome save). Where one mutation serves
+  several buttons (ops approve and reject, assign, excuse, nudge, top-up buy, saved listings, re-lock) only the pressed
+  button spins, matched on the `variables` of the mutation. The CV builder buttons were left alone because the owner is
+  working there.
+- Bug found and fixed on the way: the loading label was hidden with `visibility: hidden`, which removed the accessible
+  name of the button once the spinner showed. It is now `opacity-0`, so screen readers keep the name. Unit test:
+  `components/ui/button.test.tsx`. Two e2e specs had relied on the old label swap (a reload in the middle of a save, and
+  an `Approve` count that dropped while the request was pending); the availability spec now waits for the
+  "Availability saved" toast.
+- 4.2 `docs/RESUME.md`: removed the leftover merge conflict markers; batches 3, 4 and 5 show as merged.
+- 4.3 Polish: `Badge` is sentence case (the runway step chips and other hand-built pills are still uppercase). About
+  20 title-case button labels are sentence case ("Create account", "Confirm slot", "Mark all read", "Try again" and so
+  on). Gaps between page-level card grids are 24 px. The sidebar tagline fits on one line at 12 px (tighter tracking,
+  less side padding).
+- Not done: CV builder (owner), Home "Do this next" card (kept by decision), phone LCP, bundle trimming.

@@ -153,7 +153,8 @@ function Preferences({ prefs }: { prefs: QuickSwitchPrefs }) {
       </FormField>
       <Button
         className="w-full"
-        disabled={!fitOk || save.isPending}
+        disabled={!fitOk}
+        loading={save.isPending}
         onClick={() =>
           void save
             .mutateAsync(form)
@@ -161,7 +162,7 @@ function Preferences({ prefs }: { prefs: QuickSwitchPrefs }) {
             .catch(() => undefined)
         }
       >
-        {save.isPending ? "Saving…" : "Save preferences"}
+        Save preferences
       </Button>
     </Card>
   );
@@ -206,7 +207,7 @@ export function QuickSwitchView() {
         ))}
       </dl>
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section aria-labelledby="digest" className="space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id="digest" className="font-display text-2xl font-bold">
@@ -246,6 +247,7 @@ export function QuickSwitchView() {
                         aria-pressed={l.saved}
                         aria-label={`${l.saved ? "Saved" : "Save"} ${l.title}`}
                         disabled={toggle.isPending}
+                        loading={toggle.isPending && toggle.variables === l.id}
                         onClick={() => toggle.mutate(l.id)}
                       >
                         {l.saved ? "Saved" : "Save"}

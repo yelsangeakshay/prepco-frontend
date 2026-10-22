@@ -181,12 +181,12 @@ export function AnswersView() {
           body="Nothing in this filter."
           action={
             <Button variant="secondary" onClick={() => set({ status: "", a: "" })}>
-              Clear Filters
+              Clear filters
             </Button>
           }
         />
       ) : (
-        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           <div>
             <ul className={cn("space-y-3", isFetching && "opacity-70")}>
               {visible.map((a) => (

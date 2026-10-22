@@ -71,7 +71,7 @@ export function CaseTrackView() {
         </Card>
       )}
 
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Card variant="feature" className="md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-2xl font-bold">

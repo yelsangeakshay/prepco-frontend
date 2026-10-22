@@ -73,7 +73,7 @@ const cases: Record<string, (page: Page) => Promise<void>> = {
     await gotoReady(page, "/sign-in?scenario=gmail-unverified");
     await page.getByLabel("Email").fill("someone@gmail.com");
     await page.getByLabel("Password").fill("password123");
-    await page.getByRole("button", { name: "Sign In" }).click();
+    await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/verify-email/);
   },
   "basic-ended": async (page) => {

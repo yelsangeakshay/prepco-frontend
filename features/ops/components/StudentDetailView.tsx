@@ -57,13 +57,19 @@ export function StudentDetailView({ id }: { id: string }) {
           <p className="text-sm">&ldquo;{data.relockRequest.reason}&rdquo;</p>
           <p className="text-navy-400 text-sm">Draft score {data.relockRequest.draftScore}</p>
           <div className="flex gap-2">
-            <Button size="sm" disabled={relock.isPending} onClick={() => relock.mutate("approve")}>
-              Approve Re-lock
+            <Button
+              size="sm"
+              disabled={relock.isPending}
+              loading={relock.isPending && relock.variables === "approve"}
+              onClick={() => relock.mutate("approve")}
+            >
+              Approve re-lock
             </Button>
             <Button
               size="sm"
               variant="secondary"
               disabled={relock.isPending}
+              loading={relock.isPending && relock.variables === "reject"}
               onClick={() => relock.mutate("reject")}
             >
               Decline

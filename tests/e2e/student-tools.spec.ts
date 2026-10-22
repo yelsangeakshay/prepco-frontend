@@ -171,7 +171,7 @@ test.describe("Upgrade mid-season", () => {
     await gotoReady(page, "/billing/upgrade");
     await page.getByRole("button", { name: /^Upgrade for/ }).click();
     await expect(alerts(page)).toContainText("Payment failed");
-    await page.getByRole("button", { name: /^Retry Payment/ }).click();
+    await page.getByRole("button", { name: /^Retry payment/ }).click();
     await expect(page.getByTestId("upgrade-receipt")).toBeVisible();
   });
 
@@ -212,7 +212,7 @@ test.describe("Notifications", () => {
     await signInAsRiya(context);
     await gotoReady(page, "/notifications");
     await expect(page.getByText(/\d+ unread/)).toBeVisible();
-    await page.getByRole("button", { name: "Mark All Read" }).click();
+    await page.getByRole("button", { name: "Mark all read" }).click();
     await expect(page.getByText("0 unread")).toBeVisible();
     await expect(page.getByTestId("bell-dot")).toHaveCount(0);
   });

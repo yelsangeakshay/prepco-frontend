@@ -98,7 +98,7 @@ export function SignUpForm() {
             loading={busy || apiStatus === "starting"}
             disabled={apiStatus === "failed"}
           >
-            Create Account
+            Create account
           </Button>
         </fieldset>
       </form>

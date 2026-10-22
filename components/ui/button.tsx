@@ -55,7 +55,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {loading ? (
           <>
-            <span className={cn("inline-flex items-center gap-2", spinning && "invisible")}>
+            <span className={cn("inline-flex items-center gap-2", spinning && "opacity-0")}>
               {children}
             </span>
             {spinning && <Spinner className="absolute" />}

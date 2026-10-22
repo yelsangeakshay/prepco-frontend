@@ -62,7 +62,7 @@ export function UpgradeView() {
       <Card variant="feature" data-testid="already-elite" className="max-w-xl">
         <p className="font-semibold">You are already on Elite.</p>
         <Button asChild className="mt-4">
-          <Link href={ROUTES.student.caseTrack}>Open Case Track</Link>
+          <Link href={ROUTES.student.caseTrack}>Open case track</Link>
         </Button>
       </Card>,
     );
@@ -79,7 +79,7 @@ export function UpgradeView() {
 
   return shell(
     title,
-    <div className="grid gap-4 md:grid-cols-[1fr_320px]">
+    <div className="grid gap-6 md:grid-cols-[1fr_320px]">
       <Card variant="feature">
         <h2 className="text-navy-400 text-xs font-bold tracking-[0.12em] uppercase">
           Your upgrade price
@@ -133,17 +133,15 @@ export function UpgradeView() {
           <div className="mt-5">
             <p className="text-maroon-600 text-sm font-semibold">{q.to} is full right now.</p>
             <Button asChild className="mt-2 w-full md:w-auto">
-              <Link href={ROUTES.student.waitlist}>Join Waitlist</Link>
+              <Link href={ROUTES.student.waitlist}>Join waitlist</Link>
             </Button>
           </div>
         ) : (
           <div className="mt-5 flex flex-wrap gap-2">
-            <Button disabled={upgrade.isPending} onClick={() => upgrade.mutate()}>
-              {upgrade.isPending
-                ? "Processing…"
-                : result?.status === "failed"
-                  ? `Retry Payment · ${formatINR(q.payable)}`
-                  : `Upgrade for ${formatINR(q.payable)}`}
+            <Button loading={upgrade.isPending} onClick={() => upgrade.mutate()}>
+              {result?.status === "failed"
+                ? `Retry payment · ${formatINR(q.payable)}`
+                : `Upgrade for ${formatINR(q.payable)}`}
             </Button>
             <Button asChild variant="secondary">
               <Link href={ROUTES.student.billing}>Not now</Link>

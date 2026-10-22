@@ -33,7 +33,7 @@ export function FeedbackList() {
           body="Feedback appears here after each mock panel."
           action={
             <Button asChild>
-              <Link href={ROUTES.student.sessions}>See Your Sessions</Link>
+              <Link href={ROUTES.student.sessions}>See your sessions</Link>
             </Button>
           }
         />
@@ -134,7 +134,7 @@ export function FeedbackDetailView({ panelId }: { panelId: string }) {
         All feedback
       </Link>
 
-      <div className="grid gap-4 md:grid-cols-[1.15fr_1fr]">
+      <div className="grid gap-6 md:grid-cols-[1.15fr_1fr]">
         <Card variant="feature" className="hidden items-center gap-4 md:flex">
           <span
             aria-hidden
@@ -167,7 +167,7 @@ export function FeedbackDetailView({ panelId }: { panelId: string }) {
         )}
       </div>
 
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Card variant="feature" className="order-2 md:p-8 lg:order-none">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-2xl font-bold">Question by question</h2>

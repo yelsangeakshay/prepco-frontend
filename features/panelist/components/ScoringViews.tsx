@@ -126,7 +126,7 @@ export function LiveScoring({ sessionId }: { sessionId: string }) {
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Button asChild>
-              <Link href={ROUTES.panelist.today}>Back To Today</Link>
+              <Link href={ROUTES.panelist.today}>Back to today</Link>
             </Button>
             <Button asChild variant="secondary">
               <Link href={ROUTES.panelist.scoring}>Scoring & Feedback</Link>

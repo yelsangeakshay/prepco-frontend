@@ -9,7 +9,7 @@ export function PageSkeleton() {
     <div role="status" aria-label="Loading" className="mx-auto max-w-5xl space-y-4 p-6 md:p-10">
       <Skeleton className="h-8 w-56" />
       <Skeleton className="h-40 w-full" />
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3">
         <Skeleton className="h-28" />
         <Skeleton className="h-28" />
         <Skeleton className="h-28" />

@@ -69,14 +69,15 @@ function Editor({ data }: { data: Availability }) {
             Next week →
           </Button>
           <Button
-            disabled={!dirty || save.isPending}
+            disabled={!dirty}
+            loading={save.isPending}
             onClick={() =>
               save.mutate(value, {
                 onSuccess: () => notify("Availability saved"),
               })
             }
           >
-            {save.isPending ? "Saving…" : "Save availability"}
+            Save availability
           </Button>
         </div>
       </header>

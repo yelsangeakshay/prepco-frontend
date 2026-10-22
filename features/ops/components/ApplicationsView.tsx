@@ -42,6 +42,11 @@ function ApplicationCard({ a }: { a: ApplicationRow }) {
           <Button
             size="sm"
             disabled={decide.isPending}
+            loading={
+              decide.isPending &&
+              decide.variables?.id === a.id &&
+              decide.variables.decision === "approve"
+            }
             onClick={() =>
               decide.mutate(
                 { id: a.id, decision: "approve" },
@@ -55,6 +60,11 @@ function ApplicationCard({ a }: { a: ApplicationRow }) {
             size="sm"
             variant="secondary"
             disabled={decide.isPending}
+            loading={
+              decide.isPending &&
+              decide.variables?.id === a.id &&
+              decide.variables.decision === "reject"
+            }
             onClick={() => decide.mutate({ id: a.id, decision: "reject" })}
           >
             Reject<span className="sr-only"> {a.name}</span>
