@@ -16,8 +16,8 @@ Checks that apply to every row:
 
 - **Reachable**: opened through the sidebar, or through the previous journey step. `foundation.spec`
   crawls every nav link per role; journeys cover the in-page links.
-- **States**: loading, empty, error and success each have a Storybook story (`stories/*.stories.tsx`),
-  and `pnpm test:stories` renders all of them and checks the loading and error ones show a status or alert.
+- **States**: loading, empty, error and success are each reachable in the running app (scenarios and the mock
+  latency), and the e2e specs check that loading shows a status and errors show an alert.
 - **Scenarios**: its scenarios open by `?scenario=` (`scenarios.spec`, all 16).
 - **Keyboard and contrast**: axe, WCAG 2.1 AA, on every screen for every role at 1280 and 390 px (`a11y.spec`).
   Secondary text colour was darkened to pass; see README design notes. Slot picker and scoring form are

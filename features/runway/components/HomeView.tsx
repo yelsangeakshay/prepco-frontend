@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useNavigate } from "@/lib/nav/useNavigate";
 import { Badge } from "@/components/ui/badge";
@@ -18,10 +19,17 @@ import { ROUTES } from "@/lib/config/routes";
 import { daysUntil, formatSession } from "@/lib/utils/dates";
 import { now } from "@/lib/utils/clock";
 import { useRunway } from "../hooks/useRunway";
-import { FirstLoginHome, SecondSeasonHome } from "./HomeStates";
 import { RunwayBanner } from "./RunwayBanner";
 import { TaskList } from "./TaskList";
 import type { Runway } from "../schemas";
+
+// The first-login and second-season screens are only for those students; keep them out of the first load.
+const FirstLoginHome = dynamic(() => import("./HomeStates").then((m) => m.FirstLoginHome), {
+  loading: () => <HomeSkeleton />,
+});
+const SecondSeasonHome = dynamic(() => import("./HomeStates").then((m) => m.SecondSeasonHome), {
+  loading: () => <HomeSkeleton />,
+});
 
 const link = "text-maroon-600 text-[15px] font-semibold underline underline-offset-4";
 const eyebrow = "text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase";

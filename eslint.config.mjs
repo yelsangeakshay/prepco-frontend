@@ -8,7 +8,6 @@ const config = [
       ".next/**",
       "node_modules/**",
       "public/mockServiceWorker.js",
-      "storybook-static/**",
       "playwright-report/**",
       "test-results/**",
       "next-env.d.ts",
