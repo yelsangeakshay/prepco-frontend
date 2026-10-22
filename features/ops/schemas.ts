@@ -55,6 +55,9 @@ export const studentRowSchema = z.object({
   noShows: z.number(),
   status: z.enum(["active", "at-risk", "unpaid"]),
   joinedAt: z.string(),
+  /** Next session, or how many panels are done (a02.png "Runway stage"). */
+  stage: z.string(),
+  panelistName: z.string().nullable(),
 });
 export type StudentRow = z.infer<typeof studentRowSchema>;
 
@@ -63,6 +66,8 @@ export const studentListSchema = z.object({
   total: z.number(),
   page: z.number(),
   pageSize: z.number(),
+  /** Students flagged at risk, for the "Needs attention" filter pill. */
+  counts: z.object({ attention: z.number() }),
 });
 
 export const bookingSchema = z.object({
@@ -87,24 +92,27 @@ export const bookingListSchema = z.object({
   counts: z.object({ all: z.number(), unassigned: z.number(), noShows: z.number() }),
 });
 
-export const studentDetailSchema = studentRowSchema.extend({
-  background: z.string(),
-  cv: z.object({ version: z.string().nullable(), score: z.number() }),
-  answers: z.object({ total: z.number(), prepared: z.number(), needWork: z.number() }),
-  sessions: z.array(bookingSchema),
-  payments: z.array(
-    z.object({ id: z.string(), at: z.string(), description: z.string(), amount: z.number() }),
-  ),
-  relockRequest: z
-    .object({ requestedAt: z.string(), reason: z.string(), draftScore: z.number() })
-    .nullable(),
-});
+export const studentDetailSchema = studentRowSchema
+  .omit({ stage: true, panelistName: true })
+  .extend({
+    background: z.string(),
+    cv: z.object({ version: z.string().nullable(), score: z.number() }),
+    answers: z.object({ total: z.number(), prepared: z.number(), needWork: z.number() }),
+    sessions: z.array(bookingSchema),
+    payments: z.array(
+      z.object({ id: z.string(), at: z.string(), description: z.string(), amount: z.number() }),
+    ),
+    relockRequest: z
+      .object({ requestedAt: z.string(), reason: z.string(), draftScore: z.number() })
+      .nullable(),
+  });
 export type StudentDetail = z.infer<typeof studentDetailSchema>;
 
 export const candidateSchema = z.object({
   panelistId: z.string(),
   name: z.string(),
   specialty: z.string(),
+  function: z.string(),
   load: z.number(),
   capacity: z.number(),
   free: z.boolean(),
@@ -152,6 +160,11 @@ export const ledgerSchema = z.object({
     refunds: z.number(),
     credits: z.number(),
     net: z.number(),
+    /** Plan payments only, without top-ups, and how many there are (a05.png). */
+    planRevenue: z.number(),
+    plans: z.number(),
+    topUps: z.number(),
+    upgradeCredit: z.number(),
   }),
 });
 
@@ -161,6 +174,9 @@ export const rosterPanelistSchema = z.object({
   function: z.string(),
   specialty: z.string(),
   company: z.string(),
+  role: z.string(),
+  /** Proposed metric (p02.png "Avg. feedback turnaround"). */
+  turnaroundHours: z.number(),
   status: z.enum(["active", "paused"]),
   panelsThisSeason: z.number(),
   load: z.number(),
@@ -176,7 +192,13 @@ export const rosterSchema = z.object({
   total: z.number(),
   page: z.number(),
   pageSize: z.number(),
-  counts: z.object({ all: z.number(), needsAttention: z.number(), paused: z.number() }),
+  counts: z.object({
+    all: z.number(),
+    needsAttention: z.number(),
+    paused: z.number(),
+    /** Panelists per function, for the cards above the table (a06.png). */
+    byFunction: z.record(z.string(), z.number()),
+  }),
 });
 export const panelistActionBodySchema = z.object({ action: z.enum(["pause", "resume", "nudge"]) });
 

@@ -244,6 +244,28 @@ describe("ops actions", () => {
     expect((await getOpsStudent("st-riya")).relockRequest).toBeNull();
   });
 
+  it("ops screens carry the a02 to a06 figures: stage, panelist, track filter, kinds, ledger split, function counts", async () => {
+    const riya = (await getOpsStudents({ q: "riya" })).items[0]!;
+    expect(riya.stage).toMatch(/·/);
+    expect(riya.panelistName).not.toBeNull();
+    const students = await getOpsStudents({ track: "Summers", pageSize: 1000 });
+    expect(students.items.every((s) => s.track === "Summers")).toBe(true);
+    expect(students.counts.attention).toBeGreaterThanOrEqual(0);
+
+    const p2 = await getOpsBookings({ kind: "p2", pageSize: 100 });
+    expect(p2.items.length).toBeGreaterThan(0);
+    expect(p2.items.every((b) => b.title.startsWith("P2"))).toBe(true);
+
+    const t = (await getOpsLedger({})).totals;
+    expect(t.planRevenue + t.topUps).toBe(t.payments);
+    expect(t.upgradeCredit).toBeLessThanOrEqual(t.topUps);
+
+    const counts = (await getOpsPanelists({})).counts;
+    expect(Object.values(counts.byFunction).reduce((n, v) => n + v, 0)).toBe(counts.all);
+    const first = (await getOpsAssignments()).unassigned[0]!;
+    expect(first.candidates[0]!.function).toBeTruthy();
+  });
+
   it("ledger totals reconcile", async () => {
     const l = await getOpsLedger({ pageSize: 25 });
     expect(l.total).toBe(87);

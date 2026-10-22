@@ -1,10 +1,14 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCohort } from "@/features/ops/hooks/useOps";
 import { useRunway } from "@/features/runway/hooks/useRunway";
 import type { Role } from "@/lib/auth/roles";
+import { getOpsLedger } from "@/lib/api/endpoints/ops";
 import { ROLE_PROFILE } from "@/lib/config/nav";
+import { ROUTES } from "@/lib/config/routes";
 import { formatINR } from "@/lib/utils/currency";
 import { Avatar } from "./Avatar";
 import { NotificationBell } from "./NotificationBell";
@@ -37,19 +41,56 @@ function ExportButton() {
       ["Revenue", "Top-ups", formatINR(data.revenue.topUps)],
       ["Revenue", "Season to date", formatINR(data.revenue.total)],
     ];
-    const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "cohort-overview.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCsv(rows, "cohort-overview.csv");
   };
   return (
     <Button variant="secondary" onClick={download} disabled={!data}>
       Export
     </Button>
   );
+}
+
+function downloadCsv(rows: string[][], name: string) {
+  const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/** Ledger "Export CSV" (a05.png): every entry, not only the page on screen. */
+function ExportLedgerButton() {
+  const download = async () => {
+    const l = await getOpsLedger({ pageSize: 1000 });
+    downloadCsv(
+      [
+        ["Date", "Student", "Description", "Type", "Amount"],
+        ...l.items.map((e) => [e.at, e.studentName, e.description, e.type, String(e.amount)]),
+      ],
+      "ledger.csv",
+    );
+  };
+  return (
+    <Button variant="secondary" onClick={download}>
+      Export CSV
+    </Button>
+  );
+}
+
+/** Ops actions differ per screen, as drawn: Export on the overview, Export CSV on the ledger, the application form on the roster. */
+function OpsActions() {
+  const path = usePathname();
+  if (path === "/ops") return <ExportButton />;
+  if (path === "/ops/ledger") return <ExportLedgerButton />;
+  if (path === "/ops/panelists")
+    return (
+      <Button asChild variant="secondary" className="max-md:hidden">
+        <Link href={ROUTES.panelistApply}>View application form</Link>
+      </Button>
+    );
+  return null;
 }
 
 /** Top-right cluster from the mockups: Day 0 pill, bell and avatar (student); avatar (panelist); Export and avatar (ops). */
@@ -63,7 +104,7 @@ export function ShellActions({ role }: { role: Role }) {
           <NotificationBell />
         </>
       )}
-      {role === "ops" && <ExportButton />}
+      {role === "ops" && <OpsActions />}
       <Avatar
         initials={p.initials}
         label={p.name}

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorCard } from "@/components/shared/ErrorCard";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { PageSkeleton } from "@/components/shared/Skeletons";
 import { ApiError } from "@/lib/api/client";
 import { ROUTES } from "@/lib/config/routes";
@@ -82,11 +83,11 @@ export function ApplicationsView() {
   const { data, isPending, isError, refetch } = useOpsApplications(status);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-4 p-4 md:p-8">
+    <div className="mx-auto max-w-4xl space-y-5 p-4 md:p-8">
       <Link href={ROUTES.ops.panelists} className="text-maroon-600 text-sm font-semibold underline">
         Roster
       </Link>
-      <h1 className="font-display text-3xl font-bold">Panelist applications</h1>
+      <PageHeader eyebrow="Panelist roster" title="Panelist applications" />
 
       <div role="tablist" aria-label="Application status" className="flex gap-2">
         {TABS.map((t) => {

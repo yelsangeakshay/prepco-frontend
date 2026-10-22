@@ -5,9 +5,11 @@ import Link from "next/link";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { LazyDataTable as DataTable } from "@/components/shared/LazyDataTable";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { PANELIST_FUNCTIONS } from "@/features/onboarding/schemas";
 import { ROUTES } from "@/lib/config/routes";
 import { cn } from "@/lib/utils/cn";
@@ -15,7 +17,7 @@ import { notify } from "@/lib/utils/notify";
 import { formatSort, parseSort } from "@/lib/utils/tableState";
 import { useDebounced } from "@/lib/utils/useDebounced";
 import { useUrlState } from "@/lib/utils/useUrlState";
-import { useOpsPanelists, usePanelistAction } from "../hooks/useOps";
+import { useOpsApplications, useOpsPanelists, usePanelistAction } from "../hooks/useOps";
 import type { RosterPanelist } from "../schemas";
 
 const HEALTH = {
@@ -50,17 +52,27 @@ export function PanelistsView() {
       {
         accessorKey: "name",
         header: "Panelist",
-        cell: (c) => (
-          <span>
-            <span className="block font-semibold">{c.row.original.name}</span>
-            <span className="text-navy-400 block text-xs">
-              {c.row.original.specialty} · {c.row.original.company}
-            </span>
-          </span>
-        ),
+        cell: (c) => <span className="font-semibold">{c.row.original.name}</span>,
       },
-      { accessorKey: "function", header: "Function", enableSorting: false },
+      {
+        accessorKey: "function",
+        header: "Function",
+        enableSorting: false,
+        cell: (c) => <span className="whitespace-nowrap">{String(c.getValue())}</span>,
+      },
+      {
+        accessorKey: "role",
+        header: "Current role",
+        enableSorting: false,
+        cell: (c) => <span className="whitespace-nowrap">{String(c.getValue())}</span>,
+      },
       { accessorKey: "panelsThisSeason", header: "Panels" },
+      {
+        accessorKey: "turnaroundHours",
+        header: "Feedback turnaround",
+        enableSorting: false,
+        cell: (c) => `${c.getValue()} h`,
+      },
       {
         accessorKey: "load",
         header: "This week",
@@ -132,23 +144,46 @@ export function PanelistsView() {
   );
 
   const counts = query.data?.counts;
+  const apps = useOpsApplications("pending");
+  const pending = apps.data?.items ?? [];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-4 p-4 md:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-3 md:pr-72">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Panelists</h1>
-          {counts && (
-            <p className="text-navy-400 text-sm">
-              {counts.all} on the roster · {counts.needsAttention} need attention · {counts.paused}{" "}
-              paused
-            </p>
-          )}
-        </div>
-        <Button asChild variant="secondary">
-          <Link href={ROUTES.ops.panelistApplications}>Applications</Link>
-        </Button>
-      </div>
+    <div className="mx-auto max-w-7xl space-y-5 p-4 md:p-8">
+      <PageHeader
+        eyebrow="Each currently working in the function they interview for"
+        title={counts ? `${counts.all} panelists` : "Panelists"}
+        subtitle={
+          counts ? `${counts.needsAttention} need attention · ${counts.paused} paused` : undefined
+        }
+      />
+
+      <Button asChild variant="secondary" className="md:hidden">
+        <Link href={ROUTES.panelistApply}>View application form</Link>
+      </Button>
+
+      <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-3 xl:grid-cols-6">
+        {PANELIST_FUNCTIONS.map((f) => {
+          const on = fn === f;
+          return (
+            <li key={f}>
+              <button
+                type="button"
+                aria-pressed={on}
+                onClick={() => set({ function: on ? "" : f }, { resetPage: true })}
+                className={cn(
+                  "rounded-card h-full w-full border bg-white p-4 text-left",
+                  on ? "border-maroon-600 border-2" : "border-line",
+                )}
+              >
+                <span className="font-display block text-3xl leading-none font-bold tabular-nums">
+                  {counts?.byFunction[f] ?? "—"}
+                </span>
+                <span className="text-navy-400 mt-2 block text-sm">{f}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="flex flex-col">
@@ -184,28 +219,74 @@ export function PanelistsView() {
         />
       </div>
 
-      <div className={cn(action.isError && "outline-maroon-600 outline")}>
-        {action.isError && (
-          <p role="alert" className="text-maroon-600 mb-2 text-sm">
-            Could not update the panelist. Please try again.
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className={cn(action.isError && "outline-maroon-600 outline")}>
+          {action.isError && (
+            <p role="alert" className="text-maroon-600 mb-2 text-sm">
+              Could not update the panelist. Please try again.
+            </p>
+          )}
+          <DataTable
+            caption="Panelist roster"
+            columns={columns}
+            data={query.data?.items ?? []}
+            total={query.data?.total ?? 0}
+            page={page}
+            pageSize={pageSize}
+            onPageChange={(p) => set({ page: p })}
+            sort={sorting}
+            onSortChange={(s) => set({ sort: formatSort(s) }, { resetPage: true })}
+            loading={query.isPending}
+            error={query.isError}
+            onRetry={() => query.refetch()}
+            emptyTitle="No panelists match"
+            getRowId={(r) => r.id}
+          />
+          <p className="text-navy-400 mt-2 text-xs">
+            Feedback turnaround is a proposed metric. Hours from the panel to the written feedback.
           </p>
-        )}
-        <DataTable
-          caption="Panelist roster"
-          columns={columns}
-          data={query.data?.items ?? []}
-          total={query.data?.total ?? 0}
-          page={page}
-          pageSize={pageSize}
-          onPageChange={(p) => set({ page: p })}
-          sort={sorting}
-          onSortChange={(s) => set({ sort: formatSort(s) }, { resetPage: true })}
-          loading={query.isPending}
-          error={query.isError}
-          onRetry={() => query.refetch()}
-          emptyTitle="No panelists match"
-          getRowId={(r) => r.id}
-        />
+        </div>
+
+        <Card variant="feature" aria-labelledby="apps-h" role="region">
+          <div className="flex items-center justify-between gap-3">
+            <h2
+              id="apps-h"
+              className="text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase"
+            >
+              Applications
+            </h2>
+            {pending.length > 0 && <Badge tone="goldSoft">{pending.length} pending</Badge>}
+          </div>
+          {pending.length === 0 ? (
+            <p className="text-navy-400 mt-4 text-sm">No applications waiting.</p>
+          ) : (
+            <ul className="divide-line mt-3 divide-y">
+              {pending.slice(0, 3).map((a, i) => (
+                <li key={a.id} className="flex items-center justify-between gap-3 py-4">
+                  <div className="min-w-0">
+                    <p className="font-semibold">{a.role}</p>
+                    <p className="text-navy-400 text-sm">
+                      {a.function} · {a.years} yrs
+                    </p>
+                  </div>
+                  <Button asChild size="sm" variant={i === 0 ? "primary" : "secondary"}>
+                    <Link href={ROUTES.ops.panelistApplications}>
+                      Review<span className="sr-only"> {a.role}</span>
+                    </Link>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {pending.length > 3 && (
+            <Link
+              href={ROUTES.ops.panelistApplications}
+              className="text-maroon-600 mt-3 inline-block text-sm font-semibold underline"
+            >
+              See all {pending.length}
+            </Link>
+          )}
+        </Card>
       </div>
     </div>
   );

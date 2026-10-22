@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
+import { FilterPills } from "@/components/shared/FilterPills";
 import { LazyDataTable as DataTable } from "@/components/shared/LazyDataTable";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { ROUTES } from "@/lib/config/routes";
 import { cn } from "@/lib/utils/cn";
 import { formatSession } from "@/lib/utils/dates";
@@ -14,27 +16,77 @@ import { notify } from "@/lib/utils/notify";
 import { formatSort, parseSort } from "@/lib/utils/tableState";
 import { useDebounced } from "@/lib/utils/useDebounced";
 import { useUrlState } from "@/lib/utils/useUrlState";
-import { useExcuse, useOpsBookings } from "../hooks/useOps";
+import { useCohort, useExcuse, useOpsBookings } from "../hooks/useOps";
 import type { Booking } from "../schemas";
 
-const TONE = {
-  upcoming: "navy",
-  completed: "green",
-  "no-show": "maroonSoft",
-  cancelled: "neutral",
-  unassigned: "maroon",
-} as const;
+const KINDS = [
+  { key: "", label: "All" },
+  { key: "free", label: "Free session" },
+  { key: "profiling", label: "Profiling" },
+  { key: "p1", label: "P1" },
+  { key: "deep-dive", label: "Deep-dive" },
+  { key: "p2", label: "P2" },
+  { key: "p3", label: "P3" },
+  { key: "case", label: "Case track" },
+];
 
-const TABS = [
-  { key: "all", label: "All", count: "all" },
-  { key: "unassigned", label: "Unassigned", count: "unassigned" },
-  { key: "no-shows", label: "No-shows", count: "noShows" },
-] as const;
+/** Status pill text and colour for one booking (a04.png). */
+function statusOf(b: Booking): { label: string; tone: BadgeProps["tone"] } {
+  if (b.status === "unassigned") return { label: "Needs panelist", tone: "maroonSoft" };
+  if (b.status === "no-show")
+    return b.excused
+      ? { label: "No-show (excused)", tone: "neutral" }
+      : { label: "No-show", tone: "goldSoft" };
+  if (b.status === "completed") return { label: "Feedback sent", tone: "neutral" };
+  if (b.status === "cancelled") return { label: "Cancelled", tone: "neutral" };
+  return /free session/i.test(b.title)
+    ? { label: "Booked", tone: "neutral" }
+    : { label: "Confirmed", tone: "green" };
+}
 
-/** A4 sessions and bookings. */
+interface StatProps {
+  label: string;
+  value: number | string;
+  tone?: "maroon";
+  /** Set on the cards that also work as a filter. */
+  pressed?: boolean;
+  onClick?: () => void;
+}
+
+function Stat({ label, value, tone, pressed, onClick }: StatProps) {
+  const body = (
+    <>
+      <span className="text-navy-400 block text-sm">{label}</span>
+      <span
+        className={cn(
+          "font-display mt-1 block text-4xl font-bold tabular-nums",
+          tone === "maroon" && "text-maroon-600",
+        )}
+      >
+        {value}
+      </span>
+    </>
+  );
+  const base = "rounded-card w-full border bg-white p-5 text-left";
+  return onClick ? (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={pressed}
+      className={cn(base, pressed ? "border-maroon-600 border-2" : "border-line")}
+    >
+      {body}
+    </button>
+  ) : (
+    <div className={cn(base, "border-line")}>{body}</div>
+  );
+}
+
+/** A4 sessions and bookings (a04.png). */
 export function BookingsView() {
   const { params, set } = useUrlState();
   const tab = params.get("tab") ?? "all";
+  const kind = params.get("kind") ?? "";
   const urlQ = params.get("q") ?? "";
   const sort = params.get("sort");
   const page = Number(params.get("page") ?? 1);
@@ -47,36 +99,45 @@ export function BookingsView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced]);
 
-  const query = useOpsBookings({ tab, q: urlQ, sort, page, pageSize });
+  const query = useOpsBookings({ tab, kind, q: urlQ, sort, page, pageSize });
+  const cohort = useCohort();
   const excuse = useExcuse();
   const sorting: SortingState = useMemo(() => parseSort(sort), [sort]);
 
   const columns = useMemo<ColumnDef<Booking, unknown>[]>(
     () => [
-      { accessorKey: "studentName", header: "Student" },
-      { accessorKey: "title", header: "Session", enableSorting: false },
       {
         accessorKey: "startsAt",
         header: "When",
-        cell: (c) => (c.getValue() ? formatSession(c.getValue() as string) : "—"),
+        cell: (c) => (
+          <span className="whitespace-nowrap">
+            {c.getValue() ? formatSession(c.getValue() as string) : "—"}
+          </span>
+        ),
       },
+      {
+        accessorKey: "studentName",
+        header: "Student",
+        cell: (c) => <span className="font-semibold">{String(c.getValue())}</span>,
+      },
+      { accessorKey: "title", header: "Session", enableSorting: false },
       {
         accessorKey: "panelistName",
         header: "Panelist",
         enableSorting: false,
-        cell: (c) =>
-          (c.getValue() as string | null) ?? <span className="text-maroon-600">None</span>,
+        cell: (c) => {
+          const b = c.row.original;
+          if (b.panelistName) return b.panelistName;
+          if (/free session/i.test(b.title)) return "Prep Co team";
+          return <span className="text-navy-400">Unassigned</span>;
+        },
       },
       {
         accessorKey: "status",
         header: "Status",
         cell: (c) => {
-          const b = c.row.original;
-          return (
-            <Badge tone={TONE[b.status]}>
-              {b.status === "no-show" && b.excused ? "no-show (excused)" : b.status}
-            </Badge>
-          );
+          const st = statusOf(c.row.original);
+          return <Badge tone={st.tone}>{st.label}</Badge>;
         },
       },
       {
@@ -87,8 +148,10 @@ export function BookingsView() {
           const b = c.row.original;
           if (b.status === "unassigned") {
             return (
-              <Button asChild size="sm" variant="secondary">
-                <Link href={ROUTES.ops.assignments}>Assign</Link>
+              <Button asChild size="sm">
+                <Link href={ROUTES.ops.assignments}>
+                  Assign<span className="sr-only"> {b.studentName}</span>
+                </Link>
               </Button>
             );
           }
@@ -107,41 +170,53 @@ export function BookingsView() {
               </Button>
             );
           }
-          return null;
+          return (
+            <Button asChild size="sm" variant="secondary">
+              <Link href={ROUTES.ops.student(b.studentId)}>
+                Open<span className="sr-only"> {b.studentName}</span>
+              </Link>
+            </Button>
+          );
         },
       },
     ],
     [excuse],
   );
 
+  const counts = query.data?.counts;
+  const week = cohort.data?.thisWeek;
+
   return (
-    <div className="mx-auto max-w-7xl space-y-4 p-4 md:p-8">
-      <h1 className="font-display text-3xl font-bold">Sessions & bookings</h1>
+    <div className="mx-auto max-w-7xl space-y-5 p-4 md:p-8">
+      <PageHeader eyebrow="Synced from Calendly" title="Sessions & bookings" />
+
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat label="This week" value={week?.sessionsScheduled ?? "—"} />
+        <Stat label="Free sessions" value={week?.freeSessions ?? "—"} />
+        <Stat
+          label="No panelist yet"
+          value={counts?.unassigned ?? "—"}
+          tone="maroon"
+          pressed={tab === "unassigned"}
+          onClick={() =>
+            set({ tab: tab === "unassigned" ? "" : "unassigned" }, { resetPage: true })
+          }
+        />
+        <Stat
+          label="No-shows"
+          value={counts?.noShows ?? "—"}
+          pressed={tab === "no-shows"}
+          onClick={() => set({ tab: tab === "no-shows" ? "" : "no-shows" }, { resetPage: true })}
+        />
+      </div>
 
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div role="tablist" aria-label="Filter bookings" className="flex flex-wrap gap-2">
-          {TABS.map((t) => {
-            const active = tab === t.key;
-            return (
-              <button
-                key={t.key}
-                role="tab"
-                type="button"
-                aria-selected={active}
-                onClick={() => set({ tab: t.key === "all" ? "" : t.key }, { resetPage: true })}
-                className={cn(
-                  "min-h-11 rounded-full border px-4 text-sm font-semibold",
-                  active ? "border-maroon-600 bg-maroon-600 text-white" : "border-line bg-white",
-                )}
-              >
-                {t.label}
-                {query.data && (
-                  <span className="ml-1.5 opacity-80">{query.data.counts[t.count]}</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        <FilterPills
+          label="Session kind"
+          pills={KINDS}
+          active={kind}
+          onSelect={(k) => set({ kind: k }, { resetPage: true })}
+        />
         <div className="md:w-64">
           <label
             htmlFor="booking-search"
