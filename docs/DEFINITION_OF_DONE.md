@@ -6,7 +6,7 @@ not done and why. Nothing is ticked on trust.
 Checks that apply to every row:
 
 - **Mockup**: layout matched against the mockup PNG at 1280 px, and at 390 px where a phone mockup exists.
-  **Checked only for S1, E1, S2, E2, E3, S3, S4, E4, S5, S8 to S15 (not S7), E8, P2 and A1** (Mockup fidelity pass); open for all other screens. Layout elsewhere follows the
+  **Checked only for S1, E1, S2, E2, E3, S3, S4, E4, S5, S8 to S15 (not S7), E5, E6, E7, E9, E10, E11, E8, P2 and A1** (Mockup fidelity pass); open for all other screens. Layout elsewhere follows the
   brief's text and design tokens only. This is the one box that needs a human with the PNGs.
 - **Reachable**: opened through the sidebar, or through the previous journey step. `foundation.spec`
   crawls every nav link per role; journeys cover the in-page links.
@@ -31,10 +31,10 @@ Checks that apply to every row:
 | E12     | Free session already used (defined by me, see OPEN_DECISIONS) | `/free-session`                                                | open                                | yes         | `returning-student` scenario                     |
 | S4      | Plans, checkout                                               | `/plans`, `/checkout/[plan]`                                   | yes (checked)                       | yes         | Join and buy a plan                              |
 | E4      | Payment failed, receipt                                       | `/checkout/[plan]`                                             | yes (checked)                       | yes         | Payment fails                                    |
-| E5      | Cohort full, waitlist                                         | `/plans`, `/waitlist`                                          | open                                | yes         | Cohort is full                                   |
+| E5      | Cohort full, waitlist                                         | `/plans`, `/waitlist`                                          | yes (checked)                       | yes         | Cohort is full                                   |
 | S5      | Home                                                          | `/home`                                                        | yes (checked)                       | yes         | First login, nothing booked; Day 0 moves         |
 | S9      | Sessions and runway                                           | `/sessions`                                                    | yes (checked)                       | yes         | Session cancelled/moved/missed                   |
-| E6      | Session detail                                                | `/sessions/[id]`                                               | open                                | yes         | Session cancelled/moved/missed                   |
+| E6      | Session detail                                                | `/sessions/[id]`                                               | yes (checked)                       | yes         | Session cancelled/moved/missed                   |
 | S10     | Panel feedback                                                | `/feedback`, `/feedback/[panelId]`                             | yes (detail; list not mocked)       | yes         | One panel, three roles                           |
 | S6      | CV Builder                                                    | `/cv`                                                          | open                                | yes         | Prepare for Day 0                                |
 | S7      | CV versions                                                   | `/cv/versions`                                                 | open                                | yes         | Prepare for Day 0                                |
@@ -45,9 +45,9 @@ Checks that apply to every row:
 | S14     | Plan and billing                                              | `/billing`                                                     | yes (checked)                       | yes         | Upgrade mid-season                               |
 | E8      | Upgrade                                                       | `/billing/upgrade`                                             | yes (checked)                       | yes         | Upgrade mid-season                               |
 | S15     | Profile                                                       | `/profile`                                                     | yes (checked)                       | yes         | Target role changes                              |
-| E9      | Change target role                                            | `/profile/change-target`                                       | open                                | yes         | Target role changes                              |
-| E7, E11 | Outcome                                                       | `/outcome`                                                     | open                                | yes         | After Day 0; Not placed, credit carried over     |
-| E10     | Notifications                                                 | `/notifications` and the bell drawer                           | open                                | yes         | Day 0 moves                                      |
+| E9      | Change target role                                            | `/profile/change-target`                                       | yes (checked)                       | yes         | Target role changes                              |
+| E7, E11 | Outcome                                                       | `/outcome`                                                     | yes (checked)                       | yes         | After Day 0; Not placed, credit carried over     |
+| E10     | Notifications                                                 | `/notifications` and the bell drawer                           | yes (checked)                       | yes         | Day 0 moves                                      |
 | P1      | Apply to be a panelist                                        | `/panelist/apply`, `/panelist/apply/submitted`                 | yes (form; submitted not mocked)    | yes         | Become a panelist                                |
 | P2      | Today                                                         | `/panelist/today`                                              | yes (checked)                       | yes         | Run a panel                                      |
 | P3      | Pre-panel briefs                                              | `/panelist/briefs`, `/panelist/briefs/[sessionId]`             | yes (brief; list not mocked)        | yes         | Run a panel                                      |

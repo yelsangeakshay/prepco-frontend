@@ -61,6 +61,8 @@ export type LateJoiner = z.infer<typeof lateJoinerSchema>;
 export const plansSchema = z.object({
   items: z.array(planSchema),
   cohortFull: z.boolean(),
+  /** Queue position the next person to join the waitlist gets (e05.png, "#4 in the finals queue"). */
+  waitlistNext: z.number(),
   lateJoiner: lateJoinerSchema.nullable(),
   track: z.enum(TRACKS),
   seats: z.object({ label: z.string(), taken: z.number(), total: z.number() }),

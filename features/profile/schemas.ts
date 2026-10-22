@@ -32,8 +32,8 @@ export type UpdateProfileBody = z.infer<typeof updateProfileBodySchema>;
 
 export const changeTargetBodySchema = z.object({
   function: z.enum(FUNCTIONS, { message: "Pick a target function" }),
-  role: z.string().trim().min(2, "Enter the role you are targeting"),
-  reason: z.string().trim().min(10, "Tell us why you are changing, in a line"),
+  role: z.string().trim().min(2, "Enter the role you are targeting").optional(),
+  reason: z.string().trim().min(10, "Tell us why you are changing, in a line").optional(),
 });
 export type ChangeTargetBody = z.infer<typeof changeTargetBodySchema>;
 

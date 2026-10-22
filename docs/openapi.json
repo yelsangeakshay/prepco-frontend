@@ -859,6 +859,9 @@
                     "cohortFull": {
                       "type": "boolean"
                     },
+                    "waitlistNext": {
+                      "type": "number"
+                    },
                     "lateJoiner": {
                       "anyOf": [
                         {
@@ -989,6 +992,7 @@
                   "required": [
                     "items",
                     "cohortFull",
+                    "waitlistNext",
                     "lateJoiner",
                     "track",
                     "seats"
@@ -1695,6 +1699,78 @@
                         "flagged"
                       ],
                       "additionalProperties": false
+                    },
+                    "secondSeason": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "carried": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "label",
+                                  "value"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "plans": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "enum": [
+                                      "basic",
+                                      "premium",
+                                      "elite"
+                                    ]
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "blurb": {
+                                    "type": "string"
+                                  },
+                                  "listPrice": {
+                                    "type": "number"
+                                  },
+                                  "suggested": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "blurb",
+                                  "listPrice",
+                                  "suggested"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "carried",
+                            "plans"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "latestPanel": {
                       "anyOf": [
@@ -5263,9 +5339,7 @@
                   }
                 },
                 "required": [
-                  "function",
-                  "role",
-                  "reason"
+                  "function"
                 ],
                 "additionalProperties": false
               }
@@ -5534,6 +5608,18 @@
                             "type": "boolean"
                           },
                           "href": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "tag": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "action": {
                             "type": [
                               "string",
                               "null"

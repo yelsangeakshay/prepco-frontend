@@ -23,6 +23,15 @@ function StudentFooter() {
   const { data } = useRunway();
   const done = data?.doneCount ?? 0;
   const total = data?.totalCount ?? 6;
+  // Before the first session is booked there is no plan yet (e12.png).
+  if (data?.banner === "first-login" && done === 0) {
+    return (
+      <div className={card}>
+        <p className={eyebrow}>Free account</p>
+        <p className="mt-1.5 text-sm text-white/80">No plan yet. CV Builder is always free.</p>
+      </div>
+    );
+  }
   return (
     <div className={card}>
       <p className={eyebrow}>

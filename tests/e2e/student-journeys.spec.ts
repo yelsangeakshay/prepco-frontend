@@ -69,15 +69,17 @@ test.describe("First login, nothing booked", () => {
     await expect(page).toHaveURL(/\/onboarding\/1$/);
 
     await context.addCookies([
-      { name: "prepco_onboarded", value: "1", url: "http://localhost:3000" },
+      {
+        name: "prepco_onboarded",
+        value: "1",
+        url: `http://localhost:${process.env.PORT ?? "3000"}`,
+      },
     ]);
     await gotoReady(page, "/home");
-    await expect(page.getByTestId("banner-first-login")).toContainText("Nothing is booked yet");
-    await expect(page.getByRole("link", { name: "Book Free Session" })).toBeVisible();
-    await expect(page.getByRole("progressbar", { name: "Readiness for Day 0" })).toHaveAttribute(
-      "aria-valuenow",
-      "0",
-    );
+    await expect(
+      page.getByRole("heading", { name: /Three steps before anything costs money/ }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Pick your slot" })).toBeVisible();
   });
 });
 
@@ -114,7 +116,11 @@ test.describe("Locked out / wrong email", () => {
     await expect(alerts(page)).toContainText("expired");
 
     await context.addCookies([
-      { name: "prepco_scenario", value: "gmail-unverified", url: "http://localhost:3000" },
+      {
+        name: "prepco_scenario",
+        value: "gmail-unverified",
+        url: `http://localhost:${process.env.PORT ?? "3000"}`,
+      },
     ]);
     await gotoReady(page, "/sign-in");
     await page.getByLabel("Email").fill("someone@gmail.com");
@@ -144,8 +150,7 @@ test.describe("Cohort is full", () => {
     await expect(page.getByText("This cohort is full")).toBeVisible();
     await page.getByRole("button", { name: "Join Waitlist" }).first().click();
     await expect(page).toHaveURL(/\/waitlist$/);
-    await page.getByLabel("Email").fill("riya@scmhrd.edu");
-    await page.getByRole("button", { name: "Join Waitlist" }).click();
+    await page.getByRole("button", { name: "Join waitlist" }).click();
     await expect(page.getByText(/You are #\d+/)).toBeVisible();
     await expect(page.getByText(/24 hours to claim/)).toBeVisible();
   });
@@ -290,7 +295,11 @@ test.describe("Edge scenarios by URL", () => {
   test("cv-upload-failed shows the failure and allows skipping", async ({ page, context }) => {
     await signInAsRiya(context, "cv-upload-failed");
     await context.addCookies([
-      { name: "prepco_onboarded", value: "1", url: "http://localhost:3000" },
+      {
+        name: "prepco_onboarded",
+        value: "1",
+        url: `http://localhost:${process.env.PORT ?? "3000"}`,
+      },
     ]);
     await gotoReady(page, "/onboarding/cv-upload");
     await page.locator("#cv-file").setInputFiles({

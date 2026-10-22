@@ -1,29 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@/lib/forms/zodResolver";
-import { CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, CheckCircle2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input, Textarea } from "@/components/ui/field";
-import { FormField } from "@/components/ui/form-field";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageSkeleton } from "@/components/shared/Skeletons";
-import { FUNCTIONS } from "@/features/onboarding/schemas";
+import { FUNCTIONS, PANEL_FOR_TARGET } from "@/features/onboarding/schemas";
+import { useSessions } from "@/features/runway/hooks/useRunway";
 import { ROUTES } from "@/lib/config/routes";
+import { cn } from "@/lib/utils/cn";
+import { formatDay } from "@/lib/utils/dates";
 import { useChangeTarget, useProfile } from "../hooks/useProfile";
-import { changeTargetBodySchema, type ChangeTargetBody } from "../schemas";
 
-/** E9 change target role. */
+type Fn = (typeof FUNCTIONS)[number];
+
+const eyebrow = "text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase";
+const CARRIES = [
+  "Locked CV and its version history",
+  "Profiling notes and P1 feedback",
+  "Every answer you've drafted",
+  "Your plan, sessions used and Day 0 date",
+];
+
+/** E9 change target role (e09.png). */
 export function ChangeTargetView() {
+  const router = useRouter();
   const profile = useProfile();
+  const sessions = useSessions();
   const change = useChangeTarget();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ChangeTargetBody>({ resolver: zodResolver(changeTargetBodySchema) });
+  const [picked, setPicked] = useState<Fn | null>(null);
 
   if (profile.isPending) return <PageSkeleton />;
   if (profile.isError || !profile.data) return <ErrorCard onRetry={() => profile.refetch()} />;
@@ -51,59 +60,114 @@ export function ChangeTargetView() {
     );
   }
 
+  const current = profile.data.target.function as Fn;
+  const next = picked && picked !== current ? picked : null;
+  const nextName = next ? next.split(" & ")[0]! : null;
+  const deepDive = sessions.data?.items.find((s) => s.kind === "deep-dive" && s.startsAt);
+  const when = deepDive?.startsAt ? ` (${formatDay(deepDive.startsAt)})` : "";
+
   return (
-    <div className="mx-auto max-w-xl space-y-4 p-4 md:p-8">
-      <Link
-        href={ROUTES.student.profile}
-        className="text-maroon-600 text-sm font-semibold underline"
-      >
-        Profile
-      </Link>
-      <h1 className="font-display text-3xl font-bold">Change target role</h1>
-      <p className="text-navy-400 text-sm">
-        Now targeting {profile.data.target.function} ({profile.data.target.role}). Changing it flags
-        answers that no longer fit. You can compare first in{" "}
-        <Link href={ROUTES.student.quickSwitch} className="text-maroon-600 font-semibold underline">
-          Quick Switch
-        </Link>
-        .
-      </p>
-      <Card variant="feature">
-        <form noValidate className="space-y-4" onSubmit={handleSubmit((v) => change.mutate(v))}>
-          <FormField id="function" label="New target function" error={errors.function?.message}>
-            <select
-              id="function"
-              defaultValue=""
-              aria-invalid={!!errors.function}
-              className="rounded-control border-line aria-[invalid=true]:border-maroon-600 min-h-11 w-full border bg-white px-3 text-sm"
-              {...register("function")}
-            >
-              <option value="" disabled>
-                Select a function
-              </option>
-              {FUNCTIONS.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-          </FormField>
-          <FormField id="role" label="New target role" error={errors.role?.message}>
-            <Input id="role" aria-invalid={!!errors.role} {...register("role")} />
-          </FormField>
-          <FormField id="reason" label="Why are you changing?" error={errors.reason?.message}>
-            <Textarea id="reason" aria-invalid={!!errors.reason} {...register("reason")} />
-          </FormField>
-          {change.isError && (
-            <p role="alert" className="text-maroon-600 text-sm">
-              We could not change your target. Please try again.
-            </p>
-          )}
-          <Button type="submit" className="w-full" disabled={change.isPending}>
-            {change.isPending ? "Updating…" : "Change Target"}
-          </Button>
-        </form>
+    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
+      <PageHeader
+        title="Change your target role"
+        subtitle="If your target shifts, we re-assign you rather than run the wrong panel."
+      />
+
+      <Card variant="feature" className="space-y-4 p-6">
+        <h2 id="new-target" className="font-semibold">
+          New target role
+        </h2>
+        <div role="group" aria-labelledby="new-target" className="flex flex-wrap gap-3">
+          {FUNCTIONS.map((f) => {
+            const isCurrent = f === current;
+            return (
+              <button
+                key={f}
+                type="button"
+                aria-pressed={next === f}
+                disabled={isCurrent}
+                onClick={() => setPicked(f)}
+                className={cn(
+                  "min-h-11 cursor-pointer rounded-full border px-5 text-[15px] font-medium",
+                  next === f
+                    ? "border-maroon-600 bg-maroon-600 text-white"
+                    : "border-line bg-white",
+                  isCurrent && "text-navy-400 cursor-default line-through",
+                )}
+              >
+                {f}
+                {isCurrent && <span className="sr-only"> (current target)</span>}
+              </button>
+            );
+          })}
+        </div>
+        <div className="bg-cream-soft rounded-card flex flex-wrap items-center gap-3 px-5 py-4 text-sm">
+          <span className="text-navy-900 rounded-full bg-[#E9E6EE] px-3 py-1 text-xs font-bold tracking-wider uppercase">
+            {PANEL_FOR_TARGET[current]} panel
+          </span>
+          <ArrowRight className="text-maroon-600 size-5" aria-hidden />
+          <span className="bg-maroon-100 text-maroon-600 rounded-full px-3 py-1 text-xs font-bold tracking-wider uppercase">
+            {next ? `${PANEL_FOR_TARGET[next]} panel` : "Pick a role"}
+          </span>
+          <span className="text-navy-400">New panelist assigned within a day</span>
+        </div>
       </Card>
+
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
+        <Card variant="feature" className="p-6">
+          <h2 className={eyebrow}>Carries over, unchanged</h2>
+          <ul className="mt-4 space-y-3">
+            {CARRIES.map((c) => (
+              <li key={c} className="flex gap-3">
+                <Check className="mt-0.5 size-5 shrink-0 text-green-600" aria-hidden />
+                {c}
+              </li>
+            ))}
+          </ul>
+        </Card>
+        <Card variant="feature" className="p-6">
+          <h2 className={eyebrow}>Changes</h2>
+          <ul className="mt-4 space-y-3">
+            {[
+              `Deep-dive${when} moves to ${nextName ? `a ${nextName} practitioner` : "a practitioner in your new function"}. Same time if they're free.`,
+              nextName
+                ? `6 new role questions added to your answer bank ("Why ${nextName.toLowerCase()}?" and the like)`
+                : "6 new role questions added to your answer bank",
+              nextName
+                ? `Your CV may need a re-lock to lead with ${nextName.toLowerCase()} work`
+                : "Your CV may need a re-lock to lead with your new function",
+            ].map((c) => (
+              <li key={c} className="flex gap-3">
+                <ArrowRight className="text-maroon-600 mt-0.5 size-5 shrink-0" aria-hidden />
+                {c}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      </div>
+
+      {change.isError && (
+        <p role="alert" className="text-maroon-600 text-sm">
+          We could not change your target. Please try again.
+        </p>
+      )}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <p className="text-navy-400 max-w-xl text-sm">
+          Changing target inside the last week before Day 0 is still allowed, but P3 may not be with
+          a specialist. We&apos;ll tell you before you confirm.
+        </p>
+        <div className="flex gap-3">
+          <Button variant="secondary" onClick={() => router.push(ROUTES.student.profile)}>
+            Cancel
+          </Button>
+          <Button
+            disabled={!next || change.isPending}
+            onClick={() => next && change.mutate({ function: next })}
+          >
+            {change.isPending ? "Updating…" : `Confirm change to ${nextName ?? "target"}`}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

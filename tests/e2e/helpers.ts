@@ -1,7 +1,7 @@
 import type { BrowserContext, Page } from "@playwright/test";
 import { NAV } from "../../lib/config/nav";
 
-const BASE = "http://localhost:3000";
+const BASE = `http://localhost:${process.env.PORT ?? "3000"}`;
 
 export async function signInAsRiya(context: BrowserContext, scenario?: string) {
   const cookies = [{ name: "prepco_role", value: "student", url: BASE }];

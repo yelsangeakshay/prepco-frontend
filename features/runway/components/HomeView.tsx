@@ -18,6 +18,7 @@ import { ROUTES } from "@/lib/config/routes";
 import { daysUntil, formatSession } from "@/lib/utils/dates";
 import { now } from "@/lib/utils/clock";
 import { useRunway } from "../hooks/useRunway";
+import { FirstLoginHome, SecondSeasonHome } from "./HomeStates";
 import { RunwayBanner } from "./RunwayBanner";
 import { TaskList } from "./TaskList";
 import type { Runway } from "../schemas";
@@ -342,6 +343,10 @@ export function HomeView() {
 
   if (isPending) return <PageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
+
+  // Two states have their own page (e12.png, e11.png).
+  if (data.banner === "first-login" && data.doneCount === 0) return <FirstLoginHome data={data} />;
+  if (data.secondSeason) return <SecondSeasonHome data={data} />;
 
   const firstName = data.student.name.split(" ")[0];
   const tasks = data.tasks.map((t) => ({ ...t, done: toggled[t.id] ?? t.done }));

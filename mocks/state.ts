@@ -305,6 +305,7 @@ function buildNotifications(db: Db): Notification[] {
       body: "Pick a new slot for your domain deep-dive. No charge.",
       at: at("10-05", 11),
       href: "/sessions/s-1003",
+      tag: "Panelist cancelled",
     });
   if (s === "student-reschedule")
     add({
@@ -314,6 +315,7 @@ function buildNotifications(db: Db): Notification[] {
       body: "You can still reschedule for free until 24 hours before.",
       at: at("10-05", 11),
       href: "/sessions/s-1003",
+      tag: "You moved it",
     });
   if (s === "no-show")
     add({
@@ -323,6 +325,7 @@ function buildNotifications(db: Db): Notification[] {
       body: "Your first no-show is free. Rebook now.",
       at: at("10-05", 8),
       href: "/sessions/s-1003",
+      tag: "No-show",
     });
   if (s === "day0-moved")
     add({
@@ -332,6 +335,8 @@ function buildNotifications(db: Db): Notification[] {
       body: "Your remaining sessions still fit.",
       at: at("10-05", 10),
       href: "/journey",
+      tag: "Runway updated",
+      action: "Review runway",
     });
   if (s === "placed" || s === "not-placed")
     add({
@@ -375,6 +380,7 @@ function buildNotifications(db: Db): Notification[] {
     body: null,
     at: at("10-02", 10),
     href: "/sessions/s-1004",
+    action: "Pick a slot",
     read: true,
   });
   add({

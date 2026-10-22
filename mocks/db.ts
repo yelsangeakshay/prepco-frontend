@@ -211,7 +211,7 @@ export function getDb(scenario: Scenario | null): Db {
       sessions: buildSessions(scenario),
       raceHit: false,
       checkouts: new Map(),
-      waitlistCount: 41,
+      waitlistCount: 3,
       freeSessionBookedAt: scenario === "returning-student" ? "2026-09-08T18:30:00+05:30" : null,
       signedUpEmails: new Set(),
     };

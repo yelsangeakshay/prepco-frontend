@@ -18,6 +18,7 @@ import { notify } from "@/lib/utils/notify";
 import { useBookSession, useRunway, useSessionSlots, useSessions } from "../hooks/useRunway";
 import type { Session, SlotDto } from "../schemas";
 import { RunwayBanner } from "./RunwayBanner";
+import { SessionChanges } from "./SessionChanges";
 import { SessionStatusBadge } from "./SessionStatusBadge";
 
 /** Top-up price per mock panel at each plan's rate (s09.png, s04.png). */
@@ -177,6 +178,7 @@ export function SessionsView() {
         </span>
       </div>
       <RunwayBanner runway={r} />
+      <SessionChanges items={items} />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         {items.length === 0 ? (
@@ -308,7 +310,10 @@ export function SessionsView() {
                       {s.note && needsSlot(s) && (
                         <p className="text-navy-400 mt-2 text-sm">{s.note}</p>
                       )}
-                      {open && <InlineSlots session={s} priority={paid} />}
+                      {/* A cancelled or missed session has its own card with the slots (e06.png). */}
+                      {open && s.status === "unbooked" && (
+                        <InlineSlots session={s} priority={paid} />
+                      )}
                     </div>
                   </div>
                 </li>
