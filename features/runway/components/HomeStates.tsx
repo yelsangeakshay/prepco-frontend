@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -114,7 +114,7 @@ export function FirstLoginHome({ data }: { data: Runway }) {
 
 /** Home for a returning student starting a second season (e11.png). */
 export function SecondSeasonHome({ data }: { data: Runway }) {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const season = data.secondSeason!;
   const [planId, setPlanId] = useState(season.plans.find((p) => p.suggested)?.id ?? "premium");
   const chosen = season.plans.find((p) => p.id === planId);
@@ -183,7 +183,7 @@ export function SecondSeasonHome({ data }: { data: Runway }) {
           </div>
           <div className="flex flex-col gap-3 pt-2 md:flex-row md:items-center md:justify-between">
             <p className="text-navy-400">Day 0 for finals: set by your placement cell.</p>
-            <Button onClick={() => router.push(ROUTES.student.checkout(planId))}>
+            <Button onClick={() => navigate(ROUTES.student.checkout(planId))}>
               Continue with {chosen?.name ?? "Premium"}
             </Button>
           </div>

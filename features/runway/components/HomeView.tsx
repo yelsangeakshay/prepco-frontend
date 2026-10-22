@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,7 +36,7 @@ function Glow() {
 }
 
 function Hero({ data }: { data: Runway }) {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const next = data.nextSession;
   const attention = next && (next.status === "cancelled" || next.status === "no-show");
 
@@ -95,14 +95,14 @@ function Hero({ data }: { data: Runway }) {
       </h2>
       <p className="relative mt-3 text-base text-white/70 md:text-lg">{sub}</p>
       <div className="relative mt-6 flex flex-col gap-3 sm:flex-row md:mt-auto md:pt-6">
-        <Button variant="onNavy" onClick={() => router.push(ROUTES.student.session(next.id))}>
+        <Button variant="onNavy" onClick={() => navigate(ROUTES.student.session(next.id))}>
           {attention ? "Pick A New Slot" : "Session Details"}
         </Button>
         {data.answers.needWork > 0 && !attention && (
           <Button
             variant="ghost"
             className="border border-white/30 text-white hover:bg-white/10 max-md:hidden"
-            onClick={() => router.push(`${ROUTES.student.answers}?status=flagged`)}
+            onClick={() => navigate(`${ROUTES.student.answers}?status=flagged`)}
           >
             Prep: {data.answers.needWork} answers need work
           </Button>
@@ -128,7 +128,7 @@ function DayZero({ data }: { data: Runway }) {
 }
 
 function RunwayCard({ data }: { data: Runway }) {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   return (
     <Card variant="feature" className="p-6 md:p-7">
       <div className="mb-6 flex items-center justify-between">
@@ -146,7 +146,7 @@ function RunwayCard({ data }: { data: Runway }) {
           when: s.when,
           status: s.status,
         }))}
-        onPickSlot={(id) => router.push(ROUTES.student.session(id))}
+        onPickSlot={(id) => navigate(ROUTES.student.session(id))}
       />
     </Card>
   );

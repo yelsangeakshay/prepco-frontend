@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { useQueryClient } from "@tanstack/react-query";
 import { Wrench } from "lucide-react";
 import {
@@ -36,6 +37,7 @@ function writeCookie(name: string, value: string) {
 /** Dev-only: switch role and scenario. Hidden in production builds. */
 export function DevToolbar() {
   const router = useRouter();
+  const { navigate } = useNavigate();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState<string>(() => readCookie(ROLE_COOKIE));
@@ -49,7 +51,7 @@ export function DevToolbar() {
     writeCookie(ONBOARDED_COOKIE, "");
     // The three roles share one mock world: drop cached answers from the old role.
     qc.clear();
-    router.push(isRole(value) ? ROLE_HOME[value as Role] : ROUTES.signIn);
+    navigate(isRole(value) ? ROLE_HOME[value as Role] : ROUTES.signIn);
     router.refresh();
   };
 

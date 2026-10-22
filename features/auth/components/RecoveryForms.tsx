@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@/lib/forms/zodResolver";
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,8 @@ export function ForgotPasswordForm() {
           <Button
             variant="secondary"
             className="w-full"
-            disabled={wait > 0 || forgot.isPending}
+            loading={forgot.isPending}
+            disabled={wait > 0}
             onClick={() =>
               forgot.mutate(
                 { email: sentTo },
@@ -114,8 +115,8 @@ export function ForgotPasswordForm() {
             {...register("email")}
           />
         </FormField>
-        <Button type="submit" className="min-h-[52px] w-full" disabled={forgot.isPending || !ready}>
-          {forgot.isPending ? "Sending…" : "Send reset link"}
+        <Button type="submit" className="min-h-[52px] w-full" loading={forgot.isPending || !ready}>
+          Send reset link
         </Button>
       </form>
     </RecoveryShell>
@@ -132,7 +133,7 @@ function Rule({ ok, children }: { ok: boolean; children: string }) {
 }
 
 export function ResetPasswordForm({ token }: { token: string }) {
-  const router = useRouter();
+  const { navigate, pending: navigating } = useNavigate();
   const ready = useApiReady();
   const reset = useResetPassword();
   const {
@@ -162,7 +163,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
         onSubmit={handleSubmit((v) =>
           reset.mutate(
             { token: v.token, password: v.password },
-            { onSuccess: () => router.push(ROUTES.signIn) },
+            { onSuccess: () => navigate(ROUTES.signIn) },
           ),
         )}
       >
@@ -188,8 +189,12 @@ export function ResetPasswordForm({ token }: { token: string }) {
           <Rule ok={password.length >= 8}>At least 8 characters</Rule>
           <Rule ok={password.length > 0 && password === confirm}>Passwords match</Rule>
         </ul>
-        <Button type="submit" className="min-h-[52px] w-full" disabled={reset.isPending || !ready}>
-          {reset.isPending ? "Saving…" : "Save and sign in"}
+        <Button
+          type="submit"
+          className="min-h-[52px] w-full"
+          loading={reset.isPending || navigating || !ready}
+        >
+          Save and sign in
         </Button>
       </form>
     </RecoveryShell>

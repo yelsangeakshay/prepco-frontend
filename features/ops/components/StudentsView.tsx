@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -191,7 +191,7 @@ function StudentPanel({ id, onClose }: { id: string; onClose: () => void }) {
 
 /** A2 students (a02.png). Search, filters, sort, page and the open student live in the URL. */
 export function StudentsView() {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const { params, set } = useUrlState();
   const urlQ = params.get("q") ?? "";
   const plan = params.get("plan") ?? "";
@@ -248,7 +248,7 @@ export function StudentsView() {
   // On a wide screen a row opens the side card; on a phone it opens the full page.
   const openRow = (r: StudentRow) => {
     if (window.matchMedia("(min-width: 1024px)").matches) set({ student: r.id });
-    else router.push(ROUTES.ops.student(r.id));
+    else navigate(ROUTES.ops.student(r.id));
   };
 
   return (

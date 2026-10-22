@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { FileText, FileX, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
@@ -74,6 +75,7 @@ function FileCard({ name, detail, bad }: { name: string; detail: string; bad?: b
 /** E2 (e02.png): reading, done and failed states on one screen, a drop zone and the consent box. */
 export function CvUpload() {
   const router = useRouter();
+  const { navigate, pending: navigating } = useNavigate();
   const ready = useApiReady();
   const inputRef = useRef<HTMLInputElement>(null);
   const upload = useUploadCv();
@@ -86,7 +88,7 @@ export function CvUpload() {
   const finish = (to: string = ROUTES.student.freeSession) => {
     markOnboarded();
     clearDraft();
-    router.push(to);
+    navigate(to);
     router.refresh();
   };
 
@@ -241,10 +243,10 @@ export function CvUpload() {
 
         {!done && (
           <div className="flex flex-col gap-2 sm:flex-row">
-            <Button className="flex-1" onClick={onUpload} disabled={reading || !ready}>
+            <Button className="flex-1" onClick={onUpload} loading={reading || !ready}>
               Upload CV
             </Button>
-            <Button variant="secondary" onClick={() => finish()} disabled={reading}>
+            <Button variant="secondary" onClick={() => finish()} disabled={reading || navigating}>
               Skip for now
             </Button>
           </div>

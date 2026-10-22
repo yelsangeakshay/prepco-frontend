@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,7 +17,7 @@ import { NotificationItem } from "./NotificationItem";
 
 /** The list used by both the /notifications page and the bell drawer. */
 export function NotificationList({ onNavigate }: { onNavigate?: () => void }) {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const { data, isPending, isError, refetch } = useNotifications();
   const mark = useMarkRead();
 
@@ -62,7 +62,7 @@ export function NotificationList({ onNavigate }: { onNavigate?: () => void }) {
                 if (!n.read) mark.mutate({ ids: [n.id] });
                 if (n.href) {
                   onNavigate?.();
-                  router.push(n.href);
+                  navigate(n.href);
                 }
               }}
             />
@@ -142,7 +142,7 @@ function ReachYou() {
 
 /** E10 full page: today and earlier on the left, the channel grid on the right (e10.png). */
 export function NotificationsPage() {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const { data, isPending, isError, refetch } = useNotifications();
   const mark = useMarkRead();
 
@@ -197,7 +197,7 @@ export function NotificationsPage() {
                         className="flex min-h-14 w-full gap-3 py-4 text-left"
                         onClick={() => {
                           if (!n.read) mark.mutate({ ids: [n.id] });
-                          if (n.href) router.push(n.href);
+                          if (n.href) navigate(n.href);
                         }}
                       >
                         <span

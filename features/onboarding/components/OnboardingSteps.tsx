@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { ArrowRight, CircleCheck, Info } from "lucide-react";
 import { Controller, useForm, type FieldValues, type Resolver } from "react-hook-form";
 import { zodResolver } from "@/lib/forms/zodResolver";
@@ -101,9 +101,9 @@ function ActionRow({ back, pending, label }: { back?: string; pending?: boolean;
       ) : (
         <span />
       )}
-      <Button type="submit" className="max-lg:w-full" disabled={pending}>
+      <Button type="submit" className="max-lg:w-full" loading={pending}>
         {label}
-        {!pending && <ArrowRight className="size-4" aria-hidden />}
+        <ArrowRight className="size-4" aria-hidden />
       </Button>
     </div>
   );
@@ -133,7 +133,7 @@ function runwayNote(day0Date: string | undefined) {
 }
 
 export function OnboardingStep({ step, lateJoiner }: { step: 1 | 2; lateJoiner?: boolean }) {
-  const router = useRouter();
+  const { navigate, pending: navigating } = useNavigate();
   const ready = useApiReady();
   const { draft, setDraft } = useOnboardingDraft();
   const save = useSaveProfile();
@@ -174,7 +174,7 @@ export function OnboardingStep({ step, lateJoiner }: { step: 1 | 2; lateJoiner?:
           className="max-w-xl space-y-4"
           onSubmit={handleSubmit((v) => {
             setDraft(v);
-            router.push(ROUTES.student.onboarding(2));
+            navigate(ROUTES.student.onboarding(2));
           })}
         >
           <FormField id="college" label="College" error={errors.college?.message}>
@@ -214,7 +214,7 @@ export function OnboardingStep({ step, lateJoiner }: { step: 1 | 2; lateJoiner?:
               {...register("experience")}
             />
           </FormField>
-          <ActionRow label="Continue" />
+          <ActionRow label="Continue" pending={navigating} />
         </form>
       </OnboardingLayout>
     );
@@ -249,11 +249,11 @@ export function OnboardingStep({ step, lateJoiner }: { step: 1 | 2; lateJoiner?:
           setDraft(v);
           const parsed = profileSchema.safeParse(full);
           if (!parsed.success) {
-            router.push(ROUTES.student.onboarding(1));
+            navigate(ROUTES.student.onboarding(1));
             return;
           }
           save.mutate(parsed.data as OnboardingProfile, {
-            onSuccess: () => router.push(ROUTES.student.onboardingCv),
+            onSuccess: () => navigate(ROUTES.student.onboardingCv),
           });
         })}
       >
@@ -425,8 +425,8 @@ export function OnboardingStep({ step, lateJoiner }: { step: 1 | 2; lateJoiner?:
         )}
 
         <ActionRow
-          label={save.isPending ? "Saving…" : "Continue"}
-          pending={save.isPending || !ready}
+          label="Continue"
+          pending={save.isPending || navigating || !ready}
           back={ROUTES.student.onboarding(1)}
         />
       </form>

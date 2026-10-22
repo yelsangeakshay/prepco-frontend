@@ -9,6 +9,7 @@ import { useOpsBadge } from "@/features/ops/hooks/useOpsBadge";
 import { usePanelistToday } from "@/features/panelist/hooks/usePanelist";
 import { useRunway } from "@/features/runway/hooks/useRunway";
 import { ROUTES } from "@/lib/config/routes";
+import { LinkSpinner } from "./LinkSpinner";
 import { Wordmark } from "./Wordmark";
 
 export function isActive(pathname: string, item: NavItem) {
@@ -131,7 +132,7 @@ export function Sidebar({ role }: { role: Role }) {
                       aria-current={active ? "page" : undefined}
                       title={item.label}
                       className={cn(
-                        "rounded-control flex min-h-11 items-center gap-3 px-3 text-[15px] font-medium transition-colors max-xl:justify-center",
+                        "rounded-control relative flex min-h-11 items-center gap-3 px-3 text-[15px] font-medium transition-colors max-xl:justify-center",
                         active
                           ? "bg-maroon-600 text-white"
                           : "text-white/75 hover:bg-white/10 hover:text-white",
@@ -146,6 +147,7 @@ export function Sidebar({ role }: { role: Role }) {
                       />
                       <Icon className="size-5 shrink-0 xl:hidden" aria-hidden />
                       <span className="max-xl:sr-only">{item.label}</span>
+                      <LinkSpinner className="ml-auto max-xl:absolute max-xl:top-1.5 max-xl:right-1.5" />
                       {badge && (
                         <span
                           className={cn(

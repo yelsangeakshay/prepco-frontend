@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { ProgressBar } from "@/components/shared/ProgressBar";
 import { Skeleton } from "@/components/shared/Skeletons";
@@ -20,7 +20,7 @@ const TRACK_LABEL: Record<Track, string> = { finals: "Finals", summers: "Summers
 
 /** S4 plans. E5: sold-out plans send people to the waitlist. */
 export function PlansView() {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const [track, setTrack] = useState<Track>("finals");
   const [chosen, setChosen] = useState<Plan["id"]>("premium");
   const { data, isPending, isError, refetch } = usePlans(track);
@@ -101,7 +101,7 @@ export function PlansView() {
                 selected={!full && chosen === p.id}
                 ctaLabel={full ? "Join Waitlist" : `Choose ${p.name}`}
                 onSelect={() => {
-                  if (full) return router.push(ROUTES.student.waitlist);
+                  if (full) return navigate(ROUTES.student.waitlist);
                   setChosen(p.id);
                   document
                     .getElementById("checkout")

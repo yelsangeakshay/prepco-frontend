@@ -188,14 +188,10 @@ export function CheckoutPanel({ plan, track }: { plan: Plan; track: Track }) {
         </dl>
         <Button
           className="mt-4 w-full"
-          disabled={pay.isPending}
+          loading={pay.isPending}
           onClick={() => pay.mutate({ planId: plan.id, method })}
         >
-          {pay.isPending
-            ? "Processing…"
-            : failed
-              ? `Try again with ${methodLabel}`
-              : `Pay ${formatINR(plan.price)} →`}
+          {failed ? `Try again with ${methodLabel}` : `Pay ${formatINR(plan.price)} →`}
         </Button>
         {failed && method !== "card" && (
           <Button
