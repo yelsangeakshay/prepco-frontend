@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@/lib/forms/zodResolver";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { FieldError, Input } from "@/components/ui/field";
 import { FormField } from "@/components/ui/form-field";
 import { ApiError } from "@/lib/api/client";
@@ -53,18 +53,6 @@ export function SignInForm() {
       active="sign-in"
       title="Welcome back."
       subtitle="Pick up your runway where you left it."
-      below={
-        <Card variant="default" className="rounded-feature mt-6 hidden p-5 lg:block">
-          <p className="font-semibold">New here?</p>
-          <p className="text-navy-400 mt-1 text-sm">
-            Start with a free 30-minute session. No card, and a written summary whether or not you
-            buy.
-          </p>
-          <p className="mt-3 text-sm">
-            <AuthLink href={ROUTES.signUp}>Book your free session →</AuthLink>
-          </p>
-        </Card>
-      }
       belowPhone={
         <>
           <p>
@@ -105,7 +93,12 @@ export function SignInForm() {
               <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
-              <AuthLink href={ROUTES.forgotPassword}>Forgot?</AuthLink>
+              <Link
+                href={ROUTES.forgotPassword}
+                className="text-maroon-600 text-sm font-medium underline"
+              >
+                Forgot?
+              </Link>
             </div>
             <Input
               id="password"

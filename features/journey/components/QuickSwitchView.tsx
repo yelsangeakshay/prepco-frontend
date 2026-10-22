@@ -179,16 +179,10 @@ export function QuickSwitchView() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
       <PageHeader
-        eyebrow="Quick Switch"
-        pill={
-          <span className="flex items-center gap-2">
-            <Badge tone="goldSoft">For route four</Badge>
-            <Badge tone={live ? "green" : "neutral"}>{live ? "● Live" : "Paused"}</Badge>
-          </span>
-        }
+        pill={<Badge tone={live ? "green" : "neutral"}>{live ? "● Live" : "Paused"}</Badge>}
         pillClassName="bg-transparent p-0"
-        title="An agent that job-hunts while you don't."
-        subtitle="It scans job platforms every day and emails you only live openings, never older than 7 days. Free, and on for as long as you're looking."
+        title="Quick Switch"
+        subtitle="An agent that job-hunts while you don't. It scans job platforms every day and emails you only live openings, never older than 7 days. Free, and on for as long as you're looking."
       />
 
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">

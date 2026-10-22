@@ -54,12 +54,12 @@ function Editor({ data }: { data: Availability }) {
     <>
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-maroon-600 text-[13px] font-semibold tracking-[0.16em] uppercase">
-            Availability
-          </p>
           <h1 className="font-display text-3xl leading-tight font-bold md:text-[44px]">
-            Week of {formatDay(weekStart).split(" ").slice(1).join(" ")}
+            Availability
           </h1>
+          <p className="text-navy-400 mt-2 text-base md:text-lg">
+            Week of {formatDay(weekStart).split(" ").slice(1).join(" ")}
+          </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button variant="secondary" disabled={week <= 0} onClick={() => setWeek(week - 1)}>

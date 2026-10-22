@@ -132,7 +132,7 @@ export const SCREENS: ScreenEntry[] = [
     pattern: "/answers",
     sample: "/answers",
     code: "S8",
-    title: "HR Question Builder",
+    title: "Answer bank",
     access: "student",
   },
   {

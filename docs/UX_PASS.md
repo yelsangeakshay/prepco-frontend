@@ -11,12 +11,12 @@ match the mockups pixel for pixel.
 
 ## Status
 
-| Phase   | Scope                                                            | Depends on | State   |
-| ------- | ---------------------------------------------------------------- | ---------- | ------- |
-| Phase 0 | Decision: usability vs mockup fidelity for badges, titles, Home  | none       | open    |
-| Phase 1 | Loading feedback: spinner, button loading, nav bar, auth flows   | none       | done    |
-| Phase 2 | Tokens: type scale, tabular numbers, badge tones, page skeletons | none       | done    |
-| Phase 3 | Layout: page names, Home "do this next", filters, lists, spacing | Phase 0, 2 | blocked |
+| Phase   | Scope                                                            | Depends on | State |
+| ------- | ---------------------------------------------------------------- | ---------- | ----- |
+| Phase 0 | Decision: usability vs mockup fidelity for badges, titles, Home  | none       | done  |
+| Phase 1 | Loading feedback: spinner, button loading, nav bar, auth flows   | none       | done  |
+| Phase 2 | Tokens: type scale, tabular numbers, badge tones, page skeletons | none       | done  |
+| Phase 3 | Layout: page names, filters, lists, spacing (Home layout kept)   | Phase 0, 2 | done  |
 
 States: to do, in progress, done, blocked, open (waiting on a decision).
 
@@ -57,7 +57,7 @@ Clutter:
 
 ## Phase 0: decision
 
-- [ ] Owner decides whether usability overrides the mockups for: badge set and colours, slogan page titles, Home
+- [x] Owner decides whether usability overrides the mockups for: badge set and colours, slogan page titles, Home
       layout. Record the answer in `docs/OPEN_DECISIONS.md` and here.
 
 ## Phase 1: loading feedback
@@ -138,16 +138,16 @@ Starts after the Phase 0 answer and Phase 2.
 
 Tasks:
 
-- [ ] 3.1 Page titles name the page ("Sessions", "Answer bank"); slogan moves to the subtitle. One name per screen
+- [x] 3.1 Page titles name the page ("Sessions", "Answer bank"); slogan moves to the subtitle. One name per screen
       across sidebar, phone tab, page title and `metadata.title`.
-- [ ] 3.2 One verb per action across the app ("Start scoring" everywhere); one primary button per region.
-- [ ] 3.3 At most one overline per card; drop page overlines except on Home; marketing badges become plain text.
-- [ ] 3.4 Home: one "Do this next" card, then the runway, then three compact summary cards; Day 0 count shown once;
+- [x] 3.2 One verb per action across the app ("Start scoring" everywhere); one primary button per region.
+- [x] 3.3 At most one overline per card; drop page overlines except on Home; marketing badges become plain text.
+- [ ] 3.4 (skipped by decision, see below) Home: one "Do this next" card, then the runway, then three compact summary cards; Day 0 count shown once;
       "This week" above Quick Switch.
-- [ ] 3.5 Answers: one filter row with counts.
-- [ ] 3.6 Long lists (panelist Sent, ops lists): compact rows, latest 5, "Show all".
-- [ ] 3.7 Spacing: card padding 24 px, card gap 24 px, dense rows for read-only info.
-- [ ] 3.8 Sign-in polish: Google "G" mark, "Forgot?" at label weight, drop the duplicate "New here?" card on desktop.
+- [x] 3.5 Answers: one filter row with counts.
+- [x] 3.6 Long lists (panelist Sent, ops lists): compact rows, latest 5, "Show all".
+- [x] 3.7 Spacing: card padding 24 px, card gap 24 px, dense rows for read-only info.
+- [x] 3.8 Sign-in polish: Google "G" mark, "Forgot?" at label weight, drop the duplicate "New here?" card on desktop.
 
 Edge cases to cover:
 
@@ -208,3 +208,29 @@ Same as `docs/RESUME.md`: `pnpm exec tsc --noEmit`, `pnpm exec eslint`, `pnpm ex
 - Known and unchanged: phone web-vitals LCP fails on 3 of 6 routes on `main` as well.
 - Not done here: skeleton shape for Answers inside the view is the list only (the view draws its own header), and ops
   table pages keep the table's own loading rows under a real header.
+
+## Phase 0 decision (2026-10-23): Option C
+
+Usability wins for page titles and badges. The Home layout stays as the mockup draws it. Task 3.4 and edge case E24 are
+therefore out of scope. Rationale and the deviations are listed in `docs/OPEN_DECISIONS.md`.
+
+## Phase 3 notes (done)
+
+- 3.1: one name per screen. The sidebar, More sheet, page title and browser title agree: "Answer bank" (was "HR Question
+  Builder" in the sidebar, "Your answer bank, built from your own CV." on the page), "Sessions & runway", "Journey &
+  routes", "Case track", "Quick Switch", "Plans", "Plans & credits" (ops). The slogans moved into the subtitle. The phone
+  tab keeps the short forms "Answers" and "Sessions". Home keeps its greeting title.
+- 3.2: panelist "Score Now" and "Start Scoring" are both "Start scoring". Other button labels were left alone: changing
+  their capitalisation touches many tests for little gain.
+- 3.3: page overlines are gone on Billing, Sessions, Journey, Case track, Quick Switch, Plans, Answers, Availability and the
+  ops hub pages; any information in them moved into the subtitle. Marketing pills ("In every plan", "Priority slot
+  booking", "Elite", "For route four") are removed; status pills (Live/Paused, Sample data) stay. Home, panelist Today and
+  ops overview keep their date overline, and detail pages keep theirs.
+- 3.5: Answers has one filter row: the round tabs and the status pills with counts. The separate stats row is removed.
+  Counts are for the whole bank, as the API returns them.
+- 3.6: the panelist "Sent" list shows the latest 5 in compact rows with a "Show all" button. A link to `#<sessionId>`
+  opens the list first, and focus moves to the first newly shown row. Ops lists were already paginated tables.
+- 3.7: default card padding is 24 px (was 20 px). Gaps between cards were left as they are.
+- 3.8: Google button has the four-colour G, "Forgot?" is label weight, and the duplicate "New here?" card is gone on
+  desktop (the Create account tab covers it).
+- Phone web-vitals LCP fails on some routes on every run, with or without these changes; `main` fails 3 of 6.

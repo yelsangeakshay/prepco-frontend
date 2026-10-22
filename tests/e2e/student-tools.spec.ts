@@ -296,7 +296,7 @@ test.describe("On a phone, start to finish", () => {
     await expect(page.getByRole("dialog", { name: "Notifications" })).toBeVisible();
     await page.getByRole("button", { name: "Close" }).click();
 
-    await openFromNav(page, "HR Question Builder", true);
+    await openFromNav(page, "Answer bank", true);
     await expect(page).toHaveURL(/\/answers$/);
     await page.getByRole("tab", { name: "Flagged" }).click();
     await expect(page.getByTestId("answer-row")).toHaveCount(3);

@@ -150,7 +150,7 @@ export function SessionsView() {
   const firstBooked = items.find((s) => s.status === "upcoming" || s.status === "rescheduled");
   const topUp = TOP_UP[r.student.plan] ?? TOP_UP.Premium!;
   const lateRunway = r.totalCount < 6;
-  const title = lateRunway
+  const lead = lateRunway
     ? "The runway that fits before Day 0."
     : "Eight weeks, mapped before you start.";
 
@@ -158,18 +158,15 @@ export function SessionsView() {
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
       <div className="flex items-start justify-between gap-3 md:block">
         <PageHeader
-          eyebrow="Runway to the day"
-          pill={paid ? "Priority slot booking" : undefined}
-          pillClassName="bg-maroon-600 hidden text-white md:inline-block"
           title={
             <>
               <span className="md:hidden">Sessions</span>
-              <span className="hidden md:inline">{title}</span>
+              <span className="hidden md:inline">Sessions &amp; runway</span>
             </>
           }
           subtitle={
             <span className="hidden md:inline">
-              Every plan follows the same track. Day 0 doesn&apos;t move for anyone.
+              {lead} Every plan follows the same track. Day 0 doesn&apos;t move for anyone.
             </span>
           }
         />

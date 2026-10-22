@@ -193,7 +193,7 @@ export function BookingsView() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-5 p-4 md:p-8">
-      <PageHeader eyebrow="Synced from Calendly" title="Sessions & bookings" />
+      <PageHeader title="Sessions & bookings" subtitle="Synced from Calendly." />
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="This week" value={week?.sessionsScheduled ?? "—"} />

@@ -13,7 +13,7 @@ export function Card({
     <div
       className={cn(
         "border-line border",
-        variant === "default" && "rounded-card bg-white p-5",
+        variant === "default" && "rounded-card bg-white p-6",
         variant === "feature" && "rounded-feature bg-white p-6",
         variant === "navy" && "rounded-feature bg-navy-900 border-transparent p-6 text-white",
         variant === "inset" && "rounded-card bg-cream-soft border-transparent p-4",

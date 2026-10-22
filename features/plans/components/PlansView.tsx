@@ -31,10 +31,9 @@ export function PlansView() {
   return (
     <div className="mx-auto max-w-6xl p-4 md:p-8">
       <PageHeader
-        eyebrow="Plans"
-        title="Pick how far down the runway you want cover."
+        title="Plans"
         pill="Sample data"
-        subtitle="Seats are limited per cohort. Prices include GST."
+        subtitle="Pick how far down the runway you want cover. Seats are limited per cohort. Prices include GST."
       />
 
       <div className="mt-6 flex flex-wrap items-center gap-4">

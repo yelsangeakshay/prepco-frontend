@@ -81,7 +81,7 @@ test.describe("Run a panel", () => {
   test("an unsent score survives a reload", async ({ page, context }) => {
     await signInAs(context, "panelist");
     await gotoReady(page, "/panelist/scoring");
-    await page.getByRole("link", { name: "Score Now" }).first().click();
+    await page.getByRole("link", { name: "Start scoring" }).first().click();
     await page.getByRole("radio", { name: "Strong" }).click();
     await page.getByLabel("Note to the student").fill("A draft note that is long enough to keep.");
     await page.reload();

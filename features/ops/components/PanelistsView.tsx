@@ -151,10 +151,11 @@ export function PanelistsView() {
   return (
     <div className="mx-auto max-w-7xl space-y-5 p-4 md:p-8">
       <PageHeader
-        eyebrow="Each currently working in the function they interview for"
         title={counts ? `${counts.all} panelists` : "Panelists"}
         subtitle={
-          counts ? `${counts.needsAttention} need attention · ${counts.paused} paused` : undefined
+          counts
+            ? `${counts.needsAttention} need attention · ${counts.paused} paused. Each works in the function they interview for.`
+            : "Each works in the function they interview for."
         }
       />
 

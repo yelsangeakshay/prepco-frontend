@@ -74,7 +74,7 @@ export const NAV: Record<Role, NavConfig> = {
         items: [
           { label: "CV Builder", href: s.cv, icon: FileText, mobile: true, mobileLabel: "CV" },
           {
-            label: "HR Question Builder",
+            label: "Answer bank",
             href: s.answers,
             icon: BookOpen,
             mobile: true,

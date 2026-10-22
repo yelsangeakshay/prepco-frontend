@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,47 @@ import type { QuestionInput, ScoringValues } from "../scoring/components/Scoring
 import { ScoringFormLazy } from "./lazy";
 import { useBrief, useScoringList, useSubmitScore } from "../hooks/usePanelist";
 import { PanelRow } from "./PanelRow";
+import type { PanelItem } from "../schemas";
+
+const SENT_SHOWN = 5;
+
+/** The latest few sent panels; the rest open with "Show all". A link to #<sessionId> opens the list first. */
+function SentList({ items }: { items: PanelItem[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const firstExtra = useRef<HTMLDivElement>(null);
+  const visible = expanded ? items : items.slice(0, SENT_SHOWN);
+  const hidden = items.length - visible.length;
+
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (id && items.slice(SENT_SHOWN).some((i) => i.sessionId === id)) setExpanded(true);
+  }, [items]);
+
+  return (
+    <>
+      <div className="space-y-2">
+        {visible.map((i, n) => (
+          <div key={i.sessionId} id={i.sessionId} ref={n === SENT_SHOWN ? firstExtra : undefined}>
+            <PanelRow item={i} compact />
+          </div>
+        ))}
+      </div>
+      {items.length > SENT_SHOWN && (
+        <Button
+          variant="ghost"
+          aria-expanded={expanded}
+          onClick={() => {
+            setExpanded(!expanded);
+            if (!expanded)
+              requestAnimationFrame(() => firstExtra.current?.querySelector("a")?.focus());
+          }}
+        >
+          {expanded ? "Show fewer" : `Show all ${items.length} (${hidden} more)`}
+        </Button>
+      )}
+    </>
+  );
+}
 
 /** P4 list. */
 export function ScoringList() {
@@ -42,7 +83,7 @@ export function ScoringList() {
         {data.done.length === 0 ? (
           <EmptyState title="No feedback sent yet" />
         ) : (
-          data.done.map((i) => <PanelRow key={i.sessionId} item={i} />)
+          <SentList items={data.done} />
         )}
       </section>
     </div>
