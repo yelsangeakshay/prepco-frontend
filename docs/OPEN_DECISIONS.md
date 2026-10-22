@@ -107,3 +107,10 @@ Deviations from the mockups, all Proposed:
 - Batch 5: the second-season price is drawn as "[Season 2 price]" (decision 4) and stays that way; the plan list prices are the existing list prices.
 - Batch 5: "Unused sessions" after a placement shows "Decision needed" (decision 7). The waitlist queue position (#4), the "Also offer me Basic" and WhatsApp options, and the notification channel grid are mock UI only and Proposed; nothing is sent.
 - Batch 5: the change-target page no longer asks for a free-text role or a reason (the mockup has none); the API accepts both as optional.
+
+UX pass (2026-10-23), owner decision: usability beats the mockups for page titles and badges, but not for the Home layout.
+
+- Page titles name the page, with the slogan as the subtitle (Sessions & runway, Journey & routes, Case track, Quick
+  Switch, Plans, Answer bank). The sidebar says "Answer bank" where the mockups say "HR Question Builder".
+- Marketing badges and page overlines are removed from hub pages; status badges stay.
+- The Home layout (hero, runway, summary cards) is unchanged.

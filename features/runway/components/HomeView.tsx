@@ -186,7 +186,7 @@ function AnswersCard({ data }: { data: Runway }) {
   return (
     <Card variant="feature" className="p-6">
       <div className="flex items-center justify-between gap-2">
-        <h2 className={eyebrow}>HR Question Builder</h2>
+        <h2 className={eyebrow}>Answer bank</h2>
         {a.needWork > 0 && <NeedWorkBadge count={a.needWork} />}
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2.5">

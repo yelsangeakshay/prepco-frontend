@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { AnswersListSkeleton } from "@/components/shared/PageSkeletons";
+import { FilterPills } from "@/components/shared/FilterPills";
 import { ROUTES } from "@/lib/config/routes";
 import { cn } from "@/lib/utils/cn";
 import { useUrlState } from "@/lib/utils/useUrlState";
@@ -16,10 +17,10 @@ import { AnswerCard } from "./AnswerCard";
 import { AnswerPanel } from "./AnswerPanel";
 
 const TABS = [
-  { key: "", label: "All" },
-  { key: "rehearsed", label: "Rehearsed" },
-  { key: "flagged", label: "Flagged" },
-  { key: "not-drafted", label: "Not drafted" },
+  { key: "", label: "All", count: "all" },
+  { key: "rehearsed", label: "Rehearsed", count: "rehearsed" },
+  { key: "flagged", label: "Flagged", count: "flagged" },
+  { key: "not-drafted", label: "Not drafted", count: "notDrafted" },
 ] as const;
 
 const ROUNDS = [
@@ -77,7 +78,7 @@ function Row({
   );
 }
 
-/** S8 HR Question Builder: list on the left, the selected answer on the right (s08.png). */
+/** S8 Answer bank (HR Question Builder in the mockups): list on the left, the selected answer on the right (s08.png). */
 export function AnswersView() {
   const { params, set } = useUrlState();
   const wide = useWide();
@@ -107,16 +108,13 @@ export function AnswersView() {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:pr-72">
         <PageHeader
           className="md:pr-0"
-          eyebrow="HR Question Builder"
-          pill="In every plan"
-          pillClassName="hidden md:inline-block"
           title={
             <>
               <span className="md:hidden">
                 {roundLabel} · {data ? (round === "fit" ? data.rounds.fit : data.rounds.cv) : ""}{" "}
                 questions
               </span>
-              <span className="hidden md:inline">Your answer bank, built from your own CV.</span>
+              <span className="hidden md:inline">Answer bank</span>
             </>
           }
           subtitle={
@@ -126,40 +124,6 @@ export function AnswersView() {
             </span>
           }
         />
-        {data && (
-          <dl className="grid grid-cols-3 gap-3 text-center md:flex md:gap-6">
-            {[
-              { label: "Questions", value: data.counts.all, tone: "" },
-              { label: "Prepared", value: data.counts.rehearsed, tone: "" },
-              { label: "Need work", value: data.counts.flagged, tone: "maroon" },
-            ].map((s) => (
-              <div
-                key={s.label}
-                className={cn(
-                  "rounded-card border-line border bg-white p-3 md:border-0 md:bg-transparent md:p-0",
-                  s.tone === "maroon" && "bg-maroon-100 border-transparent",
-                )}
-              >
-                <dd
-                  className={cn(
-                    "font-num text-3xl leading-none font-bold",
-                    s.tone === "maroon" && "text-maroon-600",
-                  )}
-                >
-                  {s.value}
-                </dd>
-                <dt
-                  className={cn(
-                    "text-navy-400 mt-1 text-sm whitespace-nowrap",
-                    s.tone === "maroon" && "text-maroon-600",
-                  )}
-                >
-                  {s.label}
-                </dt>
-              </div>
-            ))}
-          </dl>
-        )}
       </div>
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -195,26 +159,16 @@ export function AnswersView() {
             );
           })}
         </div>
-        <div role="tablist" aria-label="Filter answers" className="flex flex-wrap gap-2">
-          {TABS.map((t) => {
-            const active = status === t.key;
-            return (
-              <button
-                key={t.key || "all"}
-                role="tab"
-                aria-selected={active}
-                type="button"
-                onClick={() => set({ status: t.key, a: "" }, { resetPage: true })}
-                className={cn(
-                  "min-h-11 rounded-full border px-4 text-sm font-semibold",
-                  active ? "border-maroon-600 bg-maroon-600 text-white" : "border-line bg-white",
-                )}
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+        <FilterPills
+          label="Filter answers"
+          active={status}
+          onSelect={(key) => set({ status: key, a: "" }, { resetPage: true })}
+          pills={TABS.map((t) => ({
+            key: t.key,
+            label: t.label,
+            count: data ? data.counts[t.count] : undefined,
+          }))}
+        />
       </div>
 
       {isError ? (

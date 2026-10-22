@@ -39,10 +39,8 @@ export function CaseTrackView() {
   return (
     <div className="mx-auto max-w-6xl space-y-5 p-4 md:p-8">
       <PageHeader
-        eyebrow="Route one · Case competitions"
-        pill="Elite"
-        pillClassName="bg-gold-500 text-navy-900"
-        title="The fastest route to an offer before the process even opens."
+        title="Case track"
+        subtitle="The fastest route to an offer before the process even opens."
       />
 
       {data.upgrade && (

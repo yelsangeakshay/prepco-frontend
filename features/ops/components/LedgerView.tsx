@@ -122,7 +122,11 @@ export function LedgerView() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-5 p-4 md:p-8">
-      <PageHeader eyebrow="Season 1 ledger" pill="Sample data" title="Plans, top-ups & credits" />
+      <PageHeader
+        pill="Sample data"
+        title="Plans & credits"
+        subtitle="Season 1 ledger: plans, top-ups and credits."
+      />
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Figure

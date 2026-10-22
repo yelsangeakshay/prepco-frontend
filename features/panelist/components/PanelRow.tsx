@@ -2,15 +2,21 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils/cn";
 import { ROUTES } from "@/lib/config/routes";
 import { formatSession } from "@/lib/utils/dates";
 import type { PanelItem } from "../schemas";
 import { statusTone } from "@/lib/status";
 
 /** One panel on Arjun's lists: who, when, and the next action. */
-export function PanelRow({ item }: { item: PanelItem }) {
+export function PanelRow({ item, compact }: { item: PanelItem; compact?: boolean }) {
   return (
-    <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <Card
+      className={cn(
+        "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+        compact && "p-3",
+      )}
+    >
       <div className="min-w-0">
         <p className="flex flex-wrap items-center gap-2 font-semibold">
           {item.studentName}
@@ -33,13 +39,13 @@ export function PanelRow({ item }: { item: PanelItem }) {
               <Link href={ROUTES.panelist.brief(item.sessionId)}>View Brief</Link>
             </Button>
             <Button asChild size="sm">
-              <Link href={ROUTES.panelist.scoringSession(item.sessionId)}>Start Scoring</Link>
+              <Link href={ROUTES.panelist.scoringSession(item.sessionId)}>Start scoring</Link>
             </Button>
           </>
         )}
         {item.status === "awaiting-score" && (
           <Button asChild size="sm">
-            <Link href={ROUTES.panelist.scoringSession(item.sessionId)}>Score Now</Link>
+            <Link href={ROUTES.panelist.scoringSession(item.sessionId)}>Start scoring</Link>
           </Button>
         )}
       </div>

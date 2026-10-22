@@ -49,7 +49,7 @@ export function BillingView() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-5 p-4 md:p-8">
-      <PageHeader eyebrow="Account" title="Plan & billing" />
+      <PageHeader title="Plan & billing" />
 
       {ended && (
         <div

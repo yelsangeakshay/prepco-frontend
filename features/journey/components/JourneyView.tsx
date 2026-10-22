@@ -34,9 +34,8 @@ export function JourneyView() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
       <PageHeader
-        eyebrow="The two-year runway"
-        title="From your first term to the offer letter."
-        subtitle="One CV, one answer bank, one panel that has watched you improve. Nothing gets rebuilt from scratch, because nothing gets handed off."
+        title="Journey & routes"
+        subtitle="From your first term to the offer letter. One CV, one answer bank, one panel that has watched you improve. Nothing gets rebuilt from scratch, because nothing gets handed off."
       />
       <RunwayBanner runway={runway.data} />
 

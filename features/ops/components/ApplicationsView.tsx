@@ -87,7 +87,7 @@ export function ApplicationsView() {
       <Link href={ROUTES.ops.panelists} className="text-maroon-600 text-sm font-semibold underline">
         Roster
       </Link>
-      <PageHeader eyebrow="Panelist roster" title="Panelist applications" />
+      <PageHeader title="Panelist applications" />
 
       <div role="tablist" aria-label="Application status" className="flex gap-2">
         {TABS.map((t) => {

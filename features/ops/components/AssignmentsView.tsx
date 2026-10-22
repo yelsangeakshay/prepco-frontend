@@ -137,7 +137,7 @@ export function AssignmentsView() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
-      <PageHeader eyebrow="Always a specialist in the target function" title="Panel assignment" />
+      <PageHeader title="Panel assignment" subtitle="Always a specialist in the target function." />
 
       <p className="sr-only" data-testid="unassigned-count">
         {data.unassigned.length} panels without a panelist
