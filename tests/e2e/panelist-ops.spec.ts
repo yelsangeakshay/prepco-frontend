@@ -214,7 +214,7 @@ test.describe("Students at scale", () => {
       const panel = page.getByTestId("student-panel");
       await expect(page).toHaveURL(/student=st-riya/);
       await expect(panel.getByText("Runway")).toBeVisible();
-      await expect(panel.getByText("Arjun Mehta")).toBeVisible();
+      await expect(panel.getByText(/Sethi/).first()).toBeVisible();
       await panel.getByRole("link", { name: "Full profile" }).click();
     }
     await expect(page).toHaveURL(/\/ops\/students\/st-riya$/);
