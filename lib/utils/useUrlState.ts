@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 
 /** List filters, sort, search and page live in the URL. Setting a key to "" or null removes it. */
 export function useUrlState() {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const pathname = usePathname();
   const params = useSearchParams();
 
@@ -21,9 +22,9 @@ export function useUrlState() {
       }
       if (opts.resetPage) next.delete("page");
       const qs = next.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      navigate(qs ? `${pathname}?${qs}` : pathname, { replace: true, scroll: false });
     },
-    [params, pathname, router],
+    [params, pathname, navigate],
   );
 
   return { params, set };

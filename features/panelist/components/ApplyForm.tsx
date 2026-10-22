@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@/lib/forms/zodResolver";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ const legend = "mb-2 block text-sm font-medium";
 
 /** P1 apply to be a panelist (public, p01). */
 export function ApplyForm() {
-  const router = useRouter();
+  const { navigate, pending: navigating } = useNavigate();
   const ready = useApiReady();
   const submit = useSubmitApplication();
   const {
@@ -94,7 +94,7 @@ export function ApplyForm() {
             noValidate
             className="space-y-5"
             onSubmit={handleSubmit((v) =>
-              submit.mutate(v, { onSuccess: () => router.push(ROUTES.panelistApplySubmitted) }),
+              submit.mutate(v, { onSuccess: () => navigate(ROUTES.panelistApplySubmitted) }),
             )}
           >
             <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
@@ -216,8 +216,8 @@ export function ApplyForm() {
               <p className="text-navy-400 text-sm">
                 We&apos;ll reply within a week. A short call comes first.
               </p>
-              <Button type="submit" disabled={submit.isPending || !ready}>
-                {submit.isPending ? "Sending…" : "Submit application"}
+              <Button type="submit" loading={submit.isPending || navigating || !ready}>
+                Submit application
               </Button>
             </div>
           </form>

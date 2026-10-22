@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@/lib/nav/useNavigate";
 import { ArrowRight, CheckCircle2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,7 +28,7 @@ const CARRIES = [
 
 /** E9 change target role (e09.png). */
 export function ChangeTargetView() {
-  const router = useRouter();
+  const { navigate } = useNavigate();
   const profile = useProfile();
   const sessions = useSessions();
   const change = useChangeTarget();
@@ -157,7 +157,7 @@ export function ChangeTargetView() {
           a specialist. We&apos;ll tell you before you confirm.
         </p>
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={() => router.push(ROUTES.student.profile)}>
+          <Button variant="secondary" onClick={() => navigate(ROUTES.student.profile)}>
             Cancel
           </Button>
           <Button

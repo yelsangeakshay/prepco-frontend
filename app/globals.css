@@ -22,3 +22,23 @@
     cursor: pointer;
   }
 }
+
+/* Top navigation bar: crawls to 90% and waits; NavProgress finishes and fades it. */
+@keyframes nav-progress-run {
+  from {
+    width: 0;
+  }
+  to {
+    width: 90%;
+  }
+}
+.nav-progress-run {
+  animation: nav-progress-run 8s cubic-bezier(0.1, 0.6, 0.2, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-progress-run {
+    animation: none;
+    width: 100%;
+    opacity: 0.6;
+  }
+}

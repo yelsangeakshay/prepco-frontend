@@ -8,7 +8,7 @@ import "../app/globals.css";
 const fonts = document.createElement("link");
 fonts.rel = "stylesheet";
 fonts.href =
-  "https://fonts.googleapis.com/css2?family=Caveat&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap";
 document.head.appendChild(fonts);
 
 (window as unknown as { __PREPCO_NO_LATENCY__: boolean }).__PREPCO_NO_LATENCY__ = true;
@@ -94,7 +94,6 @@ const preview: Preview = {
               {
                 "--font-inter": "Inter",
                 "--font-playfair": "'Playfair Display'",
-                "--font-caveat": "Caveat",
               } as React.CSSProperties
             }
           >

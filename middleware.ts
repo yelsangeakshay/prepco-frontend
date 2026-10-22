@@ -15,6 +15,7 @@ import { ROUTES } from "@/lib/config/routes";
  * Mock auth guard (dev only, cookie based).
  * - signed out        -> /sign-in
  * - cross-role route  -> own role home
+ * - signed in on sign-in/up -> own role home
  * - first-login       -> /onboarding/1 for students
  * - ?scenario=<name>  -> persisted in the prepco_scenario cookie
  */
@@ -36,6 +37,9 @@ export function middleware(req: NextRequest) {
 
   if (pathname === "/") {
     res = redirect(role ? ROLE_HOME[role] : ROUTES.signIn);
+  } else if (role && (pathname === ROUTES.signIn || pathname === ROUTES.signUp)) {
+    // Already signed in: the auth pages have nothing to offer.
+    res = redirect(ROLE_HOME[role]);
   } else if (!isPublicPath(pathname)) {
     if (!role) {
       res = redirect(ROUTES.signIn);

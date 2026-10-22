@@ -8,6 +8,7 @@ import { MoreHorizontal, UserRound } from "lucide-react";
 import { MORE_LABEL, NAV } from "@/lib/config/nav";
 import type { Role } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils/cn";
+import { LinkSpinner } from "./LinkSpinner";
 import { isActive } from "./Sidebar";
 
 const MoreSheet = dynamic(() => import("./MoreSheet"), { ssr: false });
@@ -36,11 +37,12 @@ export function MobileNav({ role }: { role: Role }) {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium",
+              "relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium",
               active ? "text-maroon-600" : "text-navy-400",
             )}
           >
             <Icon className="size-5" aria-hidden />
+            <LinkSpinner className="absolute top-1.5 right-3" />
             <span className="max-w-full truncate px-1">
               {item.mobileLabel ?? item.label.split(" ")[0]}
             </span>
