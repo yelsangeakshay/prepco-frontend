@@ -79,16 +79,16 @@ function Editor({ answer, as: Heading }: { answer: AnswerDetail; as: "h1" | "h2"
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span data-testid="answer-status">
           {flagged ? (
-            <span className="bg-maroon-100 text-maroon-600 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-bold tracking-wider uppercase">
+            <span className="bg-maroon-100 text-maroon-600 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold tracking-wider uppercase">
               <Flag className="size-3" aria-hidden />
               Flagged{answer.flaggedAt ? ` at ${answer.flaggedAt}` : ""}
             </span>
           ) : answer.status === "rehearsed" ? (
-            <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-[11px] font-bold tracking-wider text-green-600 uppercase">
+            <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-bold tracking-wider text-green-600 uppercase">
               Rehearsed
             </span>
           ) : (
-            <span className="bg-cream-soft inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold tracking-wider uppercase">
+            <span className="bg-cream-soft inline-flex items-center rounded-full px-3 py-1 text-xs font-bold tracking-wider uppercase">
               Not drafted
             </span>
           )}
@@ -137,7 +137,7 @@ function Editor({ answer, as: Heading }: { answer: AnswerDetail; as: "h1" | "h2"
               {answer.noteTags.map((t) => (
                 <li
                   key={t}
-                  className="text-navy-900 rounded-full bg-white px-3 py-1 text-[11px] font-bold tracking-wider uppercase"
+                  className="text-navy-900 rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wider uppercase"
                 >
                   {t}
                 </li>

@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageSkeleton } from "@/components/shared/Skeletons";
+import { ListPageSkeleton } from "@/components/shared/PageSkeletons";
 import { ApiError } from "@/lib/api/client";
 import { ROUTES } from "@/lib/config/routes";
 import { useLocalDraft } from "@/lib/utils/useLocalDraft";
@@ -19,7 +20,7 @@ import { PanelRow } from "./PanelRow";
 /** P4 list. */
 export function ScoringList() {
   const { data, isPending, isError, refetch } = useScoringList();
-  if (isPending) return <PageSkeleton />;
+  if (isPending) return <ListPageSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-8">

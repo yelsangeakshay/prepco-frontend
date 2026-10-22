@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { PageSkeleton } from "@/components/shared/Skeletons";
+import { SessionsSkeleton } from "@/components/shared/PageSkeletons";
 import { ApiError } from "@/lib/api/client";
 import { ROUTES } from "@/lib/config/routes";
 import { formatINR } from "@/lib/utils/currency";
@@ -131,7 +131,7 @@ export function SessionsView() {
   const runway = useRunway();
   const sessions = useSessions();
 
-  if (runway.isPending || sessions.isPending) return <PageSkeleton />;
+  if (runway.isPending || sessions.isPending) return <SessionsSkeleton />;
   if (runway.isError || sessions.isError || !runway.data || !sessions.data) {
     return (
       <ErrorCard

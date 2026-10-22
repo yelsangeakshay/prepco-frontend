@@ -19,11 +19,12 @@ import { useDebounced } from "@/lib/utils/useDebounced";
 import { useUrlState } from "@/lib/utils/useUrlState";
 import { useOpsApplications, useOpsPanelists, usePanelistAction } from "../hooks/useOps";
 import type { RosterPanelist } from "../schemas";
+import { statusTone } from "@/lib/status";
 
 const HEALTH = {
-  good: { label: "Good", tone: "green" },
-  watch: { label: "Watch", tone: "gold" },
-  "needs-attention": { label: "Needs attention", tone: "maroon" },
+  good: { label: "Good", tone: statusTone("good") },
+  watch: { label: "Watch", tone: statusTone("watch") },
+  "needs-attention": { label: "Needs attention", tone: statusTone("needs-attention") },
 } as const;
 
 /** A6 roster. */
@@ -175,7 +176,7 @@ export function PanelistsView() {
                   on ? "border-maroon-600 border-2" : "border-line",
                 )}
               >
-                <span className="font-display block text-3xl leading-none font-bold tabular-nums">
+                <span className="font-num block text-3xl leading-none font-bold tabular-nums">
                   {counts?.byFunction[f] ?? "—"}
                 </span>
                 <span className="text-navy-400 mt-2 block text-sm">{f}</span>

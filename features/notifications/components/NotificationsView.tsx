@@ -98,7 +98,7 @@ function ReachYou() {
               <th
                 key={c}
                 scope="col"
-                className="w-[62px] pb-2 text-center text-[10px] font-semibold sm:w-[74px]"
+                className="w-[62px] pb-2 text-center text-xs font-semibold sm:w-[74px]"
               >
                 {c}
               </th>

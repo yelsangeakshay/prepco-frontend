@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { ProgressBar } from "@/components/shared/ProgressBar";
 import { RunwayTimeline } from "@/components/shared/RunwayTimeline";
 import { ScoreBar } from "@/components/shared/ScoreBar";
-import { PageSkeleton } from "@/components/shared/Skeletons";
+import { HomeSkeleton } from "@/components/shared/PageSkeletons";
 import { cn } from "@/lib/utils/cn";
 import { ROUTES } from "@/lib/config/routes";
 import { daysUntil, formatSession } from "@/lib/utils/dates";
@@ -116,7 +116,7 @@ function DayZero({ data }: { data: Runway }) {
   return (
     <Card variant="feature" className="flex h-full flex-col p-6 md:p-7">
       <p className={eyebrow}>Day 0</p>
-      <p className="font-display mt-6 text-[88px] leading-none font-bold">{data.day0.daysLeft}</p>
+      <p className="font-num mt-6 text-[88px] leading-none font-bold">{data.day0.daysLeft}</p>
       <p className="text-navy-400 mt-1 text-lg">days · {data.day0.label} 2026</p>
       <p className="mt-auto pt-6 text-[15px]">
         {data.day0.movedFrom
@@ -161,7 +161,7 @@ function CvCard({ data }: { data: Runway }) {
         {cv.locked && <LockedVersionBadge version={cv.version} />}
       </div>
       <p className="mt-3 flex items-baseline gap-2">
-        <span className="font-display text-6xl leading-none font-bold">{cv.score}</span>
+        <span className="font-num text-6xl leading-none font-bold">{cv.score}</span>
         <span className="text-navy-400">/100 · Interview-defensible</span>
       </p>
       <div className="mt-4 space-y-3">
@@ -198,7 +198,7 @@ function AnswersCard({ data }: { data: Runway }) {
               warn ? "bg-maroon-100" : "bg-cream-soft",
             )}
           >
-            <p className={cn("font-display text-3xl font-bold", warn && "text-maroon-600")}>{n}</p>
+            <p className={cn("font-num text-3xl font-bold", warn && "text-maroon-600")}>{n}</p>
             <p className="text-navy-400 mt-1 text-sm">{label}</p>
           </div>
         ))}
@@ -303,7 +303,7 @@ function MobileHome({ data }: { data: Runway }) {
       <div className="grid grid-cols-2 gap-3">
         <Card variant="feature" className="p-5">
           <h2 className={eyebrow}>CV score</h2>
-          <p className="font-display mt-2 text-5xl leading-none font-bold">{data.cv.score}</p>
+          <p className="font-num mt-2 text-5xl leading-none font-bold">{data.cv.score}</p>
           {data.cv.locked && (
             <div className="mt-3">
               <LockedVersionBadge version={data.cv.version} />
@@ -312,7 +312,7 @@ function MobileHome({ data }: { data: Runway }) {
         </Card>
         <Card variant="feature" className="p-5">
           <h2 className={eyebrow}>Answers</h2>
-          <p className="font-display mt-2 text-5xl leading-none font-bold">
+          <p className="font-num mt-2 text-5xl leading-none font-bold">
             {data.answers.prepared}
             <span className="text-navy-400 text-2xl font-normal">/{data.answers.total}</span>
           </p>
@@ -341,7 +341,7 @@ export function HomeView() {
   const { data, isPending, isError, refetch } = useRunway();
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
 
-  if (isPending) return <PageSkeleton />;
+  if (isPending) return <HomeSkeleton />;
   if (isError || !data) return <ErrorCard onRetry={() => refetch()} />;
 
   // Two states have their own page (e12.png, e11.png).
@@ -365,7 +365,7 @@ export function HomeView() {
           title={`Good evening, ${firstName}.`}
         />
         <p className="text-navy-400 shrink-0 pb-1 text-right text-sm md:hidden">
-          <span className="font-display text-navy-900 block text-4xl leading-none font-bold">
+          <span className="font-num text-navy-900 block text-4xl leading-none font-bold">
             {data.day0.daysLeft}
           </span>
           days to Day 0

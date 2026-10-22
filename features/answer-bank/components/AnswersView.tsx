@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorCard } from "@/components/shared/ErrorCard";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Skeleton } from "@/components/shared/Skeletons";
+import { AnswersListSkeleton } from "@/components/shared/PageSkeletons";
 import { ROUTES } from "@/lib/config/routes";
 import { cn } from "@/lib/utils/cn";
 import { useUrlState } from "@/lib/utils/useUrlState";
@@ -142,7 +142,7 @@ export function AnswersView() {
               >
                 <dd
                   className={cn(
-                    "font-display text-3xl leading-none font-bold",
+                    "font-num text-3xl leading-none font-bold",
                     s.tone === "maroon" && "text-maroon-600",
                   )}
                 >
@@ -220,11 +220,7 @@ export function AnswersView() {
       {isError ? (
         <ErrorCard onRetry={() => refetch()} />
       ) : isPending ? (
-        <div role="status" aria-label="Loading answers" className="space-y-3">
-          {Array.from({ length: 5 }, (_, i) => (
-            <Skeleton key={i} className="h-16" />
-          ))}
-        </div>
+        <AnswersListSkeleton />
       ) : items.length === 0 ? (
         <EmptyState
           title="No answers match"

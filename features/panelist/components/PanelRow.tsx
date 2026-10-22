@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ROUTES } from "@/lib/config/routes";
 import { formatSession } from "@/lib/utils/dates";
 import type { PanelItem } from "../schemas";
+import { statusTone } from "@/lib/status";
 
 /** One panel on Arjun's lists: who, when, and the next action. */
 export function PanelRow({ item }: { item: PanelItem }) {
@@ -13,8 +14,12 @@ export function PanelRow({ item }: { item: PanelItem }) {
       <div className="min-w-0">
         <p className="flex flex-wrap items-center gap-2 font-semibold">
           {item.studentName}
-          {item.status === "awaiting-score" && <Badge tone="maroonSoft">Needs scoring</Badge>}
-          {item.status === "scored" && <Badge tone="green">{item.verdict ?? "Scored"}</Badge>}
+          {item.status === "awaiting-score" && (
+            <Badge tone={statusTone("needs scoring")}>Needs scoring</Badge>
+          )}
+          {item.status === "scored" && (
+            <Badge tone={statusTone(item.verdict ?? "scored")}>{item.verdict ?? "Scored"}</Badge>
+          )}
         </p>
         <p className="text-navy-400 text-sm">
           {item.title} · {item.college}

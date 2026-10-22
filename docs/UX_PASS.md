@@ -15,7 +15,7 @@ match the mockups pixel for pixel.
 | ------- | ---------------------------------------------------------------- | ---------- | ------- |
 | Phase 0 | Decision: usability vs mockup fidelity for badges, titles, Home  | none       | open    |
 | Phase 1 | Loading feedback: spinner, button loading, nav bar, auth flows   | none       | done    |
-| Phase 2 | Tokens: type scale, tabular numbers, badge tones, page skeletons | none       | to do   |
+| Phase 2 | Tokens: type scale, tabular numbers, badge tones, page skeletons | none       | done    |
 | Phase 3 | Layout: page names, Home "do this next", filters, lists, spacing | Phase 0, 2 | blocked |
 
 States: to do, in progress, done, blocked, open (waiting on a decision).
@@ -111,11 +111,11 @@ Done when:
 
 Tasks:
 
-- [ ] 2.1 Type scale tokens 12 / 14 / 16 / 20 / 28 / 40 in `styles/tokens.css`; no text below 12 px.
-- [ ] 2.2 Numbers in Inter with `tabular-nums`; Playfair only for page and section headings. Keep `en-IN` grouping.
-- [ ] 2.3 A single `statusTone()` mapping (done = green, action needed = maroon, upcoming = neutral, premium = gold)
+- [x] 2.1 Type scale tokens 12 / 14 / 16 / 20 / 28 / 40 in `styles/tokens.css`; no text below 12 px.
+- [x] 2.2 Numbers in Inter with `tabular-nums`; Playfair only for page and section headings. Keep `en-IN` grouping.
+- [x] 2.3 A single `statusTone()` mapping (done = green, action needed = maroon, upcoming = neutral, premium = gold)
       used by every feature instead of per-feature tones. Fixes the green NEEDS WORK.
-- [ ] 2.4 One skeleton per page (Home, Sessions, Answers, Scoring, ops tables), used by both the route `loading.tsx`
+- [x] 2.4 One skeleton per page (Home, Sessions, Answers, Scoring, ops tables), used by both the route `loading.tsx`
       and the client query state.
 
 Edge cases to cover:
@@ -184,3 +184,27 @@ Same as `docs/RESUME.md`: `pnpm exec tsc --noEmit`, `pnpm exec eslint`, `pnpm ex
   blocked).
 - Out of scope, still to do in a later phase: replace the remaining `isPending ? "Saving…"` labels in other features
   (answer bank, CV builder, ops, billing, waitlist) with `loading`.
+
+## Phase 2 notes (done)
+
+- 2.1: `styles/tokens.css` defines the scale (12 / 14 / 16 / 20 / 28 / 40; `text-title` and `text-hero` are the new 28 and
+  40). Every `text-[9|10|11px]` is now `text-xs` (12 px), including badges and the logo tagline. Badge tracking went
+  from `wider` to `wide` so 12 px labels fit. Badges stay uppercase; "normal case" was left to Phase 3 with the other
+  label changes.
+- 2.2: `font-num` utility (Inter, tabular and lining figures) replaces `font-display` on 29 figure elements (scores,
+  prices, counts, Day 0). `.font-display` now sets lining numerals so headings with numbers no longer use old-style
+  digits. `formatINR` is unchanged, so Indian grouping stays (checked on ops overview: ₹6,23,293).
+- 2.3: `lib/status.ts` `statusTone()` is the one source of badge colour for a status word. Twelve call sites use it.
+  Panelist "Needs work" is now maroon and "Ready" green. Booked, Watch, Okay and Cancelled are neutral; Elite is gold,
+  Premium soft gold. Tests in `lib/status.test.ts`.
+- 2.4: `components/shared/PageSkeletons.tsx` holds Home, Sessions, Answers, panelist list and ops overview/table
+  skeletons. Each is used by the route's new `loading.tsx` and by the view while its first query is pending. They live
+  in their own file because adding them to `Skeletons.tsx` pushed routes over the 170 KiB budget.
+- Bundle: `NavProgress` is now loaded after first paint (dynamic import in `Providers`), like the toaster. Phase 1 plus
+  Phase 2 had put `/panelist/availability` at 170.5 KiB; it is 169.5 KiB now. The tightest route is `/home` at about
+  169.9 KiB, so the next addition to shared code needs the same care.
+- Regression caught and fixed: Inter at 4xl made the plan price card 2 px wider than the tablet viewport on `/plans`;
+  the price row now wraps.
+- Known and unchanged: phone web-vitals LCP fails on 3 of 6 routes on `main` as well.
+- Not done here: skeleton shape for Answers inside the view is the list only (the view draws its own header), and ops
+  table pages keep the table's own loading rows under a real header.

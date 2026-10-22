@@ -18,6 +18,7 @@ import { useDebounced } from "@/lib/utils/useDebounced";
 import { useUrlState } from "@/lib/utils/useUrlState";
 import { useCohort, useExcuse, useOpsBookings } from "../hooks/useOps";
 import type { Booking } from "../schemas";
+import { statusTone } from "@/lib/status";
 
 const KINDS = [
   { key: "", label: "All" },
@@ -32,16 +33,20 @@ const KINDS = [
 
 /** Status pill text and colour for one booking (a04.png). */
 function statusOf(b: Booking): { label: string; tone: BadgeProps["tone"] } {
-  if (b.status === "unassigned") return { label: "Needs panelist", tone: "maroonSoft" };
-  if (b.status === "no-show")
+  if (b.status === "unassigned") {
+    return { label: "Needs panelist", tone: statusTone("needs panelist") };
+  }
+  if (b.status === "no-show") {
     return b.excused
-      ? { label: "No-show (excused)", tone: "neutral" }
-      : { label: "No-show", tone: "goldSoft" };
-  if (b.status === "completed") return { label: "Feedback sent", tone: "neutral" };
-  if (b.status === "cancelled") return { label: "Cancelled", tone: "neutral" };
+      ? { label: "No-show (excused)", tone: statusTone("cancelled") }
+      : { label: "No-show", tone: statusTone("no-show") };
+  }
+  if (b.status === "completed")
+    return { label: "Feedback sent", tone: statusTone("feedback sent") };
+  if (b.status === "cancelled") return { label: "Cancelled", tone: statusTone("cancelled") };
   return /free session/i.test(b.title)
-    ? { label: "Booked", tone: "neutral" }
-    : { label: "Confirmed", tone: "green" };
+    ? { label: "Booked", tone: statusTone("booked") }
+    : { label: "Confirmed", tone: statusTone("confirmed") };
 }
 
 interface StatProps {
@@ -59,7 +64,7 @@ function Stat({ label, value, tone, pressed, onClick }: StatProps) {
       <span className="text-navy-400 block text-sm">{label}</span>
       <span
         className={cn(
-          "font-display mt-1 block text-4xl font-bold tabular-nums",
+          "font-num mt-1 block text-4xl font-bold tabular-nums",
           tone === "maroon" && "text-maroon-600",
         )}
       >

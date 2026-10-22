@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { API_MOCKING } from "@/lib/api/client";
-import { NavProgress } from "./NavProgress";
 
 // Start loading the mock worker as soon as this module runs in the browser, not after hydration.
 const workerStarted: Promise<void> | null =
@@ -20,6 +19,11 @@ export type ApiStatus = "starting" | "ready" | "failed";
 const API_BOOT_TIMEOUT_MS = 8000;
 
 const ApiStatusContext = createContext<ApiStatus>(API_MOCKING ? "starting" : "ready");
+
+// The bar only matters after first paint; keep it, like the toaster, out of the initial bundle.
+const NavProgress = dynamic(() => import("./NavProgress").then((m) => m.NavProgress), {
+  ssr: false,
+});
 
 // Toasts are rarely needed on first paint; keep sonner out of the initial bundle.
 const Toaster = dynamic(() => import("sonner").then((m) => m.Toaster), { ssr: false });

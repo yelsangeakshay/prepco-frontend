@@ -1,13 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import type { AnswerSummary } from "../schemas";
+import { statusTone } from "@/lib/status";
 
 export type AnswerStatus = AnswerSummary["status"];
 
-const BADGE: Record<AnswerStatus, { label: string; tone: "green" | "maroonSoft" | "neutral" }> = {
-  rehearsed: { label: "Rehearsed", tone: "green" },
-  flagged: { label: "Flagged", tone: "maroonSoft" },
-  "not-drafted": { label: "Not drafted", tone: "neutral" },
+const LABEL: Record<AnswerStatus, string> = {
+  rehearsed: "Rehearsed",
+  flagged: "Flagged",
+  "not-drafted": "Not drafted",
 };
 
 interface Props {
@@ -22,7 +23,6 @@ interface Props {
 
 /** One row of the answer list (s08.png): the question and its status. */
 export function AnswerCard({ question, status, selected, critique, noteTags = [] }: Props) {
-  const badge = BADGE[status];
   return (
     <div
       className={cn(
@@ -34,8 +34,8 @@ export function AnswerCard({ question, status, selected, critique, noteTags = []
         <span className={cn("text-base leading-snug", selected && "font-semibold")}>
           {question}
         </span>
-        <Badge tone={badge.tone} className="shrink-0">
-          {badge.label}
+        <Badge tone={statusTone(status)} className="shrink-0">
+          {LABEL[status]}
         </Badge>
       </div>
       {selected && status === "flagged" && critique && (
@@ -45,7 +45,7 @@ export function AnswerCard({ question, status, selected, critique, noteTags = []
             {noteTags.map((t) => (
               <li
                 key={t}
-                className="bg-cream-soft text-navy-900 rounded-full px-3 py-1 text-[11px] font-bold tracking-wider uppercase"
+                className="bg-cream-soft text-navy-900 rounded-full px-3 py-1 text-xs font-bold tracking-wider uppercase"
               >
                 {t}
               </li>

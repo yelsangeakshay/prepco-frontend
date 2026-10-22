@@ -59,7 +59,7 @@ export function CvVersionsView() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <p className="font-display text-2xl font-bold">{v.score}</p>
+                  <p className="font-num text-2xl font-bold">{v.score}</p>
                   {v.id === "draft" &&
                     (hasLocked ? (
                       pending ? (

@@ -63,7 +63,7 @@ export function PlanCard({
       )}
     >
       {suggested && (
-        <p className="text-maroon-600 mb-2 text-[11px] font-bold tracking-[0.12em] uppercase">
+        <p className="text-maroon-600 mb-2 text-xs font-bold tracking-[0.12em] uppercase">
           Suggested from your free session
         </p>
       )}
@@ -72,7 +72,7 @@ export function PlanCard({
         {(badge || mostChosen || elite) && (
           <span
             className={cn(
-              "rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wider whitespace-nowrap uppercase",
+              "rounded-full px-2.5 py-1 text-xs font-bold tracking-wider whitespace-nowrap uppercase",
               elite
                 ? "bg-gold-500 text-navy-900"
                 : mostChosen
@@ -87,8 +87,8 @@ export function PlanCard({
       {tagline && (
         <p className={cn("mt-2 text-sm", elite ? "opacity-80" : "text-navy-400")}>{tagline}</p>
       )}
-      <p className="mt-4 flex items-baseline gap-2">
-        <span className="font-display text-4xl font-bold">{formatINR(price)}</span>
+      <p className="mt-4 flex flex-wrap items-baseline gap-x-2">
+        <span className="font-num text-4xl font-bold">{formatINR(price)}</span>
         {listPrice && (
           <s className="text-sm opacity-60">
             <span className="sr-only">List price </span>

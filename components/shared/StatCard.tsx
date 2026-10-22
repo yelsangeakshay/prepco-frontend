@@ -15,7 +15,7 @@ export function StatCard({ label, value, hint, tone = "default" }: Props) {
       <p className="text-navy-400 text-xs font-semibold tracking-wider uppercase">{label}</p>
       <p
         className={cn(
-          "font-display mt-1 text-3xl font-bold",
+          "font-num mt-1 text-3xl font-bold",
           tone === "maroon" && "text-maroon-600",
           tone === "green" && "text-green-600",
         )}

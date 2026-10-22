@@ -37,7 +37,7 @@ export function MobileNav({ role }: { role: Role }) {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium",
+              "relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium",
               active ? "text-maroon-600" : "text-navy-400",
             )}
           >
@@ -55,7 +55,7 @@ export function MobileNav({ role }: { role: Role }) {
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
         className={cn(
-          "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-medium",
+          "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium",
           moreActive ? "text-maroon-600" : "text-navy-400",
         )}
       >

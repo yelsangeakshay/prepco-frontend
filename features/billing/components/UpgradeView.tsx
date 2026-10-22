@@ -108,7 +108,7 @@ export function UpgradeView() {
             <div key={t.at} className="flex justify-between">
               <dt className="text-navy-400">
                 {t.label} · {formatDay(t.at)}{" "}
-                <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-bold tracking-wider text-green-600 uppercase">
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold tracking-wider text-green-600 uppercase">
                   Credited
                 </span>
               </dt>
@@ -117,7 +117,7 @@ export function UpgradeView() {
           ))}
           <div className="border-line flex justify-between border-t pt-3 text-base">
             <dt className="font-semibold">You pay today</dt>
-            <dd data-testid="payable" className="font-display text-3xl font-bold tabular-nums">
+            <dd data-testid="payable" className="font-num text-3xl font-bold tabular-nums">
               {formatINR(q.payable)}
             </dd>
           </div>

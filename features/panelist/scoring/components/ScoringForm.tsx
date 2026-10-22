@@ -154,7 +154,7 @@ export function ScoringForm({
         <div>
           <p className="text-maroon-600 flex flex-wrap items-center gap-3 text-xs font-semibold tracking-[0.16em] uppercase">
             {eyebrow}
-            <span className="bg-maroon-100 rounded-full px-3 py-1 text-[11px]">
+            <span className="bg-maroon-100 rounded-full px-3 py-1 text-xs">
               <span aria-hidden>● </span>Live
             </span>
           </p>
@@ -337,7 +337,7 @@ export function ScoringForm({
             </p>
             <div className="mt-4 flex items-end justify-between">
               <span className="text-navy-400 text-sm">P1: {p1Readiness}%</span>
-              <span className="font-display text-4xl font-bold" aria-live="polite">
+              <span className="font-num text-4xl font-bold" aria-live="polite">
                 {values.readiness}%
               </span>
             </div>
