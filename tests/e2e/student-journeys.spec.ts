@@ -232,7 +232,7 @@ test.describe("Home, sessions and feedback (Riya)", () => {
   test("feedback list opens detail", async ({ page, context, isMobile }) => {
     await signInAsRiya(context);
     await gotoReady(page, "/feedback");
-    await page.getByRole("link", { name: /Arjun Mehta/ }).click();
+    await page.getByRole("link", { name: /Kaniksha Bambode/ }).click();
     await expect(page).toHaveURL(/\/feedback\/p-1001$/);
     await expect(page.getByRole("heading", { name: "Question by question" })).toBeVisible();
     await expect(page.getByText("2 sent to your builder")).toBeVisible();

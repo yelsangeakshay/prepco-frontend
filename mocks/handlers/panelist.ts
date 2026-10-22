@@ -5,7 +5,7 @@ import type { PanelItem } from "@/features/panelist/schemas";
 import type { FeedbackDetail } from "@/features/feedback/schemas";
 import { getDb } from "../db";
 import { saveSnapshot } from "../persist";
-import { ARJUN } from "../fixtures/personas";
+import { KANIKSHA } from "../fixtures/personas";
 import { getState } from "../state";
 import { apiError, latency, scenarioOf } from "../utils";
 import {
@@ -18,7 +18,7 @@ import {
 } from "../world";
 import type { Scenario } from "@/lib/config/scenarios";
 
-const ME = "pn-arjun";
+const ME = "pn-kaniksha";
 const NOW = "2026-10-05T12:00:00+05:30";
 const TODAY = "2026-10-05";
 
@@ -345,8 +345,8 @@ export const panelistHandlers = [
       const fb: FeedbackDetail = {
         panelId: feedbackId,
         sessionId: x.id,
-        panelist: ARJUN.name,
-        function: ARJUN.function,
+        panelist: KANIKSHA.name,
+        function: KANIKSHA.function,
         startsAt: x.startsAt ?? NOW,
         verdict: body.verdict,
         headline: body.note.split(/[.!?]/)[0]!.slice(0, 90),
@@ -361,7 +361,7 @@ export const panelistHandlers = [
           if (n >= 2) break;
           if (a.status === "rehearsed") {
             a.status = "flagged";
-            a.critique = `${ARJUN.name} sent this back: rework it before your next panel.`;
+            a.critique = `${KANIKSHA.name} sent this back: rework it before your next panel.`;
             a.noteTags = ["decision", "result"];
             a.flaggedAt = "P2 · 12 Oct";
             n++;
@@ -371,7 +371,7 @@ export const panelistHandlers = [
       st.notifications.unshift({
         id: `n-fb-${feedbackId}`,
         kind: "feedback",
-        title: `${ARJUN.name} sent your feedback`,
+        title: `${KANIKSHA.name} sent your feedback`,
         body: body.sendBack
           ? "He sent you back to the builders. Check your flagged answers."
           : fb.headline,

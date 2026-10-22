@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV, ROLE_TAGLINE, type NavItem } from "@/lib/config/nav";
@@ -11,6 +12,8 @@ import { useRunway } from "@/features/runway/hooks/useRunway";
 import { ROUTES } from "@/lib/config/routes";
 import { LinkSpinner } from "./LinkSpinner";
 import { Wordmark } from "./Wordmark";
+
+const SignOutButton = dynamic(() => import("./SignOutButton"), { ssr: false });
 
 export function isActive(pathname: string, item: NavItem) {
   if (item.exact) return pathname === item.href;
@@ -171,6 +174,9 @@ export function Sidebar({ role }: { role: Role }) {
 
       <div className="max-xl:hidden">
         <FooterCard role={role} />
+      </div>
+      <div className="min-h-11">
+        <SignOutButton />
       </div>
     </aside>
   );

@@ -185,6 +185,6 @@ export const MORE_LABEL: Record<Role, string> = {
 
 export const ROLE_PROFILE: Record<Role, { name: string; initials: string; subtitle: string }> = {
   student: { name: "Riya Kulkarni", initials: "RK", subtitle: "SCMHRD Pune · MBA 2025–27" },
-  panelist: { name: "Arjun Mehta", initials: "AM", subtitle: "Marketing & Brand panelist" },
+  panelist: { name: "Kaniksha Bambode", initials: "KB", subtitle: "Marketing & Brand panelist" },
   ops: { name: "Ops team", initials: "OP", subtitle: "The Prep Co" },
 };

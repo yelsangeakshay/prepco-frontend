@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 import type { NavItem } from "@/lib/config/nav";
 import { cn } from "@/lib/utils/cn";
+import { Button } from "@/components/ui/button";
+import { useSignOut } from "@/features/auth/hooks/useAuth";
 import { isActive } from "./Sidebar";
 
 /** The phone "More" sheet. Loaded lazily on first tap. */
@@ -19,6 +21,7 @@ export default function MoreSheet({
   pathname: string;
   onClose: () => void;
 }) {
+  const { signOut, pending } = useSignOut();
   return (
     <Dialog.Root open onOpenChange={(o) => !o && onClose()}>
       <Dialog.Portal>
@@ -58,6 +61,15 @@ export default function MoreSheet({
               );
             })}
           </ul>
+          <Button
+            variant="ghost"
+            className="mt-2 w-full justify-start gap-3 px-0"
+            loading={pending}
+            onClick={signOut}
+          >
+            <LogOut className="size-5" aria-hidden />
+            Sign out
+          </Button>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

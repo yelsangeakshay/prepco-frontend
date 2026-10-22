@@ -2,13 +2,13 @@ import type { Scenario } from "@/lib/config/scenarios";
 import { formatSession } from "@/lib/utils/dates";
 import type { Session, SlotDto } from "@/features/runway/schemas";
 import type { Checkout } from "@/features/plans/schemas";
-import { ARJUN } from "./fixtures/personas";
+import { KANIKSHA } from "./fixtures/personas";
 import { readSection, registerSection } from "./persist";
 
 const at = (day: string, hour: number) =>
   `2026-${day}T${String(hour).padStart(2, "0")}:00:00+05:30`;
 
-const PANELISTS = [`${ARJUN.name}`, "Vikram Sethi", "Rahul Bose"];
+const PANELISTS = [`${KANIKSHA.name}`, "Vikram Sethi", "Rahul Bose"];
 
 function base(): Session[] {
   return [
@@ -32,8 +32,8 @@ function base(): Session[] {
       kind: "panel",
       startsAt: at("09-21", 19),
       status: "completed",
-      panelist: ARJUN.name,
-      panelFunction: ARJUN.function,
+      panelist: KANIKSHA.name,
+      panelFunction: KANIKSHA.function,
       feedbackId: "p-1001",
     },
     {

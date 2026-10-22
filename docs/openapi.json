@@ -240,6 +240,36 @@
         }
       }
     },
+    "/auth/sign-out": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "End the session",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/forgot": {
       "post": {
         "tags": [

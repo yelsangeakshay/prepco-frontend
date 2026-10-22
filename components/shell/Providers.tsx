@@ -10,6 +10,8 @@ const workerStarted: Promise<void> | null =
   API_MOCKING && typeof window !== "undefined"
     ? import("@/mocks/browser").then(async ({ worker }) => {
         await worker.start({ onUnhandledFrame: "bypass", quiet: true });
+        // A hard refresh loads the page without its worker, so every API call would 404.
+        await (await import("@/lib/api/workerControl")).afterWorkerStart();
       })
     : null;
 
@@ -24,6 +26,9 @@ const ApiStatusContext = createContext<ApiStatus>(API_MOCKING ? "starting" : "re
 const NavProgress = dynamic(() => import("./NavProgress").then((m) => m.NavProgress), {
   ssr: false,
 });
+
+// Signed-in screens listen for a sign-out in another tab; nothing to render, so load it late.
+const SessionEffects = dynamic(() => import("./SessionEffects"), { ssr: false });
 
 // Toasts are rarely needed on first paint; keep sonner out of the initial bundle.
 const Toaster = dynamic(() => import("sonner").then((m) => m.Toaster), { ssr: false });
@@ -60,6 +65,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <ApiStatusContext.Provider value={status}>
       <QueryClientProvider client={client}>
         <NavProgress />
+        <SessionEffects />
         {children}
         <Toaster position="top-right" />
       </QueryClientProvider>

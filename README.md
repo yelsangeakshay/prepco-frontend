@@ -17,13 +17,13 @@ cp .env.local.example .env.local      # mocking on by default
 pnpm dev                               # http://localhost:3000
 ```
 
-Use the wrench button (bottom right, development only) to switch **role** (Student Riya, Panelist Arjun,
+Use the wrench button (bottom right, development only) to switch **role** (Student Riya, Panelist Kaniksha,
 Ops) and **scenario**. The role is a cookie, so you can also set it by hand.
 
 ### Sample world
 
 - Today is pinned to **Mon 5 Oct 2026**, Day 0 is **Mon 9 Nov 2026** (`lib/utils/clock.ts`).
-- Riya Kulkarni (student), Arjun Mehta (panelist), the Ops team.
+- Riya Kulkarni (student), Kaniksha Bambode (panelist), the Ops team.
 - 1,000 students, 52 panelists, about 700 bookings, a ledger and an application queue, all from a
   fixed seed (`mocks/world.ts`).
 - The mock world is shared by the three roles and is saved in `sessionStorage`, so a reload or a role

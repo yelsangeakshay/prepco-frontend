@@ -8,7 +8,7 @@ import { formatSession } from "@/lib/utils/dates";
 import type { PanelItem } from "../schemas";
 import { statusTone } from "@/lib/status";
 
-/** One panel on Arjun's lists: who, when, and the next action. */
+/** One panel on Kaniksha's lists: who, when, and the next action. */
 export function PanelRow({ item, compact }: { item: PanelItem; compact?: boolean }) {
   return (
     <Card

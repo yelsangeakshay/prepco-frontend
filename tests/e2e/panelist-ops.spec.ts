@@ -237,7 +237,7 @@ test.describe("Students at scale", () => {
 });
 
 test.describe("One panel, three roles", () => {
-  test("Riya books P2, ops assigns Arjun, Arjun scores, feedback returns to Riya", async ({
+  test("Riya books P2, ops assigns Kaniksha, Kaniksha scores, feedback returns to Riya", async ({
     page,
     context,
   }) => {
@@ -248,18 +248,20 @@ test.describe("One panel, three roles", () => {
     await page.getByRole("button", { name: "Confirm slot" }).click();
     await expect(page.getByText("Booked", { exact: true })).toBeVisible();
 
-    // 2. Ops sees it unassigned and assigns Arjun.
+    // 2. Ops sees it unassigned and assigns Kaniksha.
     await signInAs(context, "ops");
     await gotoReady(page, "/ops/sessions?tab=unassigned");
     await expect(page.getByRole("cell", { name: "Riya Kulkarni", exact: true })).toBeVisible();
     await gotoReady(page, "/ops/assignments");
     await expect(page.getByTestId("unassigned-count")).toContainText("4 panels");
     await page.getByTestId("unassigned-s-1004").click();
-    const arjun = page.locator("[data-testid^=candidate-]").filter({ hasText: "Arjun Mehta" });
-    await arjun.getByRole("button", { name: /^Assign/ }).click();
+    const kaniksha = page
+      .locator("[data-testid^=candidate-]")
+      .filter({ hasText: "Kaniksha Bambode" });
+    await kaniksha.getByRole("button", { name: /^Assign/ }).click();
     await expect(page.getByTestId("unassigned-count")).toContainText("3 panels");
 
-    // 3. Arjun sees it on Today, reads the brief, scores with send-back.
+    // 3. Kaniksha sees it on Today, reads the brief, scores with send-back.
     await signInAs(context, "panelist");
     await gotoReady(page, "/panelist/today");
     await gotoReady(page, "/panelist/briefs/s-1004");
@@ -272,16 +274,16 @@ test.describe("One panel, three roles", () => {
     // 4. Riya: feedback, answer bank and notifications all reflect it.
     await signInAs(context, "student");
     await gotoReady(page, "/feedback");
-    await expect(page.getByRole("link", { name: /Arjun Mehta/ })).toHaveCount(2);
+    await expect(page.getByRole("link", { name: /Kaniksha Bambode/ })).toHaveCount(2);
     await page
-      .getByRole("link", { name: /Arjun Mehta/ })
+      .getByRole("link", { name: /Kaniksha Bambode/ })
       .first()
       .click();
     await expect(page.getByText(SCORING_NOTE)).toBeVisible();
     await gotoReady(page, "/answers?status=flagged");
     await expect(page.getByTestId("answer-row")).toHaveCount(5);
     await gotoReady(page, "/notifications");
-    await expect(page.getByText("Arjun Mehta sent your feedback")).toBeVisible();
+    await expect(page.getByText("Kaniksha Bambode sent your feedback")).toBeVisible();
   });
 });
 

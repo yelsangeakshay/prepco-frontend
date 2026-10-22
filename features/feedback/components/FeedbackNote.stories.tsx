@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { FeedbackNote } from "./FeedbackNote";
 
 const args = {
-  panelist: "Arjun Mehta",
+  panelist: "Kaniksha Bambode",
   role: "Marketing & Brand",
   when: "Wed 30 Sep · 7:00 PM IST",
   verdict: "Almost There",

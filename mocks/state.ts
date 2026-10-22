@@ -368,7 +368,7 @@ function buildNotifications(db: Db): Notification[] {
   add({
     id: "n-2",
     kind: "feedback",
-    title: "Arjun Mehta sent your P1 feedback",
+    title: "Kaniksha Bambode sent your P1 feedback",
     body: "Strong on the numbers, weak on the why. Every answer should name the trade-off you owned.",
     at: at("09-22", 9),
     href: "/feedback/p-1001",
