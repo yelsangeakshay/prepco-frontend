@@ -4,7 +4,7 @@ import { FUNCTIONS, PANEL_FOR_TARGET, PANELIST_FUNCTIONS } from "@/features/onbo
 import type { FeedbackDetail } from "@/features/feedback/schemas";
 import type { Session } from "@/features/runway/schemas";
 import { getDb, type Db } from "./db";
-import { ARJUN, RIYA } from "./fixtures/personas";
+import { KANIKSHA, RIYA } from "./fixtures/personas";
 import { readSection, registerSection } from "./persist";
 import { getState, type State } from "./state";
 
@@ -231,11 +231,11 @@ function buildWorld(): World {
     ...extra,
   });
   panelists.push(
-    mkPanelist("pn-arjun", ARJUN.name, "Marketing & Brand", "Marketing & Brand", {
+    mkPanelist("pn-kaniksha", KANIKSHA.name, "Marketing & Brand", "Marketing & Brand", {
       company: "Northwind Consumer Brands",
       role: "Brand Manager, consumer goods",
       bio: "Brand manager at a consumer-goods company. Twelve panels this season.",
-      panelsThisSeason: ARJUN.panelsThisSeason,
+      panelsThisSeason: KANIKSHA.panelsThisSeason,
       capacity: 6,
       rating: 4.8,
     }),
@@ -357,7 +357,7 @@ function buildWorld(): World {
   const pinned = new Set<string>();
   const panelistsFor = (fn: string) =>
     panelists.filter(
-      (p) => p.function === panelFunctionFor(fn) && p.id !== "pn-arjun" && p.status === "active",
+      (p) => p.function === panelFunctionFor(fn) && p.id !== "pn-kaniksha" && p.status === "active",
     );
   const newBooking = (s0: StudentRec, over: Partial<BookingRec>): BookingRec => ({
     id: `b-${String(b++).padStart(4, "0")}`,
@@ -378,7 +378,7 @@ function buildWorld(): World {
   // Spread evenly through every function so each still has active panelists to assign.
   {
     const eligible = panelists.filter(
-      (p) => !["pn-arjun", "pn-neha", "pn-rahul", "pn-karan", "pn-008", "pn-014"].includes(p.id),
+      (p) => !["pn-kaniksha", "pn-neha", "pn-rahul", "pn-karan", "pn-008", "pn-014"].includes(p.id),
     );
     eligible.forEach((p, k) => {
       if (Math.floor(((k + 1) * 21) / eligible.length) > Math.floor((k * 21) / eligible.length))
@@ -482,9 +482,9 @@ function buildWorld(): World {
     x.verdict = null;
   }
 
-  // Arjun: twelve panels this season (eleven here plus Riya's P1), three tonight, three this week,
+  // Kaniksha: twelve panels this season (eleven here plus Riya's P1), three tonight, three this week,
   // and two feedback notes due.
-  const arjunFn = students.filter(
+  const kanikshaFn = students.filter(
     (x) =>
       x.function === "Sales & Marketing" &&
       x.plan !== "none" &&
@@ -492,27 +492,28 @@ function buildWorld(): World {
       !special.has(x.id),
   );
   let a = 0;
-  const arjunBooking = (s0: StudentRec | undefined, over: Partial<BookingRec>) => {
-    const bk = newBooking(s0 ?? arjunFn[a++ % arjunFn.length]!, {
-      panelistId: "pn-arjun",
+  const kanikshaBooking = (s0: StudentRec | undefined, over: Partial<BookingRec>) => {
+    const bk = newBooking(s0 ?? kanikshaFn[a++ % kanikshaFn.length]!, {
+      panelistId: "pn-kaniksha",
       ...over,
     });
     bookings.push(bk);
     pinned.add(bk.id);
     return bk;
   };
-  for (let k = 0; k < 11; k++) arjunBooking(undefined, { startsAt: at(-3 - k * 2, 18 + (k % 3)) });
+  for (let k = 0; k < 11; k++)
+    kanikshaBooking(undefined, { startsAt: at(-3 - k * 2, 18 + (k % 3)) });
   const open = { status: "upcoming" as const, scored: false, verdict: null };
-  arjunBooking(aditya, { ...open, startsAt: atHM(0, 18, 0), title: TITLES.p2 }).id =
+  kanikshaBooking(aditya, { ...open, startsAt: atHM(0, 18, 0), title: TITLES.p2 }).id =
     AT_TONIGHT_READ;
-  arjunBooking(undefined, { ...open, startsAt: atHM(0, 19, 30), title: TITLES.p2 });
-  arjunBooking(nehaS, { ...open, startsAt: atHM(0, 21, 0), title: TITLES.dive });
-  arjunBooking(undefined, { ...open, startsAt: at(2, 18), title: TITLES.p1 });
-  arjunBooking(undefined, { ...open, startsAt: at(3, 19), title: TITLES.p2 });
-  arjunBooking(undefined, { ...open, startsAt: at(4, 18), title: TITLES.p3 });
+  kanikshaBooking(undefined, { ...open, startsAt: atHM(0, 19, 30), title: TITLES.p2 });
+  kanikshaBooking(nehaS, { ...open, startsAt: atHM(0, 21, 0), title: TITLES.dive });
+  kanikshaBooking(undefined, { ...open, startsAt: at(2, 18), title: TITLES.p1 });
+  kanikshaBooking(undefined, { ...open, startsAt: at(3, 19), title: TITLES.p2 });
+  kanikshaBooking(undefined, { ...open, startsAt: at(4, 18), title: TITLES.p3 });
   const done0 = { status: "completed" as const, scored: false, verdict: null, title: TITLES.p1 };
-  arjunBooking(meera, { ...done0, startsAt: at(-3, 19) });
-  arjunBooking(ishaan, { ...done0, startsAt: at(-2, 19) });
+  kanikshaBooking(meera, { ...done0, startsAt: at(-3, 19) });
+  kanikshaBooking(ishaan, { ...done0, startsAt: at(-2, 19) });
 
   // Sessions this week (Mon 5 to Sun 11 Oct): 46 in all (a01). Riya's own deep-dive is one of them.
   const weekLo = at(0, 0);
@@ -555,7 +556,7 @@ function buildWorld(): World {
   const availability: Record<string, Record<string, boolean>> = {};
   for (const p of panelists) {
     const grid: Record<string, boolean> = {};
-    if (p.id === "pn-arjun") {
+    if (p.id === "pn-kaniksha") {
       for (const k of [
         "Mon-18:00",
         "Mon-19:00",
@@ -659,12 +660,12 @@ function buildWorld(): World {
   };
 }
 
-/** Riya's P1 note from Arjun (the one the student side has always had). */
+/** Riya's P1 note from Kaniksha (the one the student side has always had). */
 export const P1_FEEDBACK: FeedbackDetail = {
   panelId: "p-1001",
   sessionId: "s-1002",
-  panelist: ARJUN.name,
-  function: ARJUN.function,
+  panelist: KANIKSHA.name,
+  function: KANIKSHA.function,
   startsAt: "2026-09-21T19:00:00+05:30",
   verdict: "Almost There",
   headline:

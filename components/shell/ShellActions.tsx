@@ -7,10 +7,9 @@ import { useCohort } from "@/features/ops/hooks/useOps";
 import { useRunway } from "@/features/runway/hooks/useRunway";
 import type { Role } from "@/lib/auth/roles";
 import { getOpsLedger } from "@/lib/api/endpoints/ops";
-import { ROLE_PROFILE } from "@/lib/config/nav";
 import { ROUTES } from "@/lib/config/routes";
 import { formatINR } from "@/lib/utils/currency";
-import { Avatar } from "./Avatar";
+import { AccountMenu } from "./AccountMenu";
 import { NotificationBell } from "./NotificationBell";
 
 function DayZeroPill() {
@@ -95,7 +94,6 @@ function OpsActions() {
 
 /** Top-right cluster from the mockups: Day 0 pill, bell and avatar (student); avatar (panelist); Export and avatar (ops). */
 export function ShellActions({ role }: { role: Role }) {
-  const p = ROLE_PROFILE[role];
   return (
     <div className="flex items-center gap-3">
       {role === "student" && (
@@ -105,12 +103,7 @@ export function ShellActions({ role }: { role: Role }) {
         </>
       )}
       {role === "ops" && <OpsActions />}
-      <Avatar
-        initials={p.initials}
-        label={p.name}
-        tone={role === "student" ? "maroon" : role === "ops" ? "gold" : "navy"}
-        className={role === "panelist" ? "max-md:bg-maroon-600" : undefined}
-      />
+      <AccountMenu role={role} />
     </div>
   );
 }

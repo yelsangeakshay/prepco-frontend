@@ -107,10 +107,10 @@ describe("booking", () => {
 });
 
 describe("feedback", () => {
-  it("Riya has one P1 note from Arjun", async () => {
+  it("Riya has one P1 note from Kaniksha", async () => {
     const f = await getFeedback();
     expect(f.total).toBe(1);
-    expect(f.items[0]?.panelist).toBe("Arjun Mehta");
+    expect(f.items[0]?.panelist).toBe("Kaniksha Bambode");
   });
 });
 

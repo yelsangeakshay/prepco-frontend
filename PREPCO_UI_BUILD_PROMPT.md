@@ -42,7 +42,7 @@ Online references (for the human; you may not be able to fetch them):
 ### Sample personas and calendar (use exactly these in fixtures)
 
 - **Riya Kulkarni**: student, SCMHRD Pune, MBA 2025–27, finals track, Premium, targeting Sales & Marketing (Management Trainee), two years as an FMCG sales analyst. Readiness 64%. CV V4 locked, score 84 (Impact 88, Clarity 82, Defensibility 81). Answer bank: 18 questions, 12 prepared, 4 need work.
-- **Arjun Mehta**: Marketing & Brand panelist, brand manager at a consumer-goods company, 12 panels this season.
+- **Kaniksha Bambode**: Marketing & Brand panelist, brand manager at a consumer-goods company, 12 panels this season.
 - **Ops team**: initials "OP".
 - **Today = Monday 5 October 2026. Day 0 = Monday 9 November 2026 (35 days).** Runway: Week -8 profiling call + CV lock (done), Week -7 P1 first mock panel (done), Week -5 domain deep-dive Wed 7 Oct 7:00 PM IST (next), Week -4 P2 external specialist panel (pick slot), Week -2 group positioning session Mon 26 Oct, Week -1 P3 pressure mock Mon 2 Nov, Day 0 Mon 9 Nov.
 - Pin "today" via a single `lib/utils/clock.ts` so the whole app agrees.
@@ -230,7 +230,7 @@ Keep `docs/API_CONTRACT.md` updated with every request/response shape as you add
 
 ### Mock auth
 
-A dev-only toolbar (bottom-right, hidden in production) switches role (Student Riya / Panelist Arjun / Ops) and scenario. It sets a `prepco_role` cookie that `middleware.ts` reads to: block cross-role routes, send un-onboarded students to `/onboarding/1`, and send signed-out users to `/sign-in`. Each role layout checks the role again.
+A dev-only toolbar (bottom-right, hidden in production) switches role (Student Riya / Panelist Kaniksha / Ops) and scenario. It sets a `prepco_role` cookie that `middleware.ts` reads to: block cross-role routes, send un-onboarded students to `/onboarding/1`, and send signed-out users to `/sign-in`. Each role layout checks the role again.
 
 ---
 
@@ -272,7 +272,7 @@ S6 CV Builder (bullet scoring on decision/number/trade-off; impact/clarity/defen
 ### Phase 5: Panelist and Ops
 
 Panelist: P1 apply, P2 today, P3 brief, P4 live scoring (verdict, note, send-back-to-builder switch), P5 availability. Ops: A1 cohort overview (seat gauges, free→paid funnel, revenue by tier, needs attention, this week), A2 students (table at 1,000 rows + detail), A3 assignment (load per function), A4 bookings (unassigned, no-shows), A5 ledger, A6 roster + application queue.
-**Gate:** journeys pass: Become a panelist; Run a panel; Set availability; Weekly ops loop; Keep the panel healthy; **One panel, three roles** (a P2 booked by Riya appears in Ops A4, is assigned in A3, shows on Arjun's P2, is scored in P4, and feedback returns to Riya's S10 and S8, all in shared mock state); Target role changes; Not placed, credit carried over.
+**Gate:** journeys pass: Become a panelist; Run a panel; Set availability; Weekly ops loop; Keep the panel healthy; **One panel, three roles** (a P2 booked by Riya appears in Ops A4, is assigned in A3, shows on Kaniksha's P2, is scored in P4, and feedback returns to Riya's S10 and S8, all in shared mock state); Target role changes; Not placed, credit carried over.
 
 ### Phase 6: Hardening and handover
 

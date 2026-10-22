@@ -15,7 +15,7 @@ export const ROLE_HOME: Record<Role, string> = {
 
 export const ROLE_LABEL: Record<Role, string> = {
   student: "Student · Riya",
-  panelist: "Panelist · Arjun",
+  panelist: "Panelist · Kaniksha",
   ops: "Ops",
 };
 

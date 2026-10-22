@@ -102,7 +102,7 @@ describe("the world", () => {
   });
 });
 
-describe("Arjun", () => {
+describe("Kaniksha", () => {
   it("has twelve panels this season, three tonight, two to score, and Riya's P1 among them", async () => {
     const t = await getPanelistToday();
     expect(t.panelist.panelsThisSeason).toBe(12);
@@ -141,7 +141,7 @@ describe("Arjun", () => {
 });
 
 describe("one panel, three roles", () => {
-  it("Riya books P2 -> ops sees it unassigned -> assigns Arjun -> Arjun scores -> Riya gets feedback and flagged answers", async () => {
+  it("Riya books P2 -> ops sees it unassigned -> assigns Kaniksha -> Kaniksha scores -> Riya gets feedback and flagged answers", async () => {
     expect((await getOpsAssignments()).unassigned).toHaveLength(3);
 
     await bookSession("s-1004", "s-1004-10-12-18");
@@ -151,26 +151,26 @@ describe("one panel, three roles", () => {
     expect(mine.booking.studentName).toBe("Riya Kulkarni");
     expect((await getOpsBookings({ tab: "unassigned", pageSize: 100 })).counts.unassigned).toBe(4);
 
-    // Before assignment Arjun does not see it.
+    // Before assignment Kaniksha does not see it.
     expect((await getPanelistToday()).upcoming.some((u) => u.sessionId === "s-1004")).toBe(false);
 
-    const arjun = mine.candidates.find((c) => c.name === "Arjun Mehta");
-    expect(arjun?.free).toBe(true);
-    await postAssignment({ sessionId: "s-1004", panelistId: arjun!.panelistId });
+    const kaniksha = mine.candidates.find((c) => c.name === "Kaniksha Bambode");
+    expect(kaniksha?.free).toBe(true);
+    await postAssignment({ sessionId: "s-1004", panelistId: kaniksha!.panelistId });
     expect((await getOpsAssignments()).unassigned).toHaveLength(3);
     expect((await getPanelistToday()).upcoming.some((u) => u.sessionId === "s-1004")).toBe(true);
     expect((await getNotifications()).items.some((n) => n.title.includes("is confirmed"))).toBe(
       true,
     );
-    expect(await code(postAssignment({ sessionId: "s-1004", panelistId: arjun!.panelistId }))).toBe(
-      "not_unassigned",
-    );
+    expect(
+      await code(postAssignment({ sessionId: "s-1004", panelistId: kaniksha!.panelistId })),
+    ).toBe("not_unassigned");
 
     const before = (await getAnswers({})).counts;
     await postScore("s-1004", { ...score, sendBack: true });
     expect((await getFeedback()).items).toHaveLength(2);
     expect((await getAnswers({})).counts.flagged).toBe(before.flagged + 2);
-    expect((await getNotifications()).items[0]?.title).toBe("Arjun Mehta sent your feedback");
+    expect((await getNotifications()).items[0]?.title).toBe("Kaniksha Bambode sent your feedback");
   });
 
   it("a panelist cannot take two panels at the same time", async () => {

@@ -14,10 +14,10 @@ export const RIYA = {
   answers: { total: 18, prepared: 12, needWork: 4 },
 } as const;
 
-export const ARJUN = {
-  id: "pn-arjun",
-  name: "Arjun Mehta",
-  initials: "AM",
+export const KANIKSHA = {
+  id: "pn-kaniksha",
+  name: "Kaniksha Bambode",
+  initials: "KB",
   function: "Marketing & Brand",
   bio: "Brand manager at a consumer-goods company",
   panelsThisSeason: 12,

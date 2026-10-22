@@ -25,6 +25,7 @@ export const signIn = (body: SignInBody) =>
   api("/auth/sign-in", authResultSchema, { method: "POST", json: body });
 export const signUp = (body: SignUpBody) =>
   api("/auth/sign-up", authResultSchema, { method: "POST", json: body });
+export const signOut = () => api("/auth/sign-out", okSchema, { method: "POST" });
 export const forgotPassword = (body: ForgotBody) =>
   api("/auth/forgot", okSchema, { method: "POST", json: body });
 export const resetPassword = (body: Pick<ResetBody, "token" | "password">) =>

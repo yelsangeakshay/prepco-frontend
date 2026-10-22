@@ -141,6 +141,13 @@ export const OPERATIONS: Operation[] = [
   },
   {
     method: "post",
+    path: "/auth/sign-out",
+    tag: "Auth",
+    summary: "End the session",
+    response: okSchema,
+  },
+  {
+    method: "post",
     path: "/auth/forgot",
     tag: "Auth",
     summary: "Request a reset link (always succeeds)",

@@ -32,7 +32,7 @@ const PLAN_TONE = {
   elite: statusTone("elite"),
 } as const;
 
-/** "Arjun Mehta" becomes "A. Mehta". */
+/** "Kaniksha Bambode" becomes "K. Bambode". */
 function shortName(name: string) {
   const [first, ...rest] = name.split(" ");
   return rest.length ? `${first![0]}. ${rest.join(" ")}` : name;

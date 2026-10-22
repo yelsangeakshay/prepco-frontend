@@ -18,6 +18,7 @@ match the mockups pixel for pixel.
 | Phase 2 | Tokens: type scale, tabular numbers, badge tones, page skeletons  | none       | done  |
 | Phase 3 | Layout: page names, filters, lists, spacing (Home layout kept)    | Phase 0, 2 | done  |
 | Phase 4 | Loading buttons everywhere, RESUME.md fix, badge and label polish | Phase 1-3  | done  |
+| Phase 5 | Sign out: account menu, API, session and cache cleanup            | Phase 1-4  | done  |
 
 States: to do, in progress, done, blocked, open (waiting on a decision).
 
@@ -255,3 +256,91 @@ therefore out of scope. Rationale and the deviations are listed in `docs/OPEN_DE
   on). Gaps between page-level card grids are 24 px. The sidebar tagline fits on one line at 12 px (tighter tracking,
   less side padding).
 - Not done: CV builder (owner), Home "Do this next" card (kept by decision), phone LCP, bundle trimming.
+
+## Worker control reload (done, 2026-10-23)
+
+When the mock worker does not control the page (a hard refresh, Ctrl+Shift+R, loads the page without it), every API call
+goes to the Next server and 404s, and screens show "Something went wrong". `lib/api/workerControl.ts` now checks after
+`worker.start()` and reloads the page once (a plain reload restores control). A `sessionStorage` flag stops a loop: if
+the page is still uncontrolled after the reload, the sign-in notice "Couldn't connect to the preview service" and
+Retry take over. Queries do not fire while the reload is under way. Tests: `lib/api/workerControl.test.ts` and
+`tests/e2e/worker-control.spec.ts`.
+
+## Phase 5: sign out (done)
+
+Problem: there is no way to sign out. `endMockSession()` in `lib/auth/client.ts` exists and nothing calls it; the avatar
+is a plain circle; the sidebar and More sheet list pages only. The only way out is the dev toolbar (development only).
+
+### Design
+
+- Where it lives: the avatar becomes a button that opens a small account menu: name and role, "Profile" (student and
+  panelist), "Sign out". The avatar is already on every screen (top right on tablet and desktop, the top bar on a phone),
+  so one change covers all three roles. Also add "Sign out" at the bottom of the phone More/Account sheet, because a phone
+  user looks there first, and at the bottom of the sidebar above the footer card for desktop and the icon rail.
+- Label: "Sign out", sentence case, with a log-out icon. One verb everywhere.
+- Menu parts are loaded after first paint (dynamic import) so the bundle budget holds. `/home` has about 3 KiB of room
+  after Phase 4, so do not add a menu library without measuring: prefer a small custom popover with Radix Dialog (already
+  in the bundle) on a phone and a positioned popover on desktop.
+
+### What signing out does
+
+1. `POST /auth/sign-out` (new; add to `docs/API_CONTRACT.md` and `docs/openapi.json`, handler in `mocks/handlers/auth.ts`
+   returning 204 after the usual latency). A real backend clears its httpOnly cookie here.
+2. Cancel in-flight queries, then `queryClient.clear()`, so the next person on the device never sees cached data.
+3. Mock session: `endMockSession()` (role, onboarded and scenario cookies).
+4. Clear per-user browser data: the `prepco-*` local drafts written by `useLocalDraft` (scoring drafts and similar), the
+   persisted onboarding draft store, and the mock world snapshot in `sessionStorage` (`mocks/persist.ts`).
+5. Navigate to `/sign-in` through `useNavigate()`, so the top bar and the button's loading state cover the redirect.
+
+### Edge cases to cover
+
+| ID  | Case                                                    | Handling                                                                                                                        |
+| --- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| S1  | Double click or Enter twice                             | Button `loading`; one request                                                                                                   |
+| S2  | The sign-out request fails (offline, 500)               | Still clear the local session and go to sign-in; the server cookie expires on its own                                           |
+| S3  | Back button after sign-out                              | Middleware sends signed-out visitors to `/sign-in`; add `useReloadOnRestore` to the shell so a cached page cannot show old data |
+| S4  | Other tabs stay signed in                               | Broadcast on sign-out (`BroadcastChannel`, `storage` event fallback); other tabs go to sign-in                                  |
+| S5  | Unsaved work (answer draft, availability, live scoring) | Drafts autosave locally and are cleared on sign-out, so warn first only when a form is dirty and not yet saved                  |
+| S6  | A request lands after sign-out (late response)          | Cancel queries before clearing; ignore results after the cache is cleared                                                       |
+| S7  | Signed in as another role next (student, then ops)      | Cache, drafts and mock world are cleared, so nothing carries over                                                               |
+| S8  | Keyboard and screen readers                             | Menu button has `aria-haspopup`, Esc closes, focus returns to the avatar, arrow keys move                                       |
+| S9  | Phone: menu inside the sheet and on the avatar          | Both work; the sheet closes before navigating                                                                                   |
+| S10 | Dev toolbar "signed out" role                           | Keep as is; it shares `endMockSession()`                                                                                        |
+
+### Tasks
+
+- [x] 5.1 `signOut` endpoint function, `useSignOut` hook, mock handler, contract and openapi entries.
+- [x] 5.2 `signOutCleanup()`: cancel and clear queries, `endMockSession()`, clear drafts, onboarding store and mock world.
+- [x] 5.3 Avatar account menu (all roles), lazy loaded, with keyboard and focus handling.
+- [x] 5.4 "Sign out" in the More/Account sheet and the sidebar footer.
+- [x] 5.5 Cross-tab sign-out (S4) and `useReloadOnRestore` in the shell (S3).
+- [x] 5.6 Tests: unit for `signOutCleanup`; e2e for each role (menu opens, signs out, protected route redirects, old data
+      gone after signing in as another role), phone sheet, double click sends one request, request failure still signs
+      out; a11y spec covers the open menu.
+- [x] 5.7 Update `README.md` (the "replace the mock session" step) so the backend team knows sign-out is an endpoint.
+
+Done when every role can sign out in two clicks from any screen, the checks above pass, and the bundle stays under
+170 KiB per route.
+
+### Phase 5 as built
+
+- The avatar (RK, KB or OP) is a button that opens the account menu: name and role, Profile (student and panelist),
+  Sign out. Sign out is also the last item of the phone Account/More sheet and the last item of the sidebar (icon only on
+  the tablet rail). The menu and the sidebar button load after first paint; the bundle is still under 170 KiB per route
+  (`/home` is the tightest at 170.0 KiB, so there is no room left in shared code).
+- `POST /auth/sign-out` is in the contract, `docs/API_CONTRACT.md`, `docs/openapi.json` and the mock.
+- Sign out clears the local session whether or not the request worked, announces it to other tabs, and then does a full
+  page load of `/sign-in` (not a client navigation), so every in-memory cache, store and the mock world are dropped. That
+  replaced the plan's "navigate through useNavigate" and made S6 and S7 hold by construction.
+- A ref guards the button, because the mutation state reaches React a tick after the click and Playwright's double click
+  sent two requests.
+- Accessibility: the avatar button's label contains its visible initials ("RK, account menu for Riya Kulkarni"), which
+  axe's label-content-name-mismatch rule requires.
+- Tests: `lib/auth/signOut.test.ts`; `tests/e2e/sign-out.spec.ts` (all three roles, Escape and focus, double click, role
+  switch shows none of the earlier data, second tab leaves, failed request still signs out, phone sheet).
+
+## Panelist renamed
+
+The panelist persona is now Kaniksha Bambode (initials KB, id `pn-kaniksha`) everywhere: UI, mock world and handlers,
+tests, stories, README and docs. The mock sign-in accepts an email starting with `kaniksha` or `panelist`. The mockup
+review notes still quote the mockup PNG, which says "Arjun".

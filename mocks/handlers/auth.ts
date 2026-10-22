@@ -7,7 +7,7 @@ import { getDb } from "../db";
 
 const ROLE_ME = {
   student: { id: "st-riya", role: "student", name: "Riya Kulkarni", initials: "RK" },
-  panelist: { id: "pn-arjun", role: "panelist", name: "Arjun Mehta", initials: "AM" },
+  panelist: { id: "pn-kaniksha", role: "panelist", name: "Kaniksha Bambode", initials: "KB" },
   ops: { id: "ops-1", role: "ops", name: "Ops team", initials: "OP" },
 } as const;
 
@@ -40,7 +40,7 @@ export const authHandlers = [
     if (scenario === "gmail-unverified" && isGmail(e)) {
       return apiError(403, "email_unverified", "Verify your email to continue.");
     }
-    if (e.startsWith("arjun") || e.startsWith("panelist")) {
+    if (e.startsWith("kaniksha") || e.startsWith("panelist")) {
       return HttpResponse.json({ role: "panelist", onboarded: true });
     }
     if (e.startsWith("ops")) return HttpResponse.json({ role: "ops", onboarded: true });
@@ -66,6 +66,11 @@ export const authHandlers = [
       onboarded: false,
       verifyRequired: scenario === "gmail-unverified" && isGmail(e),
     });
+  }),
+
+  http.post(`${API_BASE_URL}/auth/sign-out`, async () => {
+    await latency();
+    return HttpResponse.json({ ok: true });
   }),
 
   http.post(`${API_BASE_URL}/auth/forgot`, async () => {

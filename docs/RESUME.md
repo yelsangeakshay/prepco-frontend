@@ -60,7 +60,7 @@ change it per worktree), give each session a separate area, and merge the branch
 ## Test logins (mock)
 
 Any password works except `wrong`. The email picks the role: `riya@scmhrd.edu` is the student, an email starting
-with `arjun` or `panelist` is the panelist, one starting with `ops` is ops.
+with `kaniksha` or `panelist` is the panelist, one starting with `ops` is ops.
 
 ## Rules
 
