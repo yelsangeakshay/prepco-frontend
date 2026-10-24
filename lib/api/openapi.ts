@@ -1,7 +1,7 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { OPERATIONS, type Operation } from "./contract";
 
-const json = (schema: z.ZodType) => {
+const json = (schema: z.ZodMiniType) => {
   const out = z.toJSONSchema(schema, {
     target: "draft-7",
     unrepresentable: "any",

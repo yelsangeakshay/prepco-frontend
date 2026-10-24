@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const bulletSchema = z.object({
   id: z.string(),
@@ -26,9 +26,9 @@ export const cvSectionSchema = z.object({
 
 export const cvSchema = z.object({
   locked: z.object({
-    version: z.string().nullable(),
-    lockedAt: z.string().nullable(),
-    scores: cvScoresSchema.nullable(),
+    version: z.nullable(z.string()),
+    lockedAt: z.nullable(z.string()),
+    scores: z.nullable(cvScoresSchema),
   }),
   draft: z.object({
     version: z.string(),
@@ -37,8 +37,8 @@ export const cvSchema = z.object({
   }),
   relock: z.object({
     status: z.enum(["none", "pending"]),
-    requestedAt: z.string().nullable(),
-    reason: z.string().nullable(),
+    requestedAt: z.nullable(z.string()),
+    reason: z.nullable(z.string()),
   }),
 });
 export type Cv = z.infer<typeof cvSchema>;
@@ -61,7 +61,10 @@ export type CvVersion = z.infer<typeof cvVersionSchema>;
 export const cvVersionsSchema = z.object({ items: z.array(cvVersionSchema) });
 
 export const relockBodySchema = z.object({
-  reason: z.string().trim().min(10, "Tell ops why you need to change a locked CV"),
+  reason: z
+    .string()
+    .check(z.trim())
+    .check(z.minLength(10, "Tell ops why you need to change a locked CV")),
 });
 export type RelockBody = z.infer<typeof relockBodySchema>;
 export const relockResultSchema = z.object({

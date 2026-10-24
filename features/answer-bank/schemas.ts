@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const answerStatusSchema = z.enum(["rehearsed", "flagged", "not-drafted"]);
 export type AnswerStatus = z.infer<typeof answerStatusSchema>;
@@ -13,8 +13,8 @@ export const answerSummarySchema = z.object({
   category: z.string(),
   round: answerRoundSchema,
   status: answerStatusSchema,
-  snippet: z.string().nullable(),
-  critique: z.string().nullable(),
+  snippet: z.nullable(z.string()),
+  critique: z.nullable(z.string()),
   /** Which parts of the answer the panel note is about (the chips under the note). */
   noteTags: z.array(z.enum(["situation", "decision", "result"])),
 });
@@ -43,28 +43,28 @@ export const answerPartsSchema = z.object({
 });
 export type AnswerParts = z.infer<typeof answerPartsSchema>;
 
-export const answerDetailSchema = answerSummarySchema.extend({
+export const answerDetailSchema = z.extend(answerSummarySchema, {
   /** The three parts joined, kept for readers that want one string. */
   draft: z.string(),
   parts: answerPartsSchema,
   /** Inline critique: each note points at a phrase in the draft. */
   inlineCritique: z.array(z.object({ quote: z.string(), note: z.string() })),
   /** "P1 · 21 Sep": the panel that flagged it. */
-  flaggedAt: z.string().nullable(),
+  flaggedAt: z.nullable(z.string()),
   draftNo: z.number(),
   /** "2 min ago". */
-  savedLabel: z.string().nullable(),
+  savedLabel: z.nullable(z.string()),
   /** Ask the next panelist this question. */
   rehearseNext: z.boolean(),
   /** "P2 · Mon 12 Oct". */
-  nextPanel: z.string().nullable(),
+  nextPanel: z.nullable(z.string()),
 });
 export type AnswerDetail = z.infer<typeof answerDetailSchema>;
 
 export const patchAnswerBodySchema = z.object({
-  draft: z.string().optional(),
-  parts: answerPartsSchema.partial().optional(),
-  status: answerStatusSchema.optional(),
-  rehearseNext: z.boolean().optional(),
+  draft: z.optional(z.string()),
+  parts: z.optional(z.partial(answerPartsSchema)),
+  status: z.optional(answerStatusSchema),
+  rehearseNext: z.optional(z.boolean()),
 });
 export type PatchAnswerBody = z.infer<typeof patchAnswerBodySchema>;

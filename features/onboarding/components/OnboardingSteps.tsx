@@ -5,7 +5,7 @@ import { useNavigate } from "@/lib/nav/useNavigate";
 import { ArrowRight, CircleCheck, Info } from "lucide-react";
 import { Controller, useForm, type FieldValues, type Resolver } from "react-hook-form";
 import { zodResolver } from "@/lib/forms/zodResolver";
-import type { ZodType } from "zod";
+import type { ZodMiniType } from "zod/mini";
 import { Button } from "@/components/ui/button";
 import { FieldError, Input, Textarea } from "@/components/ui/field";
 import { FormField } from "@/components/ui/form-field";
@@ -45,7 +45,7 @@ const TRACKS = [
   },
 ] as const;
 
-function useStepForm<T extends FieldValues>(schema: ZodType<T>, initial: Partial<T>) {
+function useStepForm<T extends FieldValues>(schema: ZodMiniType<T>, initial: Partial<T>) {
   return useForm<T>({
     resolver: zodResolver(schema as never) as Resolver<T>,
     defaultValues: initial as never,

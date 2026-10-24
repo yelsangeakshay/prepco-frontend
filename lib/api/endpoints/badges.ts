@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { api } from "../client";
 
 const opsBadgesSchema = z.object({ unassigned: z.number() });

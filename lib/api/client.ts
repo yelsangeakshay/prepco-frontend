@@ -1,4 +1,4 @@
-import type { ZodType } from "zod";
+import type { ZodMiniType } from "zod/mini";
 import { SCENARIO_HEADER } from "@/lib/config/scenarios";
 import { SCENARIO_COOKIE } from "@/lib/auth/roles";
 
@@ -26,7 +26,7 @@ function currentScenario(): string | undefined {
 /** Typed fetch. Responses are Zod-parsed, so a real backend must honour the same contract. */
 export async function api<T>(
   path: string,
-  schema: ZodType<T>,
+  schema: ZodMiniType<T>,
   init: RequestInit & { json?: unknown } = {},
 ): Promise<T> {
   const { json, headers, ...rest } = init;

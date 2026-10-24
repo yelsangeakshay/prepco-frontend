@@ -1,4 +1,5 @@
-import { z, type ZodType } from "zod";
+import * as z from "zod/mini";
+import type { ZodMiniType } from "zod/mini";
 import {
   authResultSchema,
   forgotBodySchema,
@@ -95,8 +96,8 @@ export interface Operation {
   path: string;
   tag: string;
   summary: string;
-  request?: ZodType;
-  response: ZodType;
+  request?: ZodMiniType;
+  response: ZodMiniType;
   /** Expected non-2xx answers as `[status, code]`. */
   errors?: [number, string][];
   query?: string[];
@@ -110,7 +111,7 @@ const meSchema = z.object({
   onboarded: z.boolean(),
 });
 
-const resetBody = z.object({ token: z.string(), password: z.string().min(8) });
+const resetBody = z.object({ token: z.string(), password: z.string().check(z.minLength(8)) });
 const idOnly = z.object({ ok: z.literal(true) });
 const readBody = z.object({ slotId: z.string() });
 

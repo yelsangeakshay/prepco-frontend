@@ -1,12 +1,12 @@
 import type { FieldErrors, FieldValues, Resolver } from "react-hook-form";
-import type { ZodType } from "zod";
+import type { ZodMiniType } from "zod/mini";
 
 /**
  * Minimal Zod resolver for React Hook Form. Replaces @hookform/resolvers/zod, which bundles
  * adapters for several Zod majors we do not use (it costs ~6 kB on every form route).
  */
 export function zodResolver<T extends FieldValues, C = unknown, O = T>(
-  schema: ZodType<unknown>,
+  schema: ZodMiniType<unknown>,
 ): Resolver<T, C, O> {
   return async (values) => {
     const result = await schema.safeParseAsync(values);
