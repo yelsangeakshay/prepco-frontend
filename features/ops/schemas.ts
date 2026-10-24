@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const planIdSchema = z.enum(["none", "basic", "premium", "elite"]);
 
@@ -57,7 +57,7 @@ export const studentRowSchema = z.object({
   joinedAt: z.string(),
   /** Next session, or how many panels are done (a02.png "Runway stage"). */
   stage: z.string(),
-  panelistName: z.string().nullable(),
+  panelistName: z.nullable(z.string()),
 });
 export type StudentRow = z.infer<typeof studentRowSchema>;
 
@@ -76,10 +76,10 @@ export const bookingSchema = z.object({
   studentName: z.string(),
   function: z.string(),
   title: z.string(),
-  startsAt: z.string().nullable(),
+  startsAt: z.nullable(z.string()),
   status: z.enum(["upcoming", "completed", "no-show", "cancelled", "unassigned"]),
-  panelistId: z.string().nullable(),
-  panelistName: z.string().nullable(),
+  panelistId: z.nullable(z.string()),
+  panelistName: z.nullable(z.string()),
   excused: z.boolean(),
 });
 export type Booking = z.infer<typeof bookingSchema>;
@@ -92,20 +92,21 @@ export const bookingListSchema = z.object({
   counts: z.object({ all: z.number(), unassigned: z.number(), noShows: z.number() }),
 });
 
-export const studentDetailSchema = studentRowSchema
-  .omit({ stage: true, panelistName: true })
-  .extend({
+export const studentDetailSchema = z.extend(
+  z.omit(studentRowSchema, { stage: true, panelistName: true }),
+  {
     background: z.string(),
-    cv: z.object({ version: z.string().nullable(), score: z.number() }),
+    cv: z.object({ version: z.nullable(z.string()), score: z.number() }),
     answers: z.object({ total: z.number(), prepared: z.number(), needWork: z.number() }),
     sessions: z.array(bookingSchema),
     payments: z.array(
       z.object({ id: z.string(), at: z.string(), description: z.string(), amount: z.number() }),
     ),
-    relockRequest: z
-      .object({ requestedAt: z.string(), reason: z.string(), draftScore: z.number() })
-      .nullable(),
-  });
+    relockRequest: z.nullable(
+      z.object({ requestedAt: z.string(), reason: z.string(), draftScore: z.number() }),
+    ),
+  },
+);
 export type StudentDetail = z.infer<typeof studentDetailSchema>;
 
 export const candidateSchema = z.object({

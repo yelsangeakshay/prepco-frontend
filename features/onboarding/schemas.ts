@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 /** Target roles a student picks (s02.png). */
 export const FUNCTIONS = [
@@ -35,20 +35,28 @@ export const PANEL_FOR_TARGET: Record<
 
 /** Step 1, About you: where they study and what they have done so far. */
 export const step1Schema = z.object({
-  college: z.string().trim().min(2, "Enter your college"),
-  batch: z.string().trim().min(4, "Enter your batch, e.g. 2025–27"),
-  yearsExperience: z.coerce.number().min(0, "Enter 0 or more").max(15, "Enter 15 or less"),
-  experience: z.string().trim().min(10, "Describe your experience in a line or two"),
+  college: z.string().check(z.trim()).check(z.minLength(2, "Enter your college")),
+  batch: z.string().check(z.trim()).check(z.minLength(4, "Enter your batch, e.g. 2025–27")),
+  yearsExperience: z.coerce
+    .number()
+    .check(z.gte(0, "Enter 0 or more"))
+    .check(z.lte(15, "Enter 15 or less")),
+  experience: z
+    .string()
+    .check(z.trim())
+    .check(z.minLength(10, "Describe your experience in a line or two")),
 });
 /** Step 2, Track and target (s02.png). The Day 0 date is an ISO date, from the placement cell. */
 export const step2Schema = z.object({
   track: z.enum(["finals", "summers"], { message: "Pick a track" }),
   targetFunction: z.enum(FUNCTIONS, { message: "Pick a target role" }),
-  day0Date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter your Day 0 date"),
-  companies: z.string().trim().max(200, "Keep this under 200 characters").optional(),
+  day0Date: z.string().check(z.regex(/^\d{4}-\d{2}-\d{2}$/, "Enter your Day 0 date")),
+  companies: z.optional(
+    z.string().check(z.trim()).check(z.maxLength(200, "Keep this under 200 characters")),
+  ),
 });
 
-export const profileSchema = step1Schema.and(step2Schema);
+export const profileSchema = z.intersection(step1Schema, step2Schema);
 export type OnboardingProfile = z.infer<typeof step1Schema> & z.infer<typeof step2Schema>;
 
 export const cvUploadBodySchema = z.object({
@@ -58,16 +66,16 @@ export const cvUploadBodySchema = z.object({
 });
 export const cvUploadResultSchema = z.object({
   status: z.enum(["done", "failed"]),
-  reason: z.string().nullable(),
-  extracted: z
-    .object({
+  reason: z.nullable(z.string()),
+  extracted: z.nullable(
+    z.object({
       education: z.number(),
       workBullets: z.number(),
       projects: z.number(),
       achievements: z.number(),
       score: z.number(),
-    })
-    .nullable(),
+    }),
+  ),
 });
 export type CvUploadResult = z.infer<typeof cvUploadResultSchema>;
 
@@ -103,14 +111,14 @@ export type FreeSummary = z.infer<typeof freeSummarySchema>;
 
 export const freeSessionSchema = z.object({
   eligible: z.boolean(),
-  usedAt: z.string().nullable(),
-  summary: freeSummarySchema.nullable(),
+  usedAt: z.nullable(z.string()),
+  summary: z.nullable(freeSummarySchema),
   slots: z.array(
     z.object({
       id: z.string(),
       startsAt: z.string(),
       label: z.string(),
-      taken: z.boolean().optional(),
+      taken: z.optional(z.boolean()),
     }),
   ),
 });

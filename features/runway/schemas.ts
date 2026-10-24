@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const sessionStatusSchema = z.enum([
   "upcoming",
@@ -16,18 +16,18 @@ export const sessionSchema = z.object({
   title: z.string(),
   week: z.string(),
   /** One line under the title on the runway (s09.png). */
-  blurb: z.string().nullable().optional(),
+  blurb: z.optional(z.nullable(z.string())),
   kind: z.enum(["profiling", "panel", "deep-dive", "group", "free"]),
-  startsAt: z.string().nullable(),
+  startsAt: z.nullable(z.string()),
   /** Previous time, shown when a session was moved. */
-  previousStartsAt: z.string().nullable().optional(),
+  previousStartsAt: z.optional(z.nullable(z.string())),
   status: sessionStatusSchema,
-  panelist: z.string().nullable(),
-  panelFunction: z.string().nullable(),
-  note: z.string().nullable().optional(),
+  panelist: z.nullable(z.string()),
+  panelFunction: z.nullable(z.string()),
+  note: z.optional(z.nullable(z.string())),
   /** Reschedule is free until 24 h before the start (Proposed). */
-  freeRescheduleUntil: z.string().nullable().optional(),
-  feedbackId: z.string().nullable().optional(),
+  freeRescheduleUntil: z.optional(z.nullable(z.string())),
+  feedbackId: z.optional(z.nullable(z.string())),
 });
 export type Session = z.infer<typeof sessionSchema>;
 
@@ -42,7 +42,7 @@ export const slotSchema = z.object({
   id: z.string(),
   startsAt: z.string(),
   label: z.string(),
-  taken: z.boolean().optional(),
+  taken: z.optional(z.boolean()),
 });
 export type SlotDto = z.infer<typeof slotSchema>;
 
@@ -52,9 +52,9 @@ export const runwayStepSchema = z.object({
   id: z.string(),
   week: z.string(),
   title: z.string(),
-  when: z.string().optional(),
+  when: z.optional(z.string()),
   status: z.enum(["done", "next", "locked", "pick-slot", "day0"]),
-  sessionId: z.string().nullable(),
+  sessionId: z.nullable(z.string()),
 });
 
 export const runwaySchema = z.object({
@@ -70,17 +70,29 @@ export const runwaySchema = z.object({
     iso: z.string(),
     label: z.string(),
     daysLeft: z.number(),
-    movedFrom: z.string().nullable(),
+    movedFrom: z.nullable(z.string()),
   }),
-  banner: z
-    .enum(["late-joiner", "day0-moved", "first-login", "returning-student", "placed", "not-placed"])
-    .nullable(),
+  banner: z.nullable(
+    z.enum([
+      "late-joiner",
+      "day0-moved",
+      "first-login",
+      "returning-student",
+      "placed",
+      "not-placed",
+    ]),
+  ),
   steps: z.array(runwayStepSchema),
   doneCount: z.number(),
   totalCount: z.number(),
-  nextSession: sessionSchema.nullable(),
+  nextSession: z.nullable(sessionSchema),
   tasks: z.array(
-    z.object({ id: z.string(), label: z.string(), hint: z.string().optional(), done: z.boolean() }),
+    z.object({
+      id: z.string(),
+      label: z.string(),
+      hint: z.optional(z.string()),
+      done: z.boolean(),
+    }),
   ),
   cv: z.object({
     version: z.string(),
@@ -95,35 +107,36 @@ export const runwaySchema = z.object({
     prepared: z.number(),
     needWork: z.number(),
     /** A flagged question to show on Home. */
-    flagged: z.string().nullable(),
+    flagged: z.nullable(z.string()),
   }),
   /** Second season for a returning student (e11.png). Null otherwise. */
-  secondSeason: z
-    .object({
-      carried: z.array(z.object({ label: z.string(), value: z.string() })),
-      plans: z.array(
-        z.object({
-          id: z.enum(["basic", "premium", "elite"]),
-          name: z.string(),
-          blurb: z.string(),
-          listPrice: z.number(),
-          suggested: z.boolean(),
-        }),
-      ),
-    })
-    .nullable()
-    .optional(),
+  secondSeason: z.optional(
+    z.nullable(
+      z.object({
+        carried: z.array(z.object({ label: z.string(), value: z.string() })),
+        plans: z.array(
+          z.object({
+            id: z.enum(["basic", "premium", "elite"]),
+            name: z.string(),
+            blurb: z.string(),
+            listPrice: z.number(),
+            suggested: z.boolean(),
+          }),
+        ),
+      }),
+    ),
+  ),
   /** Newest panel feedback (s05.png "Latest panel"). */
-  latestPanel: z
-    .object({
+  latestPanel: z.nullable(
+    z.object({
       feedbackId: z.string(),
       label: z.string(),
       date: z.string(),
       quote: z.string(),
       panelistLine: z.string(),
       sentBack: z.number(),
-    })
-    .nullable(),
+    }),
+  ),
 });
 export type Runway = z.infer<typeof runwaySchema>;
 

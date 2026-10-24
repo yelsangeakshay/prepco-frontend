@@ -344,3 +344,17 @@ Done when every role can sign out in two clicks from any screen, the checks abov
 The panelist persona is now Kaniksha Bambode (initials KB, id `pn-kaniksha`) everywhere: UI, mock world and handlers,
 tests, stories, README and docs. The mock sign-in accepts an email starting with `kaniksha` or `panelist`. The mockup
 review notes still quote the mockup PNG, which says "Arjun".
+
+## Bundle size (done)
+
+Switched validation from `zod` to `zod/mini` (22 files: every `schemas.ts`, `lib/api/contract.ts`, the auth and badge
+endpoints, `PlacedForm`). The shared chunk that held Zod was 27 KiB gzip; it is now far smaller. Every route dropped by
+about 17 KiB: the tightest route went from 169.8 to 152.7 KiB, against the 170 KiB budget.
+
+- Same schemas, same types (`z.infer`), same JSON Schema export: `docs/openapi.json` did not change.
+- Mini has no chained methods, so \`.nullable()\`, \`.optional()\`, \`.array()\`, \`.extend()\` and the rest became wrapper
+  calls (\`z.nullable(x)\`), and \`.min()\`, \`.max()\`, \`.trim()\`, \`.regex()\`, \`.positive()\` and \`.refine()\` became
+  \`.check(z.minLength(n))\` and so on. New schemas must use that style.
+- \`.email()\` became \`z.email()\`; the old \`.trim()\` before it was dropped because \`type="email"\` inputs already trim.
+- Tried and dropped: splitting each role's sidebar footer and header actions into lazy chunks. It did not shrink the
+  shared chunk and added loader overhead (\`/home\` got 0.7 KiB worse).

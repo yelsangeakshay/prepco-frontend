@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { PANELIST_FUNCTIONS } from "@/features/onboarding/schemas";
 
 export const DIMENSIONS = ["Structure", "Defensibility", "Composure"] as const;
@@ -15,10 +15,10 @@ export const panelItemSchema = z.object({
   title: z.string(),
   startsAt: z.string(),
   status: z.enum(["upcoming", "awaiting-score", "scored"]),
-  verdict: z.string().nullable(),
+  verdict: z.nullable(z.string()),
   briefRead: z.boolean(),
   /** For feedback still to write: "Due today", "Due tomorrow", or "Overdue". */
-  dueLabel: z.string().nullable(),
+  dueLabel: z.nullable(z.string()),
 });
 export type PanelItem = z.infer<typeof panelItemSchema>;
 
@@ -66,14 +66,14 @@ export const briefSchema = z.object({
       status: z.enum(["flagged", "not-drafted"]),
     }),
   ),
-  previousFeedback: z
-    .object({
+  previousFeedback: z.nullable(
+    z.object({
       panelist: z.string(),
       verdict: z.string(),
       headline: z.string(),
       startsAt: z.string(),
-    })
-    .nullable(),
+    }),
+  ),
   /** Notes from the profiling call (p03). Proposed copy. */
   profilingNotes: z.object({ dateLabel: z.string(), text: z.string() }),
   /** One line on what changed since the last panel (p03). */
@@ -90,12 +90,12 @@ export const scoringListSchema = z.object({
 
 export const scoreBodySchema = z.object({
   scores: z.object({
-    Structure: z.number().min(1).max(5),
-    Defensibility: z.number().min(1).max(5),
-    Composure: z.number().min(1).max(5),
+    Structure: z.number().check(z.gte(1)).check(z.lte(5)),
+    Defensibility: z.number().check(z.gte(1)).check(z.lte(5)),
+    Composure: z.number().check(z.gte(1)).check(z.lte(5)),
   }),
   verdict: z.enum(VERDICTS),
-  note: z.string().trim().min(20),
+  note: z.string().check(z.trim()).check(z.minLength(20)),
   sendBack: z.boolean(),
 });
 export type ScoreBody = z.infer<typeof scoreBodySchema>;
@@ -150,23 +150,28 @@ export const availabilitySchema = z.object({
 export type Availability = z.infer<typeof availabilitySchema>;
 
 export const applicationBodySchema = z.object({
-  name: z.string().trim().min(2, "Enter your full name"),
-  email: z.string().trim().email("Enter a valid email"),
+  name: z.string().check(z.trim()).check(z.minLength(2, "Enter your full name")),
+  email: z.email("Enter a valid email"),
   function: z.enum(PANELIST_FUNCTIONS, { message: "Pick your function" }),
-  company: z.string().trim().min(2, "Enter your company"),
-  role: z.string().trim().min(2, "Enter your current role"),
+  company: z.string().check(z.trim()).check(z.minLength(2, "Enter your company")),
+  role: z.string().check(z.trim()).check(z.minLength(2, "Enter your current role")),
   years: z.coerce
     .number({ message: "Enter your years of experience" })
-    .min(3, "We need at least 3 years")
-    .max(40, "Enter 40 or less"),
+    .check(z.gte(3, "We need at least 3 years"))
+    .check(z.lte(40, "Enter 40 or less")),
   linkedin: z
     .string()
-    .trim()
-    .refine((v) => v === "" || /linkedin\.com\/in\//i.test(v), "Enter your LinkedIn profile link"),
+    .check(z.trim())
+    .check(
+      z.refine(
+        (v) => v === "" || /linkedin\.com\/in\//i.test(v),
+        "Enter your LinkedIn profile link",
+      ),
+    ),
   /** The sessions they can run (p01). */
-  sessions: z.array(z.string()).min(1, "Pick at least one session"),
+  sessions: z.array(z.string()).check(z.minLength(1, "Pick at least one session")),
   /** "Weekday evenings after 6 PM, Saturday mornings". */
-  freeWhen: z.string().trim().min(3, "Tell us when you are usually free"),
+  freeWhen: z.string().check(z.trim()).check(z.minLength(3, "Tell us when you are usually free")),
 });
 export type ApplicationBody = z.input<typeof applicationBodySchema>;
 export type ApplicationParsed = z.output<typeof applicationBodySchema>;
@@ -185,9 +190,9 @@ export const panelistProfileSchema = z.object({
 export type PanelistProfile = z.infer<typeof panelistProfileSchema>;
 
 export const updatePanelistProfileSchema = z.object({
-  name: z.string().trim().min(2, "Enter your full name"),
-  company: z.string().trim().min(2, "Enter your company"),
-  role: z.string().trim().min(2, "Enter your role"),
-  bio: z.string().trim().min(20, "Write at least 20 characters"),
+  name: z.string().check(z.trim()).check(z.minLength(2, "Enter your full name")),
+  company: z.string().check(z.trim()).check(z.minLength(2, "Enter your company")),
+  role: z.string().check(z.trim()).check(z.minLength(2, "Enter your role")),
+  bio: z.string().check(z.trim()).check(z.minLength(20, "Write at least 20 characters")),
 });
 export type UpdatePanelistProfile = z.infer<typeof updatePanelistProfileSchema>;

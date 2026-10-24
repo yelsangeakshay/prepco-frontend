@@ -2,16 +2,16 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@/lib/forms/zodResolver";
-import { z } from "zod";
+import * as z from "zod/mini";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { FormField } from "@/components/ui/form-field";
 import { PlacedNotes } from "./PlacedNotes";
 
 const placedForm = z.object({
-  company: z.string().trim().min(2, "Enter the company"),
-  role: z.string().trim().min(2, "Enter the role"),
-  ctc: z.coerce.number({ message: "Enter the CTC in ₹" }).positive("Enter the CTC in ₹"),
+  company: z.string().check(z.trim()).check(z.minLength(2, "Enter the company")),
+  role: z.string().check(z.trim()).check(z.minLength(2, "Enter the role")),
+  ctc: z.coerce.number({ message: "Enter the CTC in ₹" }).check(z.positive("Enter the CTC in ₹")),
 });
 type PlacedValues = z.input<typeof placedForm>;
 

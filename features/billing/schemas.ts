@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const billingSchema = z.object({
   plan: z.object({
@@ -6,7 +6,7 @@ export const billingSchema = z.object({
     name: z.string(),
     paid: z.number(),
     status: z.enum(["active", "ended"]),
-    endedAt: z.string().nullable(),
+    endedAt: z.nullable(z.string()),
   }),
   credits: z.object({ total: z.number(), used: z.number(), carriedOver: z.number() }),
   invoices: z.array(
@@ -24,8 +24,8 @@ export const billingSchema = z.object({
   /** s14.png: "Finals · Season 1". */
   season: z.string(),
   /** The plan's one-line promise, shown under the plan name. */
-  tagline: z.string().nullable(),
-  paidAt: z.string().nullable(),
+  tagline: z.nullable(z.string()),
+  paidAt: z.nullable(z.string()),
   /** What the plan includes, one row per runway session plus the standing perks. */
   entitlements: z.array(
     z.object({
@@ -33,7 +33,7 @@ export const billingSchema = z.object({
       label: z.string(),
       state: z.enum(["used", "booked", "unbooked", "scheduled", "active"]),
       /** "Wed 7 Oct" for booked and scheduled rows. */
-      when: z.string().nullable(),
+      when: z.nullable(z.string()),
     }),
   ),
   /** Top-ups at the student's plan rate. A null price means the rate is not set yet. */
@@ -42,7 +42,7 @@ export const billingSchema = z.object({
       id: z.string(),
       label: z.string(),
       detail: z.string(),
-      price: z.number().nullable(),
+      price: z.nullable(z.number()),
     }),
   ),
 });
@@ -76,9 +76,9 @@ export type BuyTopUpResult = z.infer<typeof buyTopUpResultSchema>;
 
 export const upgradeResultSchema = z.object({
   status: z.enum(["paid", "failed"]),
-  receiptNo: z.string().nullable(),
+  receiptNo: z.nullable(z.string()),
   amount: z.number(),
   plan: z.string(),
-  message: z.string().nullable(),
+  message: z.nullable(z.string()),
 });
 export type UpgradeResult = z.infer<typeof upgradeResultSchema>;

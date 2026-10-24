@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const journeySchema = z.object({
   /** "Term 5–6": where the student joined. */
@@ -12,7 +12,7 @@ export const journeySchema = z.object({
       detail: z.string(),
       state: z.enum(["before", "now", "after"]),
       /** 0 to 100, only on the current stage. */
-      progress: z.number().nullable(),
+      progress: z.nullable(z.number()),
     }),
   ),
   /** "Four routes to an offer". */
@@ -25,8 +25,8 @@ export const journeySchema = z.object({
       /** "Compete → PPI → Offer". */
       path: z.string(),
       fit: z.enum(["primary", "alternate"]),
-      badge: z.string().nullable(),
-      link: z.object({ label: z.string(), href: z.string() }).nullable(),
+      badge: z.nullable(z.string()),
+      link: z.nullable(z.object({ label: z.string(), href: z.string() })),
     }),
   ),
 });
@@ -47,7 +47,7 @@ export const caseTrackSchema = z.object({
   unlocked: z.boolean(),
   plan: z.string(),
   /** Price lines for the preview banner. Null once the student is on Elite. */
-  upgrade: z.object({ alone: z.number(), moreThanPlan: z.number() }).nullable(),
+  upgrade: z.nullable(z.object({ alone: z.number(), moreThanPlan: z.number() })),
   startWeek: z.string(),
   seats: z.object({ left: z.number(), total: z.number() }),
   summary: z.array(z.object({ label: z.string(), value: z.string() })),
@@ -55,7 +55,7 @@ export const caseTrackSchema = z.object({
     z.object({
       id: z.string(),
       /** Step number, or null for the PPI row (drawn with a star). */
-      n: z.number().nullable(),
+      n: z.nullable(z.number()),
       title: z.string(),
       detail: z.string(),
       state: z.enum(["done", "upload", "book", "later", "on-placing"]),
@@ -70,7 +70,7 @@ export const quickSwitchPrefsSchema = z.object({
   roles: z.string(),
   locations: z.string(),
   /** Only send matches with a fit score above this. */
-  minFit: z.number().min(0).max(100),
+  minFit: z.number().check(z.gte(0)).check(z.lte(100)),
   email: z.string(),
 });
 export type QuickSwitchPrefs = z.infer<typeof quickSwitchPrefsSchema>;
